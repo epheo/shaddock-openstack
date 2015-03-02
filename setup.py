@@ -18,7 +18,8 @@ import os
 from setuptools import setup
 
 def get_config_files():
-    config_files = []
+    config_files = [('/var/lib/panama', ['conf/configuration.yml',
+                                           'conf/services.yml'])]
     for dirname, dirnames, filenames in os.walk('panama-template'):
         for subdirname in dirnames:
             config_dest_path = ('/var/lib/panama/%s' % subdirname)
