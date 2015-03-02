@@ -41,7 +41,7 @@ setup(
     url='https://github.com/Epheo/panama-template',
     long_description_markdown_filename='README.md',
     license='Apache Software License',
-    version='2015-0.5-dev',
+    version='0.0.5',
     data_files=get_config_files(),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
