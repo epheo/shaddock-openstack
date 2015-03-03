@@ -17,32 +17,43 @@
 import os
 from setuptools import setup
 
-def get_config_files():
-    config_files = [('/var/lib/panama', ['conf/configuration.yml',
-                                           'conf/services.yml'])]
-    for dirname, dirnames, filenames in os.walk('panama-template'):
-        for subdirname in dirnames:
-            config_dest_path = ('/var/lib/panama/%s' % subdirname)
-            for dirname, dirnames, filenames in os.walk('panama-template/%s' % subdirname):
-                config_dir=[]
-                for filename in filenames:
-                    config_src_path = ('%s/%s' % (dirname, filename))
-                    config_dir.append(config_src_path)
+def dirwalk(dir, giveDirs=0):
+    for f in os.listdir(dir):
+        fullpath = os.path.join(dir,f)
+        if os.path.isdir(fullpath) and not os.path.islink(fullpath):
+            if not len(os.listdir(fullpath)):
+                yield fullpath + os.sep
+            else:
+                for x in dirwalk(fullpath):  # recurse into subdir
+                    if os.path.isdir(x):
+                        if giveDirs:
+                            yield x
+                    else:
+                        yield x
+        else:
+            yield fullpath
 
-            config_file_dir_liste = config_dest_path, config_dir
-            config_files.append(config_file_dir_liste)
-    return config_files
+def make_data_files():
+    directories = ('openstack', 'conf')
+    basedir = '/var/lib/panama/'
+    data_files = []
+    for directory in directories:
+        files = dirwalk(directory)
+        for file in files:
+            data_files.append((basedir + os.path.dirname(file), [file]))
+    return data_files
 
+print(make_data_files())
 setup(
     name='panama-template',
     description='Easily deploy an OpenStack platform in Docker Containers',
     author='Thibaut Lapierre',
     author_email='root@epheo.eu',
     url='https://github.com/Epheo/panama-template',
-    long_description_markdown_filename='README.md',
+    #long_description_markdown_filename='README.md',
     license='Apache Software License',
     version='0.0.5',
-    data_files=get_config_files(),
+    data_files=make_data_files(),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
