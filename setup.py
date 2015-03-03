@@ -43,7 +43,6 @@ def make_data_files():
             data_files.append((basedir + os.path.dirname(file), [file]))
     return data_files
 
-print(make_data_files())
 setup(
     name='panama-template',
     description='Easily deploy an OpenStack platform in Docker Containers',
