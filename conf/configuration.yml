@@ -10,9 +10,9 @@ docker_url: unix://var/run/docker.sock
 
 docker_version: '1.12'
 
-## Specify Docker repository to build containers with
-
 nocache: False
+
+template_dir: '/var/lib/panama/openstack'
 ## Pass to True in order to force rebuild of your  
 #  containers without using previous cached builds.
 
