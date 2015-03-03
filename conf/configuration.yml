@@ -12,7 +12,7 @@ docker_version: '1.12'
 
 ## Specify Docker repository to build containers with
 
-nocache: True
+nocache: False
 ## Pass to True in order to force rebuild of your  
 #  containers without using previous cached builds.
 
