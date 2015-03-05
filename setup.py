@@ -34,7 +34,7 @@ def dirwalk(dir, giveDirs=0):
             yield fullpath
 
 def make_data_files():
-    directories = ('openstack', 'conf')
+    directories = ('template', 'conf')
     basedir = '/var/lib/panama/'
     data_files = []
     for directory in directories:

@@ -1,22 +1,8 @@
-#####################################################
+###############################################
 ## PANAMA: Services Configuration Definition ##
-#####################################################
+###############################################
 
-user: panama
-
-docker_url: unix://var/run/docker.sock
-# For Mac OS with Boot2Docker:
-# docker_url : tcp://192.168.59.103:2375
-
-docker_version: '1.12'
-
-nocache: False
-
-template_dir: '/var/lib/panama/openstack'
-## Pass to True in order to force rebuild of your  
-#  containers without using previous cached builds.
-
-services_config:
+template_vars:
     HOST_NAME: your_host_name
     HOST_IP: your_host_ip
     RABBITMQ_HOST: your_host_ip
