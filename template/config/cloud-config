@@ -2,7 +2,7 @@
 
 ## KEYSTONE
 
-export OS_SERVICE_ENDPOINT=http://${HOST_NAME}:35357/v2.0
+export OS_SERVICE_ENDPOINT=http://${HOST_IP}:35357/v2.0
 export OS_SERVICE_TOKEN=${ADMIN_TOKEN}
 
 echo "Creating Keystone user..."
