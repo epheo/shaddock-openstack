@@ -12,6 +12,7 @@ ADD supervisord.conf /etc/supervisord.conf
 
 VOLUME  ["/var/log/nova"]
 
+RUN pip install future
 ADD nova-start /usr/local/bin/
 ADD configparser.py /
 RUN chmod +x /usr/local/bin/nova-start

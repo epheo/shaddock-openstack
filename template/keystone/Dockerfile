@@ -13,6 +13,7 @@ RUN \
     echo '@hourly /usr/bin/keystone-manage token_flush >/var/log/keystone/keystone-tokenflush.log 2>&1' \
     >> /var/spool/cron/crontabs/keystone
 
+RUN pip install future
 ADD keystone-start /usr/local/bin/
 ADD configparser.py /
 RUN chmod +x /usr/local/bin/keystone-start

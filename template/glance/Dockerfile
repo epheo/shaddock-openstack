@@ -10,6 +10,7 @@ ADD supervisord.conf /etc/supervisord.conf
 
 VOLUME  ["/var/log/glance"]
 
+RUN pip install future
 ADD glance-start /usr/local/bin/
 ADD configparser.py /
 RUN chmod +x /usr/local/bin/glance-start
