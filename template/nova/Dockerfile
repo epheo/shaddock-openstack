@@ -1,6 +1,5 @@
 FROM panama/base:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
-# http://docs.openstack.org/icehouse/install-guide/install/yum/content/nova-controller.html
 
 #install nova
 RUN apt-get update
