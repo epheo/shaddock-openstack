@@ -24,9 +24,9 @@ keystone service-create --name keystone --type identity \
 
 keystone endpoint-create \
 --service-id $(keystone service-list | awk '/ identity / {print $2}') \
---publicurl http://${HOST_NAME}::5000/v2.0 \
---internalurl http://${HOST_NAME}:5000/v2.0 \
---adminurl http://${HOST_NAME}:35357/v2.0 \
+--publicurl http://${HOST_IP}::5000/v2.0 \
+--internalurl http://${HOST_IP}:5000/v2.0 \
+--adminurl http://${HOST_IP}:35357/v2.0 \
 --region regionOne
 
 ## Tests
@@ -42,9 +42,9 @@ keystone user-role-add --user=glance --tenant=service --role=admin
 echo "Registering Glance API and EndPoints..."
 keystone service-create --name=${SERVICE} --type=image --description="OpenStack Image Service"
 keystone endpoint-create --service-id=$(keystone service-list | awk '/ image / {print $2}') \
---publicurl=http://${HOST_NAME}:9292 \
---internalurl=http://${HOST_NAME}:9292 \
---adminurl=http://${HOST_NAME}:9292
+--publicurl=http://${HOST_IP}:9292 \
+--internalurl=http://${HOST_IP}:9292 \
+--adminurl=http://${HOST_IP}:9292
 
 ## Nova
 
@@ -56,7 +56,7 @@ echo "Registering Nova API and EndPoints..."
 keystone service-create --name nova --type compute --description "OpenStack Compute"
 keystone endpoint-create \
 --service-id $(keystone service-list | awk '/ compute / {print $2}') \
---publicurl http://${HOST_NAME}:8774/v2/%\(tenant_id\)s \
---internalurl http://${HOST_NAME}:8774/v2/%\(tenant_id\)s \
---adminurl http://${HOST_NAME}:8774/v2/%\(tenant_id\)s \
+--publicurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
+--internalurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
+--adminurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
 --region regionOne
