@@ -12,8 +12,6 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 VOLUME ["/var/log/horizon"]
 
 ADD horizon-start /usr/local/bin/
-ADD configparser.py /usr/local/bin/
-RUN chmod +x /usr/local/bin/configparser.py
 RUN chmod +x /usr/local/bin/horizon-start
 
 EXPOSE 80

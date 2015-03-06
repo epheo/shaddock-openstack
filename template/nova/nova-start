@@ -21,7 +21,7 @@ echo "Removing nova DB..."
 rm /var/lib/nova/nova.sqlite
 
 echo "Updating conf file..."
-python3 /usr/local/bin/configparser.py
+python3 configparser.py
 
 
 echo "Restarting nova..."

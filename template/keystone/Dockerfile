@@ -14,8 +14,7 @@ RUN \
     >> /var/spool/cron/crontabs/keystone
 
 ADD keystone-start /usr/local/bin/
-ADD configparser.py /usr/local/bin/
-RUN chmod +x /usr/local/bin/configparser.py
+ADD configparser.py /
 RUN chmod +x /usr/local/bin/keystone-start
 
 EXPOSE 35357

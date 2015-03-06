@@ -13,8 +13,7 @@ ADD supervisord.conf /etc/supervisord.conf
 VOLUME  ["/var/log/nova"]
 
 ADD nova-start /usr/local/bin/
-ADD configparser.py /usr/local/bin/
-RUN chmod +x /usr/local/bin/configparser.py
+ADD configparser.py /
 RUN chmod +x /usr/local/bin/nova-start
 
 EXPOSE 9774
