@@ -8,11 +8,8 @@ RUN apt-get install -y --force-yes glance python-glance python-glanceclient
 #Setup supervisord
 ADD supervisord.conf /etc/supervisord.conf
 
-VOLUME  ["/var/log/glance"]
-
-RUN pip install future
-ADD glance-start /usr/local/bin/
-ADD configparser.py /
+VOLUME  ["/var/log/glance"]ADD glance-start /usr/local/bin/
+ADD configparse.py /usr/local/bin/
 RUN chmod +x /usr/local/bin/glance-start
 
 EXPOSE 9292
