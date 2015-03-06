@@ -8,7 +8,6 @@ glance:
     - 4324
   volumes: 
     '/var/log/supervisor': '/var/log/panama/glance'
-    #'/etc/glance': '/var/lib/panama/glance/etc'
   privileged: false
   priority: 50
 
@@ -19,7 +18,6 @@ horizon:
     - 11211 
   volumes:
     '/var/log/supervisor': '/var/log/panama/horizon'
-    #'/etc/openstack-dashboard': '/var/lib/panama/horizon/etc'
   privileged: false
   priority: 60
 
@@ -30,7 +28,6 @@ keystone:
     - 5000
   volumes:
     '/var/log/supervisor': '/var/log/panama/keystone'
-    #'/etc/keystone': '/var/lib/panama/keystone/etc'
   privileged: false
   priority: 30
 
@@ -50,7 +47,6 @@ nova:
     - 8775
   volumes:
     '/var/log/supervisor': '/var/log/panama/nova'
-    #'/etc/nova': '/var/lib/panama/nova/etc'
   privileged: true
   priority: 40
 

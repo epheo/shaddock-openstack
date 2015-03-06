@@ -1,15 +1,6 @@
 FROM ubuntu:14.04
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-# HP intern specific Proxy configuration
-ENV http_proxy 	http://proxy.sdc.hp.com:8080/
-ENV https_proxy https://proxy.sdc.hp.com:8080/
-ENV no_proxy 	'gerrit.hpcloud.net'
-ENV HOME /root
-
-ADD 01proxies /etc/apt/apt.conf.d/01proxies
-
-
 # OpenStack Repo and packages
 RUN apt-get -y update
 
