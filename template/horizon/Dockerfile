@@ -3,8 +3,8 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install horizon
 RUN apt-get update
-RUN apt-get install -y --force-yes openstack-dashboard apache2 libapache2-mod-wsgi memcached python-memcache
-RUN apt-get remove -y --force-yes --purge openstack-dashboard-ubuntu-theme
+RUN apt-get install -y openstack-dashboard apache2 libapache2-mod-wsgi memcached python-memcache
+RUN apt-get remove -y --purge openstack-dashboard-ubuntu-theme
 
 #Setup supervisord
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
