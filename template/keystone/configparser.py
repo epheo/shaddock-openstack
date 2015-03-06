@@ -18,17 +18,21 @@
 from configparser import ConfigParser
 import os
 
+configfile = '/etc/keystone/keystone.conf'
 config = ConfigParser()
-config.read('etc/keystone.conf')
+config.read(configfile)
 
 config['DEFAULT']['admin_token'] = os.environ.get('ADMIN_TOKEN')
 
-config['database']['connection'] = 'mysql://keystone:%s@controller/keystone' % os.environ.get('KEYSTONE_DBPASS')
+config['database']['connection'] = 'mysql://keystone:%s@%s/keystone' % (os.environ.get('KEYSTONE_DBPASS'),
+                                                                        os.environ.get('HOST_IP'))
 
 config['token']['provider'] = 'keystone.token.providers.uuid.Provider'
 config['token']['driver'] = 'keystone.token.persistence.backends.sql.Token'
 config['revoke']['driver'] = 'keystone.contrib.revoke.backends.sql.Revoke'
 config['DEFAULT']['verbose'] = 'True'
 
-with open('etc/keystone.conf', 'w') as configfile:
+print('Parsing of %s...' % configfile)
+with open(configfile, 'w') as configfile:
     config.write(configfile)
+print('Done')
