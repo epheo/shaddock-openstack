@@ -15,7 +15,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from configparse import ConfigParser
+from configparser import ConfigParser
 import os
 
 configfile = '/etc/keystone/keystone.conf'
