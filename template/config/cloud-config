@@ -33,7 +33,6 @@ keystone endpoint-create \
 
 # http://docs.openstack.org/juno/install-guide/install/apt/content/keystone-verify.html
 
-
 ## GLANCE
 
 echo "Creating Glance user..."

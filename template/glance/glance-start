@@ -9,7 +9,7 @@ echo "Removing glance DB..."
 rm /var/lib/glance/glance.sqlite
 
 echo "Updating conf file..."
-python3 configparser.py
+python3 /usr/local/bin/configparser.py
 
 echo "Restarting glance"
 service glance-registry restart >/dev/null 2>&1
