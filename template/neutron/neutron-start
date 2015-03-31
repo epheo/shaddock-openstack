@@ -1,0 +1,31 @@
+#!/bin/bash
+
+echo "Setting up neutron..."
+
+service neutron start >/dev/null 2>&1
+
+echo "Removing neutron DB"
+rm /var/lib/neutron/neutron.db
+
+echo "Updating conf file..."
+python3 /usr/local/bin/configparse.py
+
+echo "Restarting neutron"
+service neutron restart >/dev/null 2>&1
+
+echo "Create database..."
+echo "=> Creating ${SERVICE} database"
+echo "=> DB ${MYSQL_DB}"
+echo "=> User ${MYSQL_USER}"
+echo "=> Password ${MYSQL_PASSWORD}"
+
+
+
+echo "Create database tables"
+su -s /bin/sh -c "neutron-manage db_sync" neutron
+
+echo "Stopping neutron"
+service neutron stop >/dev/null 2>&1
+
+echo "Starting neutron using supervisord..."
+exec /usr/bin/supervisord -n
