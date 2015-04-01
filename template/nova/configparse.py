@@ -46,6 +46,11 @@ config.set(section, 'vncserver_listen', os.environ.get('HOST_IP'))
 config.set(section, 'vncserver_proxyclient_address', os.environ.get('HOST_IP'))
 config.set(section, 'verbose', 'True')
 
+## NOVA-NETWORK
+config.set(section, 'network_api_class', 'nova.network.api.API')
+config.set(section, 'security_group_api', 'nova')
+
+
 section = 'keystone_authtoken'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
@@ -158,6 +163,7 @@ def neutron_config():
     config.set(section, 'security_group_api', 'neutron')
     config.set(section, 'linuxnet_interface_driver', 'nova.network.linux_net.LinuxOVSInterfaceDriver')
     config.set(section, 'firewall_driver', 'nova.virt.firewall.NoopFirewallDriver')
+
 
     section = 'neutron'
     if not set([section]).issubset(config.sections()):
