@@ -36,7 +36,7 @@ keystone endpoint-create \
 ## GLANCE
 
 echo "Creating Glance user..."
-keystone user-create --name=glance --pass=${GLANCE_PASS} --email=glance@example.com
+keystone user-create --name=glance --pass=${GLANCE_PASS} --email=glance@${EMAIL_ADDRESS}
 keystone user-role-add --user=glance --tenant=service --role=admin
 
 echo "Registering Glance API and EndPoints..."
@@ -49,7 +49,7 @@ keystone endpoint-create --service-id=$(keystone service-list | awk '/ image / {
 ## Nova
 
 echo "Creating Nova user..."
-keystone user-create --name nova --pass ${NOVA_PASS}
+keystone user-create --name nova --pass ${NOVA_PASS} --email=nova@${EMAIL_ADDRESS}
 keystone user-role-add --user nova --tenant service --role admin
 
 echo "Registering Nova API and EndPoints..."
@@ -63,7 +63,7 @@ keystone endpoint-create \
 
 ## Neutron
 echo "Creating Neutron user..."
-keystone user-create --name neutron --pass ${NEUTRON_PASS}
+keystone user-create --name neutron --pass ${NEUTRON_PASS} --email=neutron@${EMAIL_ADDRESS}
 keystone user-role-add --user neutron --tenant service --role admin
 
 echo "Registering Neutron API and EndPoints..."

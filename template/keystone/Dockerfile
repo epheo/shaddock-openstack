@@ -2,6 +2,7 @@ FROM panama/base:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 # Install Keystone
+RUN apt-get update
 RUN apt-get install -y keystone python-keystone
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

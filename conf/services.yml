@@ -9,7 +9,7 @@ rabbitmq:
   volumes:
     '/data/log': '/var/lib/rabbitmq/log'
     '/data/mnesia': '/var/lib/rabbitmq/mnesia'
-  privileged: false
+  privileged: False
   priority: 10
   depend-on: None
 
@@ -19,7 +19,7 @@ mysql:
     - 3306
   volumes:
     '/var/log/supervisor': '/var/log/panama/mysql'
-  privileged: false
+  privileged: False
   priority: 20
   depend-on: None
 
@@ -30,7 +30,7 @@ keystone:
     - 5000
   volumes:
     '/var/log/supervisor': '/var/log/panama/keystone'
-  privileged: false
+  privileged: False
   priority: 30
   depend-on:
     mysql:
@@ -48,8 +48,8 @@ nova:
     - 8775
     - 9696
   volumes:
-    '/var/log/supervisor': '/var/log/panama/nova'
-  privileged: true
+    '/var/log/nova': '/var/log/panama/nova'
+  privileged: True
   priority: 40
   depend-on:
     keystone:
@@ -62,17 +62,18 @@ nova:
 
 
 glance:
-  ports: 
+  ports:
     - 9292
     - 4324
-  volumes: 
+  volumes:
     '/var/log/supervisor': '/var/log/panama/glance'
-  privileged: false
+  privileged: False
   priority: 50
   depend-on:
     nova:
       - tcp: 8774
       - tcp: 8775
+      - http: (url, code)
       - state: running
     mysql:
       - tcp: 3306
@@ -86,10 +87,10 @@ glance:
 horizon:
   ports:
     - 80
-    - 11211 
+    - 11211
   volumes:
     '/var/log/supervisor': '/var/log/panama/horizon'
-  privileged: false
+  privileged: False
   priority: 60
   depend-on:
     nova:
@@ -111,7 +112,7 @@ neutron:
     - 11211
   volumes:
     '/var/log/supervisor': '/var/log/panama/neutron'
-  privileged: false
+  privileged: False
   priority: 70
   depend-on:
     nova:
@@ -133,7 +134,7 @@ cinder:
     - 11211
   volumes:
     '/var/log/supervisor': '/var/log/panama/cinder'
-  privileged: false
+  privileged: False
   priority: 80
   depend-on:
     nova:
@@ -150,12 +151,10 @@ cinder:
 
 
 nova-compute:
-  ports:
-    - 90
-    - 11211
   volumes:
-    '/var/log/supervisor': '/var/log/panama/cinder'
-  privileged: false
+    '/var/log/nova': '/var/log/panama/compute'
+  privileged: True
+  network_mode: host
   priority: 90
   depend-on:
     nova:

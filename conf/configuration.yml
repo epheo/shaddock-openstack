@@ -35,3 +35,4 @@ template_vars:
     TROVE_PASS: panamassword
     MURANO_DBPASS: panamassword
     MURANO_PASS: panamassword
+    no_proxy: '16.49.136.0/22, 127.0.0.1, localhost'
