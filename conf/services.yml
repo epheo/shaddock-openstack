@@ -3,6 +3,7 @@
 ##############################################
 
 rabbitmq:
+  priority: 10
   ports:
     - 5672
     - 15672
@@ -10,28 +11,27 @@ rabbitmq:
     '/data/log': '/var/lib/rabbitmq/log'
     '/data/mnesia': '/var/lib/rabbitmq/mnesia'
   privileged: False
-  priority: 10
   depend-on: None
 
 
 mysql:
+  priority: 20
   ports:
     - 3306
   volumes:
     '/var/log/supervisor': '/var/log/panama/mysql'
   privileged: False
-  priority: 20
   depend-on: None
 
 
 keystone:
+  priority: 30
   ports:
     - 35357
     - 5000
   volumes:
     '/var/log/supervisor': '/var/log/panama/keystone'
   privileged: False
-  priority: 30
   depend-on:
     mysql:
       - tcp: 3306
@@ -43,6 +43,7 @@ keystone:
 
 
 nova:
+  priority: 40
   ports:
     - 8774
     - 8775
@@ -50,7 +51,6 @@ nova:
   volumes:
     '/var/log/nova': '/var/log/panama/nova'
   privileged: True
-  priority: 40
   depend-on:
     keystone:
      - tcp: 5000
@@ -62,13 +62,13 @@ nova:
 
 
 glance:
+  priority: 50
   ports:
     - 9292
     - 4324
   volumes:
     '/var/log/supervisor': '/var/log/panama/glance'
   privileged: False
-  priority: 50
   depend-on:
     nova:
       - tcp: 8774
@@ -85,13 +85,13 @@ glance:
 
 
 horizon:
+  priority: 60
   ports:
     - 80
     - 11211
   volumes:
     '/var/log/supervisor': '/var/log/panama/horizon'
   privileged: False
-  priority: 60
   depend-on:
     nova:
       - tcp: 8774
@@ -107,13 +107,13 @@ horizon:
 
 
 neutron:
+  priority: 70
   ports:
     - 80
     - 11211
   volumes:
     '/var/log/supervisor': '/var/log/panama/neutron'
   privileged: False
-  priority: 70
   depend-on:
     nova:
       - tcp: 8774
@@ -129,13 +129,13 @@ neutron:
 
 
 cinder:
+  priority: 80
   ports:
     - 80
     - 11211
   volumes:
     '/var/log/supervisor': '/var/log/panama/cinder'
   privileged: False
-  priority: 80
   depend-on:
     nova:
       - tcp: 8774
