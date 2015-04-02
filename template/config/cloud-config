@@ -22,6 +22,9 @@ echo "Registering Keystone API and EndPoints..."
 keystone service-create --name keystone --type identity \
 --description "OpenStack Identity"
 
+keystone service-create --name keystonev3 --type identity \
+--description "OpenStack Identity"
+
 keystone endpoint-create \
 --service-id $(keystone service-list | awk '/ identity / {print $2}') \
 --publicurl http://${HOST_IP}::5000/v2.0 \
@@ -29,9 +32,13 @@ keystone endpoint-create \
 --adminurl http://${HOST_IP}:35357/v2.0 \
 --region regionOne
 
-## Tests
+keystone endpoint-create \
+--service-id $(keystone service-list | awk '/ keystonev3 / {print $2}') \
+--publicurl http://${HOST_IP}::5000/v3.0 \
+--internalurl http://${HOST_IP}:5000/v3.0 \
+--adminurl http://${HOST_IP}:35357/v3.0 \
+--region regionOne
 
-# http://docs.openstack.org/juno/install-guide/install/apt/content/keystone-verify.html
 
 ## GLANCE
 
@@ -74,3 +81,13 @@ keystone endpoint-create \
   --adminurl http://${HOST_IP}:9696 \
   --internalurl http://${HOST_IP}:9696 \
   --region regionOne
+
+## Tests
+
+# http://docs.openstack.org/juno/install-guide/install/apt/content/keystone-verify.html
+
+unset OS_SERVICE_TOKEN OS_SERVICE_ENDPOINT
+
+keystone --os-tenant-name admin --os-username admin --os-password ADMIN_PASS \
+      --os-auth-url http://${HOST_IP}:35357/v2.0 token-get
+

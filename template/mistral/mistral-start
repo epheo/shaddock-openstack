@@ -19,16 +19,20 @@ echo "=> DB ${MYSQL_DB}"
 echo "=> User ${MYSQL_USER}"
 echo "=> Password ${MYSQL_PASSWORD}"
 
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "CREATE DATABASE mistral;"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'localhost' \
-IDENTIFIED BY '${MISTRAL_DBPASS}';"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'${HOST_NAME}' \
-IDENTIFIED BY '${MISTRAL_DBPASS}';"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'%' \
-IDENTIFIED BY '${MISTRAL_DBPASS}'"
+mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} \
+      -e "CREATE DATABASE mistral;"
+mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} \
+      -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'localhost' \
+          IDENTIFIED BY '${MISTRAL_DBPASS}';"
+mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} \
+      -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'${HOST_NAME}' \
+          IDENTIFIED BY '${MISTRAL_DBPASS}';"
+mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} \
+      -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'%' \
+          IDENTIFIED BY '${MISTRAL_DBPASS}'"
 
 echo "Create database tables"
-su -s /bin/sh -c "mistral-manage db_sync" mistral
+python tools/sync_db.py --config-file /mistral/etc/mistral.conf
 
 echo "Stopping mistral"
 service mistral stop >/dev/null 2>&1

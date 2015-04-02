@@ -23,11 +23,21 @@ configfile = '/mistral/etc/mistral.conf.sample'
 config = ConfigParser.RawConfigParser()
 config.read(configfile)
 
+section = 'database'
+if not set([section]).issubset(config.sections()):
+    config.add_section(section)
+config.set(section, 'connection',
+                    'mysql://mistral:%s@%s/mistral' 
+                    % (os.environ.get('NOVA_DBPASS'),
+                       os.environ.get('HOST_IP')))
+
 section = 'keystone_authtoken'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
-config.set(section, 'auth_uri', 'http://%s:5000/v3' % os.environ.get('HOST_IP'))
-config.set(section, 'identity_uri', 'http://%s:35357' % os.environ.get('HOST_IP'))
+config.set(section, 'auth_uri', 
+                    'http://%s:5000/v3' % os.environ.get('HOST_IP'))
+config.set(section, 'identity_uri', 
+                    'http://%s:35357' % os.environ.get('HOST_IP'))
 config.set(section, 'admin_tenant_name', 'service')
 config.set(section, 'auth_version', 'v3')
 config.set(section, 'admin_user', 'nova')

@@ -11,8 +11,13 @@ RUN \
      git clone https://github.com/stackforge/mistral.git &&\
      cd mistral && python setup.py install
 
+ADD supervisord.conf /etc/supervisord.conf
+
 ADD mistral-start /usr/local/bin/
 ADD configparse.py /usr/local/bin/
-RUN chmod +x /usr/local/bin/keystone-start
+RUN chmod +x /usr/local/bin/mistral-start
+RUN chmod +x /usr/local/bin/configparse.py
 
-EXPOSE 8082
+#EXPOSE 8082
+
+CMD ["mistral-start"]
