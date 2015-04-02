@@ -22,8 +22,6 @@ import os
 ## nova.conf
 ############
 
-
-
 configfile = '/etc/nova/nova.conf'
 config = ConfigParser.RawConfigParser()
 config.read(configfile)

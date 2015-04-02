@@ -1,0 +1,37 @@
+#!/bin/bash
+
+echo "Setting up mistral..."
+
+service mistral start >/dev/null 2>&1
+
+echo "Removing mistral DB"
+rm /var/lib/mistral/mistral.db
+
+echo "Updating conf file..."
+python3 /usr/local/bin/configparse.py
+
+echo "Restarting mistral"
+service mistral restart >/dev/null 2>&1
+
+echo "Create database..."
+echo "=> Creating ${SERVICE} database"
+echo "=> DB ${MYSQL_DB}"
+echo "=> User ${MYSQL_USER}"
+echo "=> Password ${MYSQL_PASSWORD}"
+
+mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "CREATE DATABASE mistral;"
+mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'localhost' \
+IDENTIFIED BY '${MISTRAL_DBPASS}';"
+mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'${HOST_NAME}' \
+IDENTIFIED BY '${MISTRAL_DBPASS}';"
+mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON mistral.* TO 'mistral'@'%' \
+IDENTIFIED BY '${MISTRAL_DBPASS}'"
+
+echo "Create database tables"
+su -s /bin/sh -c "mistral-manage db_sync" mistral
+
+echo "Stopping mistral"
+service mistral stop >/dev/null 2>&1
+
+echo "Starting mistral using supervisord..."
+exec /usr/bin/supervisord -n
