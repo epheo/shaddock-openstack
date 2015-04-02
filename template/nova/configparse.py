@@ -18,7 +18,7 @@
 import ConfigParser
 import os
 
-    
+ 
 ## nova.conf
 ############
 
@@ -29,10 +29,11 @@ config.read(configfile)
 section = 'database'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
-config.set(section, 'connection',  'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
-                                                                os.environ.get('HOST_IP')))
+config.set(section, 'connection',
+                    'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
+                                                 os.environ.get('HOST_IP')))
 
-section = 'DEFAULT'
+section = 'DEFAULT'<F6><F6><F6>
 #if not set([section]).issubset(config.sections()):
 #    config.add_section(section)
 config.set(section, 'rpc_backend', 'rabbit')
@@ -52,8 +53,10 @@ config.set(section, 'security_group_api', 'nova')
 section = 'keystone_authtoken'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
-config.set(section, 'auth_uri', 'http://%s:5000/v2.0' % os.environ.get('HOST_IP'))
-config.set(section, 'identity_uri', 'http://%s:35357' % os.environ.get('HOST_IP'))
+config.set(section, 'auth_uri', 
+                    'http://%s:5000/v2.0' % os.environ.get('HOST_IP'))
+config.set(section, 'identity_uri',
+                    'http://%s:35357' % os.environ.get('HOST_IP'))
 config.set(section, 'admin_tenant_name', 'service')
 config.set(section, 'admin_user', 'nova')
 config.set(section, 'admin_password', os.environ.get('NOVA_PASS'))
@@ -79,8 +82,10 @@ def neutron_config():
     section = 'database'
     if not set([section]).issubset(config.sections()):
         config.add_section(section)
-    config.set(section, 'connection', 'mysql://neutron:%s@%s/neutron' % (os.environ.get('NEUTRON_DBPASS'),
-                                                                         os.environ.get('HOST_IP')))
+    config.set(section, 'connection',
+                        'mysql://neutron:%s@%s/neutron' 
+                        % (os.environ.get('NEUTRON_DBPASS'),
+                           os.environ.get('HOST_IP')))
 
     section = 'DEFAULT'
     #if not set([section]).issubset(config.sections()):

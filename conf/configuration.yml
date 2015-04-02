@@ -7,10 +7,10 @@
 
 template_vars:
     HOST_NAME: lapierrt-wn
-    HOST_IP: '16.49.138.223'
-    RABBITMQ_HOST: '16.49.138.223'
+    HOST_IP: '192.168.3.200'
+    RABBITMQ_HOST: '192.168.3.200'
     RABBIT_PASS: panamassword
-    MYSQL_DB: 16.49.138.223
+    MYSQL_DB: '192.168.3.200'
     EMAIL_ADDRESS: example.com
     MYSQL_USER: admin
     MYSQL_PASSWORD: password

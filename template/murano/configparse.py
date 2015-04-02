@@ -18,39 +18,28 @@
 from configparser import ConfigParser
 import os
 
-configfile = '/murano/murano/etc/murano/murano.conf.sample'
-config = ConfigParser()
+configfile = '/etc/nova/nova.conf'
+config = ConfigParser.RawConfigParser()
 config.read(configfile)
 
-config['DEFAULT']['debug'] = os.environ.get('ADMIN_TOKEN')
-config['DEFAULT']['verbose'] = os.environ.get('ADMIN_TOKEN')
-config['DEFAULT']['rabbit_host'] = os.environ.get('ADMIN_TOKEN')
-config['DEFAULT']['rabbit_userid'] = os.environ.get('ADMIN_TOKEN')
-config['DEFAULT']['rabbit_password'] = os.environ.get('ADMIN_TOKEN')
-config['DEFAULT']['rabbit_virtual_host'] = os.environ.get('ADMIN_TOKEN')
-config['DEFAULT']['notification_driver'] = os.environ.get('ADMIN_TOKEN')
-
-config['database']['backend'] = 'sqlalchemy'
-config['database']['connection'] = 'mysql://murano:%s@%s/murano' % (os.environ.get('MURANO_DBPASS'),
-                                                                        os.environ.get('HOST_IP'))
-
-config['keystone']['auth_url'] = 'http://%OPENSTACK_HOST_IP%:5000/v2.0'
-
-config['keystone_authtoken']['auth_uri'] = 'http://%OPENSTACK_HOST_IP%:5000/v2.0'
-config['keystone_authtoken']['auth_host'] = '%OPENSTACK_HOST_IP%'
-config['keystone_authtoken']['auth_port'] = 5000
-config['keystone_authtoken']['auth_protocol'] = http
-config['keystone_authtoken']['admin_tenant_name'] = %OPENSTACK_ADMIN_TENANT%
-config['keystone_authtoken']['admin_user'] = %OPENSTACK_ADMIN_USER%
-config['keystone_authtoken']['admin_password'] = %OPENSTACK_ADMIN_PASSWORD%
-
-config['murano']['url'] = 'http://%YOUR_HOST_IP%:8082'
+section = 'database'
+if not set([section]).issubset(config.sections()):
+    config.add_section(section)
+config.set(section, 'connection',
+                    'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
+                                                 os.environ.get('HOST_IP')))
 
 
-config['rabbitmq']['host'] = %RABBITMQ_SERVER_IP%
-config['rabbitmq']['login'] = %RABBITMQ_USER%
-config['rabbitmq']['password'] = %RABBITMQ_PASSWORD%
-config['rabbitmq']['virtual_host'] = %RABBITMQ_SERVER_VIRTUAL_HOST%
+section = 'keystone_authtoken'
+if not set([section]).issubset(config.sections()):
+    config.add_section(section)
+config.set(section, 'auth_uri',
+                    'http://%s:5000/v2.0' % os.environ.get('HOST_IP'))
+config.set(section, 'identity_uri',
+                    'http://%s:35357' % os.environ.get('HOST_IP'))
+config.set(section, 'admin_tenant_name', 'service')
+config.set(section, 'admin_user', 'nova')
+config.set(section, 'admin_password', os.environ.get('NOVA_PASS'))
 
 print('Parsing of %s...' % configfile)
 with open(configfile, 'w') as configfile:
