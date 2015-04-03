@@ -3,15 +3,9 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 # Install Keystone
 RUN apt-get update
-#RUN apt-get install -y keystone python-keystone
 
-##
-RUN apt-get install -y git python-dev libffi-dev libssl-dev
-RUN pip install pbr
 RUN git clone https://github.com/openstack/keystone /opt/keystone/
 RUN cd /opt/keystone && python setup.py install
-
-##
 
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

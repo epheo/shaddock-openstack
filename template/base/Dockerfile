@@ -9,5 +9,5 @@ RUN echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu trusty-updates/ju
 
 RUN apt-get -y update && apt-get -y dist-upgrade
 
-RUN apt-get -y install supervisor wget python-pip mysql-client mysql-common python-mysqldb      git python-dev libffi-dev libssl-dev
+RUN apt-get -y install supervisor wget python-pip mysql-client mysql-common python-mysqldb git python-dev libffi-dev libssl-dev
 RUN pip install pbr
