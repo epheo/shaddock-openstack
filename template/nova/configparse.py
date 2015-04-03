@@ -33,7 +33,7 @@ config.set(section, 'connection',
                     'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
                                                  os.environ.get('HOST_IP')))
 
-section = 'DEFAULT'<F6><F6><F6>
+section = 'DEFAULT'
 #if not set([section]).issubset(config.sections()):
 #    config.add_section(section)
 config.set(section, 'rpc_backend', 'rabbit')

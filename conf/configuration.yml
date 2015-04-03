@@ -7,10 +7,10 @@
 
 template_vars:
     HOST_NAME: lapierrt-wn
-    HOST_IP: '192.168.3.200'
-    RABBITMQ_HOST: '192.168.3.200'
+    HOST_IP: '16.49.138.223'
+    RABBITMQ_HOST: '16.49.138.223'
     RABBIT_PASS: panamassword
-    MYSQL_DB: '192.168.3.200'
+    MYSQL_DB: '16.49.138.223'
     EMAIL_ADDRESS: example.com
     MYSQL_USER: admin
     MYSQL_PASSWORD: password
@@ -35,4 +35,7 @@ template_vars:
     TROVE_PASS: panamassword
     MURANO_DBPASS: panamassword
     MURANO_PASS: panamassword
+    MISTRAL_PASS: panamassword
+    MISTRAL_DBPASS: panamassword
+    OS_MISTRAL_URL: http://16.49.138.223:8989/v2
     no_proxy: '16.49.136.0/22, 127.0.0.1, localhost'

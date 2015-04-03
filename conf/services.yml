@@ -44,7 +44,6 @@ nova:
   ports:
     - 8774
     - 8775
-    - 9696
   volumes:
     '/var/log/nova': '/var/log/panama/nova'
   privileged: True
@@ -54,7 +53,7 @@ nova:
      - tcp: 35357
      - state: running
     config:
-      - state: finnished
+      - state: stoped
       - grep-logs: service_id
 
 
@@ -166,7 +165,11 @@ nova-compute:
 
 
 mistral:
+  ports:
+    - 8989
   priority: 90
+  volumes:
+    '/var/log/supervisor': '/var/log/panama/mistral'
   depend-on:
     mysql:
       - tcp: 3306

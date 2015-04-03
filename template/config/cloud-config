@@ -14,6 +14,7 @@ keystone tenant-create --name admin --description "Admin Tenant"
 keystone user-create --name admin --pass ${ADMIN_PASS} --email admin@${EMAIL_ADDRESS}
 keystone role-create --name admin
 keystone user-role-add --user admin --tenant admin --role admin
+
 keystone tenant-create --name demo --description "Demo Tenant"
 keystone user-create --name demo --tenant demo --pass ${DEMO_PASS} --email demo@${EMAIL_ADDRESS}
 keystone tenant-create --name service --description "Service Tenant"
@@ -22,39 +23,37 @@ echo "Registering Keystone API and EndPoints..."
 keystone service-create --name keystone --type identity \
 --description "OpenStack Identity"
 
-keystone service-create --name keystonev3 --type identity \
---description "OpenStack Identity"
+keystone service-create --name keystonev3 --type identityv3 \
+--description "OpenStack Identity v3"
 
 keystone endpoint-create \
---service-id $(keystone service-list | awk '/ identity / {print $2}') \
---publicurl http://${HOST_IP}::5000/v2.0 \
+--service keystone \
+--publicurl http://${HOST_IP}:5000/v2.0 \
 --internalurl http://${HOST_IP}:5000/v2.0 \
 --adminurl http://${HOST_IP}:35357/v2.0 \
 --region regionOne
 
 keystone endpoint-create \
---service-id $(keystone service-list | awk '/ keystonev3 / {print $2}') \
---publicurl http://${HOST_IP}::5000/v3.0 \
---internalurl http://${HOST_IP}:5000/v3.0 \
---adminurl http://${HOST_IP}:35357/v3.0 \
+--service keystonev3 \
+--publicurl http://${HOST_IP}:5000/v3 \
+--internalurl http://${HOST_IP}:5000/v3 \
+--adminurl http://${HOST_IP}:35357/v3 \
 --region regionOne
 
 
 ## GLANCE
-
 echo "Creating Glance user..."
 keystone user-create --name=glance --pass=${GLANCE_PASS} --email=glance@${EMAIL_ADDRESS}
 keystone user-role-add --user=glance --tenant=service --role=admin
 
 echo "Registering Glance API and EndPoints..."
-keystone service-create --name=${SERVICE} --type=image --description="OpenStack Image Service"
+keystone service-create --name=glance --type=image --description="OpenStack Image Service"
 keystone endpoint-create --service-id=$(keystone service-list | awk '/ image / {print $2}') \
 --publicurl=http://${HOST_IP}:9292 \
 --internalurl=http://${HOST_IP}:9292 \
 --adminurl=http://${HOST_IP}:9292
 
 ## Nova
-
 echo "Creating Nova user..."
 keystone user-create --name nova --pass ${NOVA_PASS} --email=nova@${EMAIL_ADDRESS}
 keystone user-role-add --user nova --tenant service --role admin
@@ -69,25 +68,38 @@ keystone endpoint-create \
 --region regionOne
 
 ## Neutron
-echo "Creating Neutron user..."
-keystone user-create --name neutron --pass ${NEUTRON_PASS} --email=neutron@${EMAIL_ADDRESS}
-keystone user-role-add --user neutron --tenant service --role admin
+#echo "Creating Neutron user..."
+#keystone user-create --name neutron --pass ${NEUTRON_PASS} --email=neutron@${EMAIL_ADDRESS}
+#keystone user-role-add --user neutron --tenant service --role admin
 
-echo "Registering Neutron API and EndPoints..."
-keystone service-create --name neutron --type network --description "OpenStack Networking"
+#echo "Registering Neutron API and EndPoints..."
+#keystone service-create --name neutron --type network --description "OpenStack Networking"
+#keystone endpoint-create \
+#  --service-id $(keystone service-list | awk '/ network / {print $2}') \
+#  --publicurl http://${HOST_IP}:9696 \
+#  --adminurl http://${HOST_IP}:9696 \
+#  --internalurl http://${HOST_IP}:9696 \
+#  --region regionOne
+
+## Mistral
+echo "Creating Mistral user..."
+keystone user-create --name mistral --pass ${MISTRAL_PASS} --email=mistral@${EMAIL_ADDRESS}
+keystone user-role-add --user mistral --tenant service --role admin
+
+echo "Registering Mistral API and EndPoints..."
+keystone service-create --name mistral --type workflowv2 --description "OpenStack Mistral"
 keystone endpoint-create \
-  --service-id $(keystone service-list | awk '/ network / {print $2}') \
-  --publicurl http://${HOST_IP}:9696 \
-  --adminurl http://${HOST_IP}:9696 \
-  --internalurl http://${HOST_IP}:9696 \
+  --service-id $(keystone service-list | awk '/ workflowv2 / {print $2}') \
+  --publicurl http://${HOST_IP}:8989/v2 \
+  --adminurl http://${HOST_IP}:8989/v2 \
+  --internalurl http://${HOST_IP}:8989/v2 \
   --region regionOne
 
 ## Tests
-
-# http://docs.openstack.org/juno/install-guide/install/apt/content/keystone-verify.html
-
 unset OS_SERVICE_TOKEN OS_SERVICE_ENDPOINT
 
-keystone --os-tenant-name admin --os-username admin --os-password ADMIN_PASS \
+echo "Checking configuration by geting a token..."
+keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} \
       --os-auth-url http://${HOST_IP}:35357/v2.0 token-get
 
+echo "#END"
