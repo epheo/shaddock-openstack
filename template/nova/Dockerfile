@@ -1,4 +1,4 @@
-FROM panama/base:latest
+FROM panama/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install nova
