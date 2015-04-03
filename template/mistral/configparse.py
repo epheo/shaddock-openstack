@@ -15,32 +15,40 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from configparser import ConfigParser
+import ConfigParser
 import os
 
-configfile = '/etc/nova/nova.conf'
+
+configfile = '/mistral/etc/mistral.conf.sample'
 config = ConfigParser.RawConfigParser()
 config.read(configfile)
+
+section = 'DEFAULT'
+config.set(section, 'rpc_backend', 'rabbit')
+config.set(section, 'rabbit_host', os.environ.get('HOST_IP'))
+config.set(section, 'rabbit_password', os.environ.get('RABBIT_PASS'))
 
 section = 'database'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
 config.set(section, 'connection',
-                    'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
-                                                 os.environ.get('HOST_IP')))
-
+                    'mysql://mistral:%s@%s/mistral' 
+                    % (os.environ.get('MISTRAL_DBPASS'),
+                       os.environ.get('HOST_IP')))
 
 section = 'keystone_authtoken'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
-config.set(section, 'auth_uri',
-                    'http://%s:5000/v2.0' % os.environ.get('HOST_IP'))
-config.set(section, 'identity_uri',
+config.set(section, 'auth_uri', 
+                    'http://%s:5000/v3' % os.environ.get('HOST_IP'))
+config.set(section, 'identity_uri', 
                     'http://%s:35357' % os.environ.get('HOST_IP'))
 config.set(section, 'admin_tenant_name', 'service')
-config.set(section, 'admin_user', 'nova')
-config.set(section, 'admin_password', os.environ.get('NOVA_PASS'))
+config.set(section, 'auth_version', 'v3')
+config.set(section, 'admin_user', 'mistral')
+config.set(section, 'admin_password', os.environ.get('MISTRAL_PASS'))
 
+configfile = '/mistral/etc/mistral.conf'
 print('Parsing of %s...' % configfile)
 with open(configfile, 'w') as configfile:
     config.write(configfile)

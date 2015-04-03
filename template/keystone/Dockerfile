@@ -16,6 +16,7 @@ RUN \
 ADD keystone-start /usr/local/bin/
 ADD configparse.py /usr/local/bin/
 RUN chmod +x /usr/local/bin/keystone-start
+RUN chmod +x /usr/local/bin/configparse.py
 
 EXPOSE 35357
 EXPOSE 5000
