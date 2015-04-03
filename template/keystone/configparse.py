@@ -18,7 +18,7 @@
 from configparser import ConfigParser
 import os
 
-configfile = '/etc/keystone/keystone.conf'
+configfile = '/opt/keystone/etc/keystone.conf.sample'
 config = ConfigParser()
 config.read(configfile)
 
@@ -32,6 +32,7 @@ config['token']['driver'] = 'keystone.token.persistence.backends.sql.Token'
 config['revoke']['driver'] = 'keystone.contrib.revoke.backends.sql.Revoke'
 config['DEFAULT']['verbose'] = 'True'
 
+configfile = '/opt/keystone/etc/keystone.conf'
 print('Parsing of %s...' % configfile)
 with open(configfile, 'w') as configfile:
     config.write(configfile)
