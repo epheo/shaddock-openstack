@@ -1,4 +1,4 @@
-FROM panama/seed:latest
+FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu> 
 
 # Install packages

@@ -1,5 +1,5 @@
 ##############################################
-## PANAMA: Services Architecture Definition ##
+## SHADDOCK: Services Architecture Definition ##
 ##############################################
 
 rabbitmq:
@@ -18,7 +18,7 @@ mysql:
   ports:
     - 3306
   volumes:
-    '/var/log/supervisor': '/var/log/panama/mysql'
+    '/var/log/supervisor': '/var/log/shaddock/mysql'
   depend-on: None
 
 
@@ -28,7 +28,7 @@ keystone:
     - 35357
     - 5000
   volumes:
-    '/var/log/supervisor': '/var/log/panama/keystone'
+    '/var/log/supervisor': '/var/log/shaddock/keystone'
   depend-on:
     mysql:
       - tcp: 3306
@@ -45,7 +45,7 @@ nova:
     - 8774
     - 8775
   volumes:
-    '/var/log/nova': '/var/log/panama/nova'
+    '/var/log/nova': '/var/log/shaddock/nova'
   privileged: True
   depend-on:
     keystone:
@@ -63,7 +63,7 @@ glance:
     - 9292
     - 4324
   volumes:
-    '/var/log/supervisor': '/var/log/panama/glance'
+    '/var/log/supervisor': '/var/log/shaddock/glance'
   depend-on:
     nova:
       - tcp: 8774
@@ -85,7 +85,7 @@ horizon:
     - 80
     - 11211
   volumes:
-    '/var/log/supervisor': '/var/log/panama/horizon'
+    '/var/log/supervisor': '/var/log/shaddock/horizon'
   depend-on:
     nova:
       - tcp: 8774
@@ -106,7 +106,7 @@ neutron:
     - 80
     - 11211
   volumes:
-    '/var/log/supervisor': '/var/log/panama/neutron'
+    '/var/log/supervisor': '/var/log/shaddock/neutron'
   privileged: True
   depend-on:
     nova:
@@ -128,7 +128,7 @@ cinder:
     - xx
     - xx
   volumes:
-    '/var/log/supervisor': '/var/log/panama/cinder'
+    '/var/log/supervisor': '/var/log/shaddock/cinder'
   privileged: True
   depend-on:
     nova:
@@ -146,7 +146,7 @@ cinder:
 
 nova-compute:
   volumes:
-    '/var/log/nova': '/var/log/panama/compute'
+    '/var/log/nova': '/var/log/shaddock/compute'
   privileged: True
   network_mode: host
   priority: 90
@@ -169,7 +169,7 @@ mistral:
     - 8989
   priority: 90
   volumes:
-    '/var/log/supervisor': '/var/log/panama/mistral'
+    '/var/log/supervisor': '/var/log/shaddock/mistral'
   depend-on:
     mysql:
       - tcp: 3306
