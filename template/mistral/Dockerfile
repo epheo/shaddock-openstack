@@ -1,4 +1,4 @@
-FROM panama/base:latest
+FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 # Install Mistral

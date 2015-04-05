@@ -18,7 +18,6 @@
 import ConfigParser
 import os
 
-
 configfile = '/mistral/etc/mistral.conf.sample'
 config = ConfigParser.RawConfigParser()
 config.read(configfile)

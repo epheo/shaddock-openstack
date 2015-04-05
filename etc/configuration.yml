@@ -1,0 +1,41 @@
+###############################################
+## SHADDOCK: Services Configuration Definition ##
+###############################################
+
+# All this variables will be passed as environment
+# variables to the containers.
+
+template_vars:
+    HOST_NAME: lapierrt-wn
+    HOST_IP: '16.49.138.223'
+    RABBITMQ_HOST: '16.49.138.223'
+    RABBIT_PASS: shaddockssword
+    MYSQL_DB: '16.49.138.223'
+    EMAIL_ADDRESS: example.com
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+    KEYSTONE_DBPASS: shaddockssword
+    DEMO_PASS: shaddockssword
+    ADMIN_TOKEN: shaddockssword
+    ADMIN_PASS: shaddockssword
+    GLANCE_DBPASS: shaddockssword
+    GLANCE_PASS: shaddockssword
+    NOVA_DBPASS: shaddockssword
+    NOVA_PASS: shaddockssword
+    DASH_DBPASS: shaddockssword
+    CINDER_DBPASS: shaddockssword
+    CINDER_PASS: shaddockssword
+    NEUTRON_DBPASS: shaddockssword
+    NEUTRON_PASS: shaddockssword
+    HEAT_DBPASS: shaddockssword
+    HEAT_PASS: shaddockssword
+    CEILOMETER_DBPASS: shaddockssword
+    CEILOMETER_PASS: shaddockssword
+    TROVE_DBPASS: shaddockssword
+    TROVE_PASS: shaddockssword
+    MURANO_DBPASS: shaddockssword
+    MURANO_PASS: shaddockssword
+    MISTRAL_PASS: shaddockssword
+    MISTRAL_DBPASS: shaddockssword
+    OS_MISTRAL_URL: http://16.49.138.223:8989/v2
+    no_proxy: '16.49.136.0/22, 127.0.0.1, localhost'

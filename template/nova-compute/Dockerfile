@@ -1,4 +1,4 @@
-FROM panama/base:latest
+FROM shaddock/base:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install nova
