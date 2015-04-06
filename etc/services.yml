@@ -100,50 +100,6 @@ horizon:
       - state: running
 
 
-neutron:
-  priority: 70
-  ports:
-    - 80
-    - 11211
-  volumes:
-    '/var/log/supervisor': '/var/log/shaddock/neutron'
-  privileged: True
-  depend-on:
-    nova:
-      - tcp: 8774
-      - tcp: 8775
-      - state: running
-    mysql:
-      - tcp: 3306
-      - state: running
-    keystone:
-      - tcp: 35357
-      - tcp: 5000
-      - state: running
-
-
-cinder:
-  priority: 80
-  ports:
-    - xx
-    - xx
-  volumes:
-    '/var/log/supervisor': '/var/log/shaddock/cinder'
-  privileged: True
-  depend-on:
-    nova:
-      - tcp: 8774
-      - tcp: 8775
-      - state: running
-    mysql:
-      - tcp: 3306
-      - state: running
-    keystone:
-      - tcp: 35357
-      - tcp: 5000
-      - state: running
-
-
 nova-compute:
   volumes:
     '/var/log/nova': '/var/log/shaddock/compute'
