@@ -1,0 +1,145 @@
+##############################################
+## SHADDOCK: Services Architecture Definition ##
+##############################################
+
+- name: rabbitmq
+  image: shaddock/rabbitmq
+  priority: 10
+  ports:
+    - 5672
+    - 15672
+  volumes:
+    - mount: /data/log
+      host_dir: /var/lib/rabbitmq/log 
+    - mount: /data/mnesia
+      host_dir: /var/lib/rabbitmq/mnesia
+
+
+- name: mysql
+  image: shaddock/mysql
+  priority: 20
+  ports:
+    - 3306
+  volumes:
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/mysql 
+
+
+- name: keystone
+  image: shaddock/keystone
+  priority: 30
+  ports:
+    - 35357
+    - 5000
+  volumes:
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/keystone 
+  depend-on:
+    - running: mysql
+      tcp: 3306
+
+
+- name: nova
+  image: shaddock/nova
+  priority: 40
+  ports:
+    - 8774
+    - 8775
+  volumes:
+    - mount: /var/log/nova
+      host_dir: /var/log/shaddock/nova
+  privileged: True
+  depend-on:
+    - running: mysql
+      tcp: 3306
+    - running: keystone
+      tcp: 35357
+      tcp: 5000
+
+
+- name: glance
+  image: shaddock/glance
+  priority: 50
+  ports:
+    - 9292
+    - 4324
+  volumes:
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/glance
+  depend-on:
+    - running: mysql
+      tcp: 3306
+    - running: keystone
+      tcp: 35357
+      tcp: 5000
+
+
+- name: horizon
+  image: shaddock/horizon
+  priority: 60
+  ports:
+    - 80
+    - 11211
+  volumes:
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/horizon
+  depend-on:
+    - running: mysql
+      tcp: 3306
+    - running: keystone
+      tcp: 35357
+      tcp: 5000
+
+- name: horizon2 
+  image: shaddock/horizon
+  priority: 60
+  ports:
+    - 80
+    - 11211
+  volumes:
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/horizon2
+  depend-on:
+    - running: mysql
+      tcp: 3306
+    - running: keystone
+      tcp: 35357
+      tcp: 5000
+
+- name: nova-compute
+  image: shaddock/nova-compute
+  volumes:
+    - mount: /var/log/nova
+      host_dir: /var/log/shaddock/compute
+  privileged: True
+  network_mode: host
+  priority: 90
+  depend-on:
+    - running: nova
+      tcp: 8774
+      tcp: 8775
+    - running: mysql
+      tcp: 3306
+    - running: keystone
+      tcp: 35357
+      tcp: 5000
+      net: {port: 5000, get: '/v2.0', code: 200}
+    - running: shaddock/rabbitmq
+      tcp: 5672
+      tcp: 15672
+
+
+- name: mistral
+  image: shaddock/mistral
+  ports:
+    - 8989
+  priority: 90
+  volumes:
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/mistral
+  depend-on:
+    - running: mysql
+      tcp: 3306
+    - running: keystone
+      tcp: 35357
+      tcp: 5000
