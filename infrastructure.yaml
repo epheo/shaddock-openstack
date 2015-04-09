@@ -1,6 +1,6 @@
-##############################################
+################################################
 ## SHADDOCK: Services Architecture Definition ##
-##############################################
+################################################
 
 - name: rabbitmq
   image: shaddock/rabbitmq
@@ -124,7 +124,7 @@
       tcp: 35357
       tcp: 5000
       net: {port: 5000, get: '/v2.0', code: 200}
-    - running: shaddock/rabbitmq
+    - running: rabbitmq
       tcp: 5672
       tcp: 15672
 

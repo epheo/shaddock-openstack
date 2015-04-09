@@ -1,11 +1,6 @@
 FROM ubuntu:14.04
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-ENV https_proxy https://proxy.sdc.hp.com:8080/
-RUN echo 'Acquire::http::Proxy "http://proxy.sdc.hp.com:8080/";' > /etc/apt/apt.conf.d/01proxies
-RUN echo 'Acquire::https::Proxy "https://proxy.sdc.hp.com:8080/";' >> /etc/apt/apt.conf.d/01proxies
-RUN echo 'Acquire::http::Proxy::keg.dev.uswest.hpcloud.net DIRECT;' >> /etc/apt/apt.conf.d/01proxies
-
 # OpenStack Repo and packages
 RUN apt-get -y update
 
