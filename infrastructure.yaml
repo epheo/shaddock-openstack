@@ -33,6 +33,7 @@
     - 5000
   volumes:
     - mount: /var/log/supervisor
+<<<<<<< HEAD
       host_dir: /var/log/shaddock/keystone
   depends-on:
     - {name: mysql, port: 3306}
@@ -44,7 +45,17 @@
   depends-on:
     - {name: keystone, port: 5000, get: '/v2.0'}
     - {name: keystone, port: 35357, get: '/v2.0'}
+=======
+      host_dir: /var/log/shaddock/keystone 
+  depend-on:
+    - running: mysql
+      net: 3306
+>>>>>>> f41b8b67cbff19637cf9831af26fc0a48299ae13
 
+
+- name: seed
+  image: shaddock/seed
+  priority: 30
 
 - name: nova
   image: shaddock/nova
@@ -56,12 +67,21 @@
     - mount: /var/log/nova
       host_dir: /var/log/shaddock/nova
   privileged: True
+<<<<<<< HEAD
   depends-on:
     - {name: seed, status: stopped}
     - {name: mysql, port: 3306}
     - {name: rabbitmq, port: 5672}
     - {name: keystone, port: 5000, get: '/v2.0'}
     - {name: keystone, port: 35357, get: '/v2.0'}
+=======
+  depend-on:
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
+>>>>>>> f41b8b67cbff19637cf9831af26fc0a48299ae13
 
 
 - name: glance
@@ -73,11 +93,20 @@
   volumes:
     - mount: /var/log/supervisor
       host_dir: /var/log/shaddock/glance
+<<<<<<< HEAD
   depends-on:
     - {name: seed, status: stopped}
     - {name: mysql, port: 3306}
     - {name: keystone, port: 5000, get: '/v2.0'}
     - {name: keystone, port: 35357, get: '/v2.0'}
+=======
+  depend-on:
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
+>>>>>>> f41b8b67cbff19637cf9831af26fc0a48299ae13
 
 
 - name: horizon
@@ -89,6 +118,7 @@
   volumes:
     - mount: /var/log/supervisor
       host_dir: /var/log/shaddock/horizon
+<<<<<<< HEAD
   depends-on:
     - {name: seed, status: stopped}
     - {name: mysql, port: 3306}
@@ -97,10 +127,22 @@
 
 
 - name: horizon2
+=======
+  depend-on:
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
+
+
+- name: horizon2 
+>>>>>>> f41b8b67cbff19637cf9831af26fc0a48299ae13
   image: shaddock/horizon
   priority: 60
   ports:
     - 81
+<<<<<<< HEAD
     - 11212
   volumes:
     - mount: /var/log/supervisor
@@ -110,6 +152,41 @@
     - {name: mysql, port: 3306}
     - {name: keystone, port: 5000, get: '/v2.0'}
     - {name: keystone, port: 35357, get: '/v2.0'}
+=======
+    - 1111
+  volumes:
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/horizon2
+  depend-on:
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
+
+
+- name: nova-compute
+  image: shaddock/nova-compute
+  volumes:
+    - mount: /var/log/nova
+      host_dir: /var/log/shaddock/compute
+  privileged: True
+  network_mode: host
+  priority: 90
+  depend-on:
+    - running: nova
+      net: 8774
+      net: 8775
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
+      net: {port: 5000, get: '/v2.0', code: 200}
+    - running: rabbitmq
+      net: 5672
+      net: 15672
+>>>>>>> f41b8b67cbff19637cf9831af26fc0a48299ae13
 
 # - name: nova-compute
   # image: shaddock/nova-compute
@@ -139,8 +216,17 @@
   volumes:
     - mount: /var/log/supervisor
       host_dir: /var/log/shaddock/mistral
+<<<<<<< HEAD
   depends-on:
     - {name: seed, status: stopped}
     - {name: mysql, port: 3306}
     - {name: keystone, port: 5000, get: '/v2.0'}
     - {name: keystone, port: 35357, get: '/v2.0'}
+=======
+  depend-on:
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
+>>>>>>> f41b8b67cbff19637cf9831af26fc0a48299ae13
