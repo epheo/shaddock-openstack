@@ -10,7 +10,7 @@
     - 15672
   volumes:
     - mount: /data/log
-      host_dir: /var/lib/rabbitmq/log 
+      host_dir: /var/lib/rabbitmq/log
     - mount: /data/mnesia
       host_dir: /var/lib/rabbitmq/mnesia
 
@@ -22,7 +22,7 @@
     - 3306
   volumes:
     - mount: /var/log/supervisor
-      host_dir: /var/log/shaddock/mysql 
+      host_dir: /var/log/shaddock/mysql
 
 
 - name: keystone
@@ -33,10 +33,17 @@
     - 5000
   volumes:
     - mount: /var/log/supervisor
-      host_dir: /var/log/shaddock/keystone 
-  depend-on:
-    - running: mysql
-      tcp: 3306
+      host_dir: /var/log/shaddock/keystone
+  depends-on:
+    - {name: mysql, port: 3306}
+
+
+- name: seed
+  image: shaddock/seed
+  priority: 35
+  depends-on:
+    - {name: keystone, port: 5000, get: '/v2.0'}
+    - {name: keystone, port: 35357, get: '/v2.0'}
 
 
 - name: nova
@@ -49,12 +56,12 @@
     - mount: /var/log/nova
       host_dir: /var/log/shaddock/nova
   privileged: True
-  depend-on:
-    - running: mysql
-      tcp: 3306
-    - running: keystone
-      tcp: 35357
-      tcp: 5000
+  depends-on:
+    - {name: seed, status: stopped}
+    - {name: mysql, port: 3306}
+    - {name: rabbitmq, port: 5672}
+    - {name: keystone, port: 5000, get: '/v2.0'}
+    - {name: keystone, port: 35357, get: '/v2.0'}
 
 
 - name: glance
@@ -66,12 +73,11 @@
   volumes:
     - mount: /var/log/supervisor
       host_dir: /var/log/shaddock/glance
-  depend-on:
-    - running: mysql
-      tcp: 3306
-    - running: keystone
-      tcp: 35357
-      tcp: 5000
+  depends-on:
+    - {name: seed, status: stopped}
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v2.0'}
+    - {name: keystone, port: 35357, get: '/v2.0'}
 
 
 - name: horizon
@@ -83,51 +89,47 @@
   volumes:
     - mount: /var/log/supervisor
       host_dir: /var/log/shaddock/horizon
-  depend-on:
-    - running: mysql
-      tcp: 3306
-    - running: keystone
-      tcp: 35357
-      tcp: 5000
+  depends-on:
+    - {name: seed, status: stopped}
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v2.0'}
+    - {name: keystone, port: 35357, get: '/v2.0'}
 
-- name: horizon2 
+
+- name: horizon2
   image: shaddock/horizon
   priority: 60
   ports:
-    - 80
-    - 11211
+    - 81
+    - 11212
   volumes:
     - mount: /var/log/supervisor
       host_dir: /var/log/shaddock/horizon2
-  depend-on:
-    - running: mysql
-      tcp: 3306
-    - running: keystone
-      tcp: 35357
-      tcp: 5000
+  depends-on:
+    - {name: seed, status: stopped}
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v2.0'}
+    - {name: keystone, port: 35357, get: '/v2.0'}
 
-- name: nova-compute
-  image: shaddock/nova-compute
-  volumes:
-    - mount: /var/log/nova
-      host_dir: /var/log/shaddock/compute
-  privileged: True
-  network_mode: host
-  priority: 90
-  depend-on:
-    - running: nova
-      tcp: 8774
-      tcp: 8775
-    - running: mysql
-      tcp: 3306
-    - running: keystone
-      tcp: 35357
-      tcp: 5000
-      net: {port: 5000, get: '/v2.0', code: 200}
-    - running: rabbitmq
-      tcp: 5672
-      tcp: 15672
-
+# - name: nova-compute
+  # image: shaddock/nova-compute
+  # volumes:
+    # - mount: /var/log/nova
+      # host_dir: /var/log/shaddock/compute
+  # privileged: True
+  # network_mode: host
+  # priority: 90
+  # depends-on:
+  #   - {name: nova}
+  #   - {name: nova, status: stopped}
+  #   - {name: nova, port: 8774, type: tcp}
+  #   - {name: nova, port: 8774, state: down, type: tcp}
+  #   - {host: google.com, port: 8774, state: down, type: tcp}
+  #   - {name: nova, type: http, get: '/v2.0', port: 5000, code: 200}
+  #   - {host: google.com, type: http, get: '/v2.0', port: 5000, code: 200}
+  #   - {host: 127.0.0.1, type: http, get: '/', code: 200, useproxy: False }
+  #   - {name: nova, sleep: 20} # defaults to 10
+  #   - {name: nova, retry: 10} # defaults to 5
 
 - name: mistral
   image: shaddock/mistral
@@ -137,9 +139,8 @@
   volumes:
     - mount: /var/log/supervisor
       host_dir: /var/log/shaddock/mistral
-  depend-on:
-    - running: mysql
-      tcp: 3306
-    - running: keystone
-      tcp: 35357
-      tcp: 5000
+  depends-on:
+    - {name: seed, status: stopped}
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v2.0'}
+    - {name: keystone, port: 35357, get: '/v2.0'}
