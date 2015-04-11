@@ -111,25 +111,27 @@
     - {name: keystone, port: 5000, get: '/v2.0'}
     - {name: keystone, port: 35357, get: '/v2.0'}
 
-# - name: nova-compute
-  # image: shaddock/nova-compute
-  # volumes:
-    # - mount: /var/log/nova
-      # host_dir: /var/log/shaddock/compute
-  # privileged: True
-  # network_mode: host
-  # priority: 90
-  # depends-on:
-  #   - {name: nova}
-  #   - {name: nova, status: stopped}
-  #   - {name: nova, port: 8774, type: tcp}
-  #   - {name: nova, port: 8774, state: down, type: tcp}
-  #   - {host: google.com, port: 8774, state: down, type: tcp}
-  #   - {name: nova, type: http, get: '/v2.0', port: 5000, code: 200}
-  #   - {host: google.com, type: http, get: '/v2.0', port: 5000, code: 200}
-  #   - {host: 127.0.0.1, type: http, get: '/', code: 200, useproxy: False }
-  #   - {name: nova, sleep: 20} # defaults to 10
-  #   - {name: nova, retry: 10} # defaults to 5
+- name: qemu
+  image: shaddock/qemu
+  volumes:
+    - mount: /var/log/nova
+      host_dir: /var/log/shaddock/compute
+  privileged: True
+  network_mode: host
+  priority: 90
+  depends-on:
+    - {name: nova}
+
+
+#     - {name: nova, status: stopped}
+#     - {name: nova, port: 8774, type: tcp}
+#     - {name: nova, port: 8774, state: down, type: tcp}
+#     - {host: google.com, port: 8774, state: down, type: tcp}
+#     - {name: nova, type: http, get: '/v2.0', port: 5000, code: 200}
+#     - {host: google.com, type: http, get: '/v2.0', port: 5000, code: 200}
+#     - {host: 127.0.0.1, type: http, get: '/', code: 200, useproxy: False }
+#     - {name: nova, sleep: 20} # defaults to 10
+#     - {name: nova, retry: 10} # defaults to 5
 
 - name: mistral
   image: shaddock/mistral
