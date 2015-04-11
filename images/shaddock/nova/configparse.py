@@ -49,7 +49,6 @@ config.set(section, 'verbose', 'True')
 config.set(section, 'network_api_class', 'nova.network.api.API')
 config.set(section, 'security_group_api', 'nova')
 
-
 section = 'keystone_authtoken'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)

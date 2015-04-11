@@ -50,6 +50,22 @@ config.set(section, 'vncserver_listen', '0.0.0.0')
 config.set(section, 'vncserver_proxyclient_address', '%s' % os.environ.get('HOST_IP'))
 config.set(section, 'novncproxy_base_url', 'http://%s:6080/vnc_auto.html' % os.environ.get('HOST_IP'))
 
+# Nova-network
+
+config.set(section, 'network_api_class', 'nova.network.api.API')
+config.set(section, 'security_group_api', 'nova')
+config.set(section, 'firewall_driver', 'nova.virt.libvirt.firewall.IptablesFirewallDriver')
+config.set(section, 'network_manager', 'nova.network.manager.FlatDHCPManager')
+config.set(section, 'network_size', '254')
+config.set(section, 'allow_same_net_traffic', 'False')
+config.set(section, 'multi_host', 'True')
+config.set(section, 'send_arp_for_ha', 'True')
+config.set(section, 'share_dhcp_address', 'True')
+config.set(section, 'force_dhcp_release', 'True')
+config.set(section, 'flat_network_bridge', 'br100')
+config.set(section, 'flat_interface', 'INTERFACE_NAME')
+config.set(section, 'public_interface', 'INTERFACE_NAME')
+
 section = 'keystone_authtoken'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
