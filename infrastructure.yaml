@@ -96,21 +96,6 @@
     - {name: keystone, port: 35357, get: '/v2.0'}
 
 
-- name: horizon2
-  image: shaddock/horizon
-  priority: 60
-  ports:
-    - 81
-    - 11212
-  volumes:
-    - mount: /var/log/supervisor
-      host_dir: /var/log/shaddock/horizon2
-  depends-on:
-    - {name: seed, status: stopped}
-    - {name: mysql, port: 3306}
-    - {name: keystone, port: 5000, get: '/v2.0'}
-    - {name: keystone, port: 35357, get: '/v2.0'}
-
 - name: qemu
   image: shaddock/qemu
   volumes:
