@@ -13,7 +13,8 @@ RUN \
                         mysql-client mysql-common \
                         python-mysqldb git python-dev \
                         libffi-dev libssl-dev \
-                        python-keystoneclient
+                        python-keystoneclient \
+                        python-openstackclient
 
 ADD cloud-config /usr/local/bin/
 RUN chmod +x /usr/local/bin/cloud-config
