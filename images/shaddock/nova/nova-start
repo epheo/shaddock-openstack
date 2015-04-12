@@ -10,16 +10,18 @@ endpoint=`openstack --os-tenant-name admin --os-username admin --os-password ${A
 
 if [ -z "$endpoint" ]
 then
+    echo "Endpoint not created"
+    echo "Creating database"
     mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "CREATE DATABASE nova;"
     mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' \
     IDENTIFIED BY '${NOVA_DBPASS}';"
     mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' \
     IDENTIFIED BY '${NOVA_DBPASS}';"
-
+    #
     echo "Creating Nova user..."
     keystone user-create --name nova --pass ${NOVA_PASS} --email=nova@${EMAIL_ADDRESS}
     keystone user-role-add --user nova --tenant service --role admin
-
+    #
     echo "Registering Nova API and EndPoints..."
     keystone service-create --name nova --type compute --description "OpenStack Compute"
     keystone endpoint-create \
