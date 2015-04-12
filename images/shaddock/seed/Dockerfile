@@ -19,6 +19,4 @@ RUN \
 ADD cloud-config /usr/local/bin/
 RUN chmod +x /usr/local/bin/cloud-config
 
-RUN pip install pbr
-
 CMD ["cloud-config"]

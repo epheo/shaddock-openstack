@@ -53,33 +53,6 @@ keystone endpoint-create --service-id=$(keystone service-list | awk '/ image / {
 --internalurl=http://${HOST_IP}:9292 \
 --adminurl=http://${HOST_IP}:9292
 
-## Nova
-echo "Creating Nova user..."
-keystone user-create --name nova --pass ${NOVA_PASS} --email=nova@${EMAIL_ADDRESS}
-keystone user-role-add --user nova --tenant service --role admin
-
-echo "Registering Nova API and EndPoints..."
-keystone service-create --name nova --type compute --description "OpenStack Compute"
-keystone endpoint-create \
---service-id $(keystone service-list | awk '/ compute / {print $2}') \
---publicurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
---internalurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
---adminurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
---region regionOne
-
-## Neutron
-#echo "Creating Neutron user..."
-#keystone user-create --name neutron --pass ${NEUTRON_PASS} --email=neutron@${EMAIL_ADDRESS}
-#keystone user-role-add --user neutron --tenant service --role admin
-
-#echo "Registering Neutron API and EndPoints..."
-#keystone service-create --name neutron --type network --description "OpenStack Networking"
-#keystone endpoint-create \
-#  --service-id $(keystone service-list | awk '/ network / {print $2}') \
-#  --publicurl http://${HOST_IP}:9696 \
-#  --adminurl http://${HOST_IP}:9696 \
-#  --internalurl http://${HOST_IP}:9696 \
-#  --region regionOne
 
 ## Mistral
 echo "Creating Mistral user..."
