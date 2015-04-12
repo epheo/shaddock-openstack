@@ -49,7 +49,6 @@
   priority: 40
   ports:
     - 8774
-    - 8775
   volumes:
     - mount: /var/log/nova
       host_dir: /var/log/shaddock/nova
@@ -96,6 +95,8 @@
 
 - name: qemu
   image: shaddock/qemu
+  ports:
+    - 8775
   volumes:
     - mount: /var/log/nova
       host_dir: /var/log/shaddock/compute
