@@ -52,8 +52,6 @@ config.set(section, 'novncproxy_base_url', 'http://%s:6080/vnc_auto.html' % os.e
 
 # If Qemu:
 config.set(section, 'compute_driver', 'libvirt.LibvirtDriver')
-config.set(section, 'virt_type', 'qemu')
-
 
 # Nova-network
 config.set(section, 'network_api_class', 'nova.network.api.API')
@@ -69,6 +67,12 @@ config.set(section, 'force_dhcp_release', 'True')
 config.set(section, 'flat_network_bridge', 'br100')
 config.set(section, 'flat_interface', 'eth0')
 config.set(section, 'public_interface', 'eth0')
+
+
+section = 'libvirt'
+if not set([section]).issubset(config.sections()):
+    config.add_section(section)
+config.set(section, 'virt_type', 'qemu')
 
 
 section = 'keystone_authtoken'
