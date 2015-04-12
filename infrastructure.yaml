@@ -10,9 +10,7 @@
     - 15672
   volumes:
     - mount: /data/log
-      host_dir: /var/lib/rabbitmq/log
-    - mount: /data/mnesia
-      host_dir: /var/lib/rabbitmq/mnesia
+      host_dir: /var/log/shaddock/rabbitmq/log
 
 
 - name: mysql
@@ -21,7 +19,7 @@
   ports:
     - 3306
   volumes:
-    - mount: /var/log/supervisor
+    - mount: /var/log/mysql
       host_dir: /var/log/shaddock/mysql
 
 
@@ -32,7 +30,7 @@
     - 35357
     - 5000
   volumes:
-    - mount: /var/log/supervisor
+    - mount: /var/log/keystone
       host_dir: /var/log/shaddock/keystone
   depends-on:
     - {name: mysql, port: 3306}
