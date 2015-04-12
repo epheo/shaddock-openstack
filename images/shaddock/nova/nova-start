@@ -15,7 +15,7 @@ endpoint=`openstack endpoint list -f csv -q |grep nova`
 
 if [ -z "$endpoint" ]
 then
-    echo "Endpoint not created"
+    echo ">>>>>>> Endpoint not created"
     echo "Creating database"
     mysql \
         -h${MYSQL_DB} \
@@ -68,10 +68,10 @@ else
 
     if [[ $endpoint == *"ERROR"* ]]
     then
-        echo "Cannot connect to Keystone"
+        echo ">>>>>>> Cannot connect to Keystone"
         exit
     else
-        echo "Endpoint already created"
+        echo ">>>>>>> Endpoint already created"
     fi
 fi
 

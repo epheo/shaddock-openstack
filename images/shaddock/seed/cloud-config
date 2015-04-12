@@ -41,10 +41,6 @@ keystone endpoint-create \
 --region regionOne
 
 
-
-## Mistral
-
-
 ## Tests
 unset OS_SERVICE_TOKEN OS_SERVICE_ENDPOINT
 
