@@ -72,6 +72,7 @@ else
         exit
     else
         echo "Endpoint already created"
+    fi
 fi
 
 echo "Create database tables"
