@@ -9,8 +9,7 @@ configparse.py
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS} 
 export OS_TENANT_NAME=admin
-export OS_AUTH_URL=https://${HOST_IP}:35357/v2.0
-
+export OS_AUTH_URL=http://${HOST_IP}:35357/v2.0
 
 endpoint=`openstack endpoint list -f csv -q |grep nova`
 
@@ -66,7 +65,13 @@ then
         --adminurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
         --region regionOne
 else
-    echo "Endpoint already created"
+
+    if [[ $endpoint == *"ERROR"* ]]
+    then
+        echo "Cannot connect to Keystone"
+        exit
+    else
+        echo "Endpoint already created"
 fi
 
 echo "Create database tables"

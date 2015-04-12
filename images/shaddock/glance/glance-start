@@ -1,34 +1,46 @@
 #!/bin/bash
 
-echo "Setting up glance"
-
-service glance-registry restart >/dev/null 2>&1
-service glance-api restart >/dev/null 2>&1
-
 echo "Removing glance DB..."
 rm /var/lib/glance/glance.sqlite
 
 echo "Updating conf file..."
 python3 /usr/local/bin/configparse.py
 
-echo "Restarting glance"
-service glance-registry restart >/dev/null 2>&1
-service glance-api restart >/dev/null 2>&1
+export OS_USERNAME=admin
+export OS_PASSWORD=${ADMIN_PASS}
+export OS_TENANT_NAME=admin
+export OS_AUTH_URL=http://${HOST_IP}:35357/v2.0
 
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "CREATE DATABASE glance;"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' \
-IDENTIFIED BY '${GLANCE_DBPASS}';"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'${HOST_NAME}' \
-IDENTIFIED BY '${GLANCE_DBPASS}';"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' \
-IDENTIFIED BY '${GLANCE_DBPASS}'"
+endpoint=`openstack endpoint list -f csv -q |grep glance`
+
+if [ -z "$endpoint" ]
+then
+    echo "Endpoint not created"
+    echo "Creating database"
+    mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "CREATE DATABASE glance;"
+    mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' \
+    IDENTIFIED BY '${GLANCE_DBPASS}';"
+    mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'${HOST_NAME}' \
+    IDENTIFIED BY '${GLANCE_DBPASS}';"
+    mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' \
+    IDENTIFIED BY '${GLANCE_DBPASS}'"
+
+    echo "Creating Glance user..."
+    keystone user-create --name=glance --pass=${GLANCE_PASS} --email=glance@${EMAIL_ADDRESS}
+    keystone user-role-add --user=glance --tenant=service --role=admin
+
+    echo "Registering Glance API and EndPoints..."
+    keystone service-create --name=glance --type=image --description="OpenStack Image Service"
+    keystone endpoint-create --service-id=$(keystone service-list | awk '/ image / {print $2}') \
+    --publicurl=http://${HOST_IP}:9292 \
+    --internalurl=http://${HOST_IP}:9292 \
+    --adminurl=http://${HOST_IP}:9292
+else
+    echo "Endpoint already created"
+fi
 
 echo "Create database tables"
 su -s /bin/sh -c "glance-manage db_sync" glance
-
-echo "Stopping glance"
-service glance-registry stop >/dev/null 2>&1
-service glance-api stop >/dev/null 2>&1
 
 echo "Starting glance using supervisord..."
 exec /usr/bin/supervisord -n

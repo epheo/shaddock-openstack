@@ -41,32 +41,9 @@ keystone endpoint-create \
 --region regionOne
 
 
-## GLANCE
-echo "Creating Glance user..."
-keystone user-create --name=glance --pass=${GLANCE_PASS} --email=glance@${EMAIL_ADDRESS}
-keystone user-role-add --user=glance --tenant=service --role=admin
-
-echo "Registering Glance API and EndPoints..."
-keystone service-create --name=glance --type=image --description="OpenStack Image Service"
-keystone endpoint-create --service-id=$(keystone service-list | awk '/ image / {print $2}') \
---publicurl=http://${HOST_IP}:9292 \
---internalurl=http://${HOST_IP}:9292 \
---adminurl=http://${HOST_IP}:9292
-
 
 ## Mistral
-echo "Creating Mistral user..."
-keystone user-create --name mistral --pass ${MISTRAL_PASS} --email=mistral@${EMAIL_ADDRESS}
-keystone user-role-add --user mistral --tenant service --role admin
 
-echo "Registering Mistral API and EndPoints..."
-keystone service-create --name mistral --type workflowv2 --description "OpenStack Mistral"
-keystone endpoint-create \
-  --service-id $(keystone service-list | awk '/ workflowv2 / {print $2}') \
-  --publicurl http://${HOST_IP}:8989/v2 \
-  --adminurl http://${HOST_IP}:8989/v2 \
-  --internalurl http://${HOST_IP}:8989/v2 \
-  --region regionOne
 
 ## Tests
 unset OS_SERVICE_TOKEN OS_SERVICE_ENDPOINT
