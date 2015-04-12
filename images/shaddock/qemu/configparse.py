@@ -93,3 +93,21 @@ print('Parsing of %s...' % configfile)
 with open(configfile, 'w') as configfile:
     config.write(configfile)
 print('Done')
+
+
+configfile = '/etc/nova/nova-compute.conf'
+config = ConfigParser.RawConfigParser()
+config.read(configfile)
+
+section = 'DEFAULT'
+config.set(section, 'compute_driver', 'libvirt.LibvirtDriver')
+
+section = 'libvirt'
+if not set([section]).issubset(config.sections()):
+    config.add_section(section)
+config.set(section, 'virt_type', 'qemu')
+
+print('Parsing of %s...' % configfile)
+with open(configfile, 'w') as configfile:
+    config.write(configfile)
+print('Done')
