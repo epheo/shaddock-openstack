@@ -52,7 +52,7 @@ config.set(section, 'novncproxy_base_url', 'http://%s:6080/vnc_auto.html' % os.e
 
 # If Qemu:
 config.set(section, 'compute_driver', 'libvirt.LibvirtDriver')
-config.set(section, 'libvirt_type', 'qemu')
+config.set(section, 'virt_type', 'qemu')
 
 
 # Nova-network
