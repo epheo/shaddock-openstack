@@ -13,6 +13,7 @@ VOLUME  ["/var/log/glance"]
 ADD glance-start /usr/local/bin/
 ADD configparse.py /usr/local/bin/
 RUN chmod +x /usr/local/bin/glance-start
+RUN chmod +x /usr/local/bin/configparse.py
 
 EXPOSE 9292
 CMD ["glance-start"]
