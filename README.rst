@@ -12,16 +12,19 @@ Currently implemented OpenStack services
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **OpenStack core:**
+
 * Keystone
 * Nova
 * Glance
 * Horizon
 
 **Dependencies:**
+
 * RabbitMq
 * Mysql
 
 **Stackforge:**
+
 * Mistral
 
 About the compute
