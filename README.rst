@@ -8,14 +8,8 @@ You sould run ./set_ip.sh first in order to sed your main nic ip in
 configuration.yaml.
 
 
-About the compute
-~~~~~~~~~~~~~~~~~
-Privileged mode should be True to use kvm when deploying on baremetal.
-You can change the param Privileged: to True in order to use KVM. If not qemu 
-will run on software emulation.
-
-Implemented OpenStack services list
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Currently implemented OpenStack services
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **OpenStack core:**
 
@@ -29,6 +23,12 @@ Implemented OpenStack services list
 * RabbitMq
 * Mysql
 
-** Stackforge:**
+**Stackforge:**
 
 * Mistral
+
+About the compute
+~~~~~~~~~~~~~~~~~
+Privileged mode should be True to use kvm when deploying on baremetal.
+You can change the param Privileged: to True in order to use KVM. If not qemu
+will run on software emulation.
