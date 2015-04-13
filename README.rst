@@ -14,3 +14,21 @@ Privileged mode should be True to use kvm when deploying on baremetal.
 You can change the param Privileged: to True in order to use KVM. If not qemu 
 will run on software emulation.
 
+Implemented OpenStack services list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**OpenStack core:**
+
+* Keystone
+* Nova
+* Glance
+* Horizon
+
+**Dependencies:**
+
+* RabbitMq
+* Mysql
+
+** Stackforge:**
+
+* Mistral
