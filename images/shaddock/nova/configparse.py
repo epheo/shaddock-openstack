@@ -18,8 +18,7 @@
 import ConfigParser
 import os
 
- 
-## nova.conf
+# nova.conf
 ############
 
 configfile = '/etc/nova/nova.conf'
@@ -34,7 +33,7 @@ config.set(section, 'connection',
                                                  os.environ.get('HOST_IP')))
 
 section = 'DEFAULT'
-#if not set([section]).issubset(config.sections()):
+# if not set([section]).issubset(config.sections()):
 #    config.add_section(section)
 config.set(section, 'rpc_backend', 'rabbit')
 config.set(section, 'rabbit_host', os.environ.get('HOST_IP'))
@@ -45,14 +44,14 @@ config.set(section, 'vncserver_listen', os.environ.get('HOST_IP'))
 config.set(section, 'vncserver_proxyclient_address', os.environ.get('HOST_IP'))
 config.set(section, 'verbose', 'True')
 
-## NOVA-NETWORK
+# NOVA-NETWORK
 config.set(section, 'network_api_class', 'nova.network.api.API')
 config.set(section, 'security_group_api', 'nova')
 
 section = 'keystone_authtoken'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
-config.set(section, 'auth_uri', 
+config.set(section, 'auth_uri',
                     'http://%s:5000/v2.0' % os.environ.get('HOST_IP'))
 config.set(section, 'identity_uri',
                     'http://%s:35357' % os.environ.get('HOST_IP'))
@@ -72,7 +71,7 @@ print('Done')
 
 
 def neutron_config():
-    ## neutron.conf
+    # neutron.conf
     ###############
 
     configfile = '/etc/neutron/neutron.conf'
@@ -82,12 +81,12 @@ def neutron_config():
     if not set([section]).issubset(config.sections()):
         config.add_section(section)
     config.set(section, 'connection',
-                        'mysql://neutron:%s@%s/neutron' 
+                        'mysql://neutron:%s@%s/neutron'
                         % (os.environ.get('NEUTRON_DBPASS'),
                            os.environ.get('HOST_IP')))
 
     section = 'DEFAULT'
-    #if not set([section]).issubset(config.sections()):
+    # if not set([section]).issubset(config.sections()):
     #    config.add_section(section)
     config.set(section, 'rpc_backend', 'rabbit')
     config.set(section, 'rabbit_host', os.environ.get('HOST_IP'))
@@ -98,8 +97,10 @@ def neutron_config():
     config.set(section, 'allow_overlapping_ips', 'True')
     config.set(section, 'notify_nova_on_port_status_changes', 'True')
     config.set(section, 'notify_nova_on_port_data_changes', 'True')
-    config.set(section, 'nova_url', 'http://%s:8774/v2' % os.environ.get('HOST_IP'))
-    config.set(section, 'nova_admin_auth_url', 'http://%s:35357/v2' % os.environ.get('HOST_IP'))
+    config.set(section, 'nova_url', 'http://%s:8774/v2' % 
+             os.environ.get('HOST_IP'))
+    config.set(section, 'nova_admin_auth_url', 'http://%s:35357/v2' % 
+               :wos.environ.get('HOST_IP'))
     config.set(section, 'nova_region_name', 'regionOne')
     config.set(section, 'nova_admin_username', 'nova')
     config.set(section, 'nova_admin_tenant_id', 'service')

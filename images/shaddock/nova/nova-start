@@ -64,6 +64,7 @@ then
         --internalurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
         --adminurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
         --region regionOne
+    
 else
 
     if [[ $endpoint == *"ERROR"* ]]
