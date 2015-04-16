@@ -2,6 +2,8 @@ shaddock-template
 ===================
 Typical OpenStack in Docker templates to be deployed with Shaddock
 
+https://github.com/epheo/shaddock
+
 Configuration
 ~~~~~~~~~~~~~
 You sould run ./set_ip.sh first in order to sed your main nic ip in
