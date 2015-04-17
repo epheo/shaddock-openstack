@@ -1,4 +1,4 @@
-FROM shaddock/seed:latest
+FROM shaddock/seed:juno
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install glance

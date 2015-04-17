@@ -3,7 +3,7 @@
 ################################################
 
 - name: rabbitmq
-  image: shaddock/rabbitmq:juno
+  image: shaddock/rabbitmq:latest
   priority: 10
   ports:
     - 5672
@@ -14,7 +14,7 @@
 
 
 - name: mysql
-  image: shaddock/mysql:juno
+  image: shaddock/mysql:latest
   priority: 20
   ports:
     - 3306
@@ -37,7 +37,7 @@
 
 
 - name: seed
-  image: shaddock/seed:latest
+  image: shaddock/seed:juno
   priority: 35
   depends-on:
     - {name: keystone, port: 5000, get: '/v2.0'}
