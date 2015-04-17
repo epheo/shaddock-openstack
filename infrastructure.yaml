@@ -3,7 +3,7 @@
 ################################################
 
 - name: rabbitmq
-  image: shaddock/rabbitmq:juno
+  image: shaddock/rabbitmq:latest
   priority: 10
   ports:
     - 5672
@@ -16,7 +16,7 @@
 
 
 - name: mysql
-  image: shaddock/mysql:juno
+  image: shaddock/mysql:latest
   priority: 20
   ports:
     - 3306
@@ -26,7 +26,7 @@
 
 
 - name: keystone
-  image: shaddock/keystone:juno
+  image: shaddock/keystone:latest
   priority: 30
   ports:
     - 35357
@@ -48,7 +48,7 @@
 
 
 - name: nova
-  image: shaddock/nova:juno
+  image: shaddock/nova:latest
   priority: 40
   ports:
     - 8774
@@ -66,7 +66,7 @@
 
 
 - name: glance
-  image: shaddock/glance:juno
+  image: shaddock/glance:latest
   priority: 50
   ports:
     - 9292
@@ -82,7 +82,7 @@
 
 
 - name: horizon
-  image: shaddock/horizon:juno
+  image: shaddock/horizon:latest
   priority: 60
   ports:
     - 80
@@ -116,7 +116,7 @@
 
 
 - name: qemu
-  image: shaddock/qemu:juno
+  image: shaddock/qemu:latest
   ports:
     - 8775
   volumes:
@@ -141,7 +141,7 @@
 
 
 # - name: mistral
-  # image: shaddock/mistral:juno
+  # image: shaddock/mistral:latest
   # ports:
     # - 8989
   # priority: 90
