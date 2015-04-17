@@ -10,7 +10,9 @@
     - 15672
   volumes:
     - mount: /data/log
-      host_dir: /var/log/shaddock/rabbitmq/log
+      host_dir: /var/lib/rabbitmq/log 
+    - mount: /data/mnesia
+      host_dir: /var/lib/rabbitmq/mnesia
 
 
 - name: mysql
@@ -19,21 +21,22 @@
   ports:
     - 3306
   volumes:
-    - mount: /var/log/mysql
-      host_dir: /var/log/shaddock/mysql
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/mysql 
 
 
 - name: keystone
-  image: shaddock/keystone:juno
+  image: shaddock/keystone:latest
   priority: 30
   ports:
     - 35357
     - 5000
   volumes:
-    - mount: /var/log/keystone
-      host_dir: /var/log/shaddock/keystone
-  depends-on:
-    - {name: mysql, port: 3306}
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/keystone 
+  depend-on:
+    - running: mysql
+      net: 3306
 
 
 - name: seed
@@ -45,31 +48,32 @@
 
 
 - name: nova
-  image: shaddock/nova:juno
+  image: shaddock/nova:latest
   priority: 40
   ports:
     - 8774
+    - 8775
   volumes:
     - mount: /var/log/nova
       host_dir: /var/log/shaddock/nova
   privileged: True
-  depends-on:
-    - {name: seed, status: stopped}
-    - {name: mysql, port: 3306}
-    - {name: rabbitmq, port: 5672}
-    - {name: keystone, port: 5000, get: '/v2.0'}
-    - {name: keystone, port: 35357, get: '/v2.0'}
+  depend-on:
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
 
 
 - name: glance
-  image: shaddock/glance:juno
+  image: shaddock/glance:latest
   priority: 50
   ports:
     - 9292
     - 4324
   volumes:
-    # - mount: /var/log/glance
-      # host_dir: /var/log/shaddock/glance
+    - mount: /var/log/glance
+      host_dir: /var/log/shaddock/glance
   depends-on:
     - {name: seed, status: stopped}
     - {name: mysql, port: 3306}
@@ -78,47 +82,66 @@
 
 
 - name: horizon
-  image: shaddock/horizon:juno
+  image: shaddock/horizon:latest
   priority: 60
   ports:
     - 80
     - 11211
   volumes:
-    - mount: /var/log/horizon
+    - mount: /var/log/supervisor
       host_dir: /var/log/shaddock/horizon
-  depends-on:
-    - {name: seed, status: stopped}
-    - {name: mysql, port: 3306}
-    - {name: keystone, port: 5000, get: '/v2.0'}
-    - {name: keystone, port: 35357, get: '/v2.0'}
+  depend-on:
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
+
+
+- name: horizon2 
+  image: shaddock/horizon
+  priority: 60
+  ports:
+    - 81
+    - 1111
+  volumes:
+    - mount: /var/log/supervisor
+      host_dir: /var/log/shaddock/horizon2
+  depend-on:
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
 
 
 - name: qemu
-  image: shaddock/qemu:juno
+  image: shaddock/qemu:latest
   ports:
     - 8775
   volumes:
     - mount: /var/log/nova
-      host_dir: /var/log/shaddock/compute
+      host_dir: /var/log/shaddock/qemu
   privileged: True
   network_mode: host
   priority: 90
-  depends-on:
-    - {name: nova}
+  depend-on:
+    - running: nova
+      net: 8774
+      net: 8775
+    - running: mysql
+      net: 3306
+    - running: keystone
+      net: 35357
+      net: 5000
+      net: {port: 5000, get: '/v2.0', code: 200}
+    - running: rabbitmq
+      net: 5672
+      net: 15672
 
-
-#     - {name: nova, status: stopped}
-#     - {name: nova, port: 8774, type: tcp}
-#     - {name: nova, port: 8774, state: down, type: tcp}
-#     - {host: google.com, port: 8774, state: down, type: tcp}
-#     - {name: nova, type: http, get: '/v2.0', port: 5000, code: 200}
-#     - {host: google.com, type: http, get: '/v2.0', port: 5000, code: 200}
-#     - {host: 127.0.0.1, type: http, get: '/', code: 200, useproxy: False }
-#     - {name: nova, sleep: 20} # defaults to 10
-#     - {name: nova, retry: 10} # defaults to 5
 
 # - name: mistral
-  # image: shaddock/mistral:juno
+  # image: shaddock/mistral:latest
   # ports:
     # - 8989
   # priority: 90
