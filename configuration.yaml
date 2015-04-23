@@ -7,10 +7,10 @@
 
 template_vars:
     HOST_NAME: <your_hostname>
-    HOST_IP: <your_ip>
-    RABBITMQ_HOST: <your_ip>
+    HOST_IP: 10.0.0.20
+    RABBITMQ_HOST: 10.0.0.20
     RABBIT_PASS: panama
-    MYSQL_DB: <your_ip>
+    MYSQL_DB: 10.0.0.20
     MYSQL_USER: admin
     MYSQL_PASSWORD: password
     KEYSTONE_DBPASS: panama
@@ -36,5 +36,5 @@ template_vars:
     MURANO_PASS: panama
     MISTRAL_PASS: panama
     MISTRAL_DBPASS: panama
-    OS_MISTRAL_URL: http://<your_ip>:8989/v2
+    OS_MISTRAL_URL: http://10.0.0.20:8989/v2
     no_proxy: '16.49.136.0/22, 127.0.0.1, localhost'

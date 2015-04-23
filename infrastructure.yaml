@@ -52,7 +52,6 @@
   priority: 40
   ports:
     - 8774
-    - 8775
   volumes:
     - mount: /var/log/nova
       host_dir: /var/log/shaddock/nova
@@ -128,7 +127,6 @@
   depend-on:
     - running: nova
       net: 8774
-      net: 8775
     - running: mysql
       net: 3306
     - running: keystone
