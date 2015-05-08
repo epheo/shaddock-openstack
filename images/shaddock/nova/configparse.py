@@ -30,18 +30,18 @@ if not set([section]).issubset(config.sections()):
     config.add_section(section)
 config.set(section, 'connection',
                     'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
-                                                 os.environ.get('HOST_IP')))
+                                                 os.environ.get('MYSQL_HOST_IP')))
 
 section = 'DEFAULT'
 # if not set([section]).issubset(config.sections()):
 #    config.add_section(section)
 config.set(section, 'rpc_backend', 'rabbit')
-config.set(section, 'rabbit_host', os.environ.get('HOST_IP'))
+config.set(section, 'rabbit_host', os.environ.get('RABBIT_HOST_IP'))
 config.set(section, 'rabbit_password', os.environ.get('RABBIT_PASS'))
 config.set(section, 'auth_strategy', 'keystone')
-config.set(section, 'my_ip', os.environ.get('HOST_IP'))
-config.set(section, 'vncserver_listen', os.environ.get('HOST_IP'))
-config.set(section, 'vncserver_proxyclient_address', os.environ.get('HOST_IP'))
+config.set(section, 'my_ip', os.environ.get('NOVA_HOST_IP'))
+config.set(section, 'vncserver_listen', os.environ.get('NOVA_HOST_IP'))
+config.set(section, 'vncserver_proxyclient_address', os.environ.get('NOVA_HOST_IP'))
 config.set(section, 'verbose', 'True')
 
 # NOVA-NETWORK
@@ -52,9 +52,9 @@ section = 'keystone_authtoken'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
 config.set(section, 'auth_uri',
-                    'http://%s:5000/v2.0' % os.environ.get('HOST_IP'))
+                    'http://%s:5000/v2.0' % os.environ.get('KEYSTONE_HOST_IP'))
 config.set(section, 'identity_uri',
-                    'http://%s:35357' % os.environ.get('HOST_IP'))
+                    'http://%s:35357' % os.environ.get('KEYSTONE_HOST_IP'))
 config.set(section, 'admin_tenant_name', 'service')
 config.set(section, 'admin_user', 'nova')
 config.set(section, 'admin_password', os.environ.get('NOVA_PASS'))

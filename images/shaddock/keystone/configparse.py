@@ -25,7 +25,7 @@ config.read(configfile)
 config['DEFAULT']['admin_token'] = os.environ.get('ADMIN_TOKEN')
 
 config['database']['connection'] = 'mysql://keystone:%s@%s/keystone' % (os.environ.get('KEYSTONE_DBPASS'),
-                                                                        os.environ.get('HOST_IP'))
+                                                                        os.environ.get('MYSQL_HOST_IP'))
 
 config['token']['provider'] = 'keystone.token.providers.uuid.Provider'
 config['token']['driver'] = 'keystone.token.persistence.backends.sql.Token'

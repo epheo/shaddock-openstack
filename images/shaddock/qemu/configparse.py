@@ -32,13 +32,13 @@ section = 'database'
 if not set([section]).issubset(config.sections()):
     config.add_section(section)
 config.set(section, 'connection',  'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
-                                                                os.environ.get('HOST_IP')))
+                                                                os.environ.get('MYSQL_HOST_IP')))
 
 section = 'DEFAULT'
 #if not set([section]).issubset(config.sections()):
 #    config.add_section(section)
 config.set(section, 'rpc_backend', 'rabbit')
-config.set(section, 'rabbit_host', os.environ.get('HOST_IP'))
+config.set(section, 'rabbit_host', os.environ.get('RABBIT_HOST_IP'))
 config.set(section, 'rabbit_password', os.environ.get('RABBIT_PASS'))
 config.set(section, 'auth_strategy', 'keystone')
 config.set(section, 'my_ip', os.environ.get('HOST_IP'))
@@ -47,7 +47,7 @@ config.set(section, 'vncserver_proxyclient_address', os.environ.get('HOST_IP'))
 config.set(section, 'verbose', 'True')
 config.set(section, 'vnc_enabled', 'True')
 config.set(section, 'vncserver_listen', '0.0.0.0')
-config.set(section, 'vncserver_proxyclient_address', '%s' % os.environ.get('HOST_IP'))
+config.set(section, 'vncserver_proxyclient_address', os.environ.get('HOST_IP'))
 config.set(section, 'novncproxy_base_url', 'http://%s:6080/vnc_auto.html' % os.environ.get('HOST_IP'))
 
 # If Qemu:

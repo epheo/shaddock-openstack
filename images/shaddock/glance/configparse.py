@@ -24,10 +24,10 @@ configfile = '/etc/glance/glance-api.conf'
 config.read(configfile)
 
 config['database']['connection'] = 'mysql://glance:%s@%s/glance' % (os.environ.get('GLANCE_DBPASS'),
-                                                                    os.environ.get('HOST_IP'))
+                                                                    os.environ.get('MYSQL_HOST_IP'))
 
-config['keystone_authtoken']['auth_uri'] = 'http://%s:5000/v2.0' % os.environ.get('HOST_IP')
-config['keystone_authtoken']['identity_uri'] = 'http://%s:35357' % os.environ.get('HOST_IP')
+config['keystone_authtoken']['auth_uri'] = 'http://%s:5000/v2.0' % os.environ.get('KEYSTONE_HOST_IP')
+config['keystone_authtoken']['identity_uri'] = 'http://%s:35357' % os.environ.get('KEYSTONE_HOST_IP')
 config['keystone_authtoken']['admin_tenant_name'] = 'service'
 config['keystone_authtoken']['admin_user'] = 'glance'
 config['keystone_authtoken']['admin_password'] = os.environ.get('GLANCE_PASS')
@@ -52,10 +52,10 @@ configfile = '/etc/glance/glance-registry.conf'
 config.read(configfile)
 
 config['database']['connection'] = 'mysql://glance:%s@%s/glance' % (os.environ.get('GLANCE_DBPASS'),
-                                                                    os.environ.get('HOST_IP'))
+                                                                    os.environ.get('MYSQL_HOST_IP'))
 
-config['keystone_authtoken']['auth_uri'] = 'http://%s:5000/v2.0' % os.environ.get('HOST_IP')
-config['keystone_authtoken']['identity_uri'] = 'http://%s:35357' % os.environ.get('HOST_IP')
+config['keystone_authtoken']['auth_uri'] = 'http://%s:5000/v2.0' % os.environ.get('KEYSTONE_HOST_IP')
+config['keystone_authtoken']['identity_uri'] = 'http://%s:35357' % os.environ.get('KEYSTONE_HOST_IP')
 config['keystone_authtoken']['admin_tenant_name'] = 'service'
 config['keystone_authtoken']['admin_user'] = 'glance'
 config['keystone_authtoken']['admin_password'] = os.environ.get('GLANCE_PASS')
