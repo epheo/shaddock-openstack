@@ -1,4 +1,4 @@
-FROM shaddock/seed:juno
+FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install nova
