@@ -9,7 +9,7 @@ configparse.py
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS} 
 export OS_TENANT_NAME=admin
-export OS_AUTH_URL=http://${HOST_IP}:35357/v2.0
+export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v2.0
 
 endpoint=`openstack endpoint list -f csv -q |grep nova`
 
@@ -18,20 +18,20 @@ then
     echo ">>>>>>> Endpoint not created"
     echo "Creating database"
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "CREATE DATABASE nova;"
 
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' \
             IDENTIFIED BY '${NOVA_DBPASS}';"
 
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' \
@@ -60,9 +60,9 @@ then
     keystone \
         endpoint-create \
         --service-id $(keystone service-list | awk '/ compute / {print $2}') \
-        --publicurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
-        --internalurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
-        --adminurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
+        --publicurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
+        --internalurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
+        --adminurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
         --region regionOne
     
 else

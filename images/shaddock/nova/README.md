@@ -1,4 +1,4 @@
-Used in order to deploy OpenStack in Docker with the Shaddock project:
+Used in order to deploy OpenStack in Docker with Shaddock:
 
 [https://github.com/epheo/shaddock](https://github.com/epheo/shaddock)
 

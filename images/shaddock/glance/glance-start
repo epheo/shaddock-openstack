@@ -9,7 +9,7 @@ python3 /usr/local/bin/configparse.py
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS}
 export OS_TENANT_NAME=admin
-export OS_AUTH_URL=http://${HOST_IP}:35357/v2.0
+export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v2.0
 
 endpoint=`openstack endpoint list -f csv -q |grep glance`
 
@@ -18,27 +18,27 @@ then
     echo ">>>>>>> Endpoint not yet created"
     echo "Creating database"
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "CREATE DATABASE glance;"
 
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' \
             IDENTIFIED BY '${GLANCE_DBPASS}';"
 
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'${HOST_NAME}' \
             IDENTIFIED BY '${GLANCE_DBPASS}';"
 
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' \

@@ -5,17 +5,36 @@ python3 /usr/local/bin/configparse.py
 
 echo "Create database..."
 echo "=> Creating ${SERVICE} database"
-echo "=> DB ${MYSQL_DB}"
+echo "=> DB ${MYSQL_HOST_IP}"
 echo "=> User ${MYSQL_USER}"
 echo "=> Password ${MYSQL_PASSWORD}"
 
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "CREATE DATABASE keystone;"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' \
-IDENTIFIED BY '${KEYSTONE_DBPASS}';"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'${HOST_NAME}' \
-IDENTIFIED BY '${KEYSTONE_DBPASS}';"
-mysql -h${MYSQL_DB} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' \
-IDENTIFIED BY '${KEYSTONE_DBPASS}'"
+mysql \
+    -h${MYSQL_HOST_IP} \
+    -u${MYSQL_USER} \
+    -p${MYSQL_PASSWORD} \
+    -e "CREATE DATABASE keystone;"
+
+mysql \
+    -h${MYSQL_HOST_IP} \
+    -u${MYSQL_USER} \
+    -p${MYSQL_PASSWORD} \
+    -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' \
+        IDENTIFIED BY '${KEYSTONE_DBPASS}';"
+
+mysql \
+    -h${MYSQL_HOST_IP} \
+    -u${MYSQL_USER} \
+    -p${MYSQL_PASSWORD} \
+    -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'${HOST_NAME}' \
+        IDENTIFIED BY '${KEYSTONE_DBPASS}';"
+
+mysql \
+    -h${MYSQL_HOST_IP} \
+    -u${MYSQL_USER} \
+    -p${MYSQL_PASSWORD} \
+    -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' \
+        IDENTIFIED BY '${KEYSTONE_DBPASS}'"
 
 echo "Create database tables"
 python /opt/keystone/bin/keystone-manage db_sync

@@ -6,7 +6,11 @@ rm -f /var/lib/nova/nova.sqlite
 echo "Updating conf file..."
 configparse.py
 
-keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${HOST_IP}:35357/v2.0 service-list
+keystone \
+    --os-tenant-name admin \
+    --os-username admin \
+    --os-password ${ADMIN_PASS} \
+    --os-auth-url http://${KEYSTONE_HOST_IP}:35357/v2.0 service-list
 
 
 echo "Starting nova using supervisord..."
