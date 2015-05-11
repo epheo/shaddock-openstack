@@ -19,7 +19,7 @@ from configparser import ConfigParser
 import os
 
 configfile = '/opt/keystone/etc/keystone.conf.sample'
-config = ConfigParser.RawConfigParser()
+config = ConfigParser()
 config.read(configfile)
 
 config['DEFAULT']['admin_token'] = os.environ.get('ADMIN_TOKEN')
