@@ -18,7 +18,7 @@
 import ConfigParser
 import os
 
-nova_db_pass = os.environ.get('NOVA_DB_PASS')
+nova_db_pass = os.environ.get('NOVA_DBPASS')
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
@@ -52,30 +52,38 @@ def apply_config(configfile, dict):
 
 
 nova_conf = {
-            'DEFAULT':
-            {'rpc_backend': 'rabbit',
-             'rabbit_host': rabbit_host_ip,
-             'rabbit_password': rabbit_pass,
-             'auth_strategy': 'keystone',
-             'my_ip': nova_host_ip,
-             'vncserver_listen': nova_host_ip,
-             'vncserver_proxyclient_address': nova_host_ip,
-             'verbose': 'True'},
+    'DEFAULT':
+    {'rpc_backend': 'rabbit',
+     'auth_strategy': 'keystone',
+     'my_ip': nova_host_ip,
+     'vncserver_listen': nova_host_ip,
+     'vncserver_proxyclient_address': nova_host_ip,
+     'verbose': 'True'},
 
-            'database':
-            {'connection':
-             'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
+    'oslo_messaging_rabbit':
+    {'rabbit_host': rabbit_host_ip,
+     'rabbit_password': rabbit_pass},
 
-            'keystone_authtoken':
-            {'auth_uri': 'http://%s:5000/v2.0' % keystone_host_ip,
-             'identity_uri': 'http://%s:35357' % keystone_host_ip,
-             'admin_tenant_name': 'service',
-             'admin_user': 'nova',
-             'admin_password': nova_pass},
+    'database':
+    {'connection':
+     'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
 
-            'glance':
-            {'host': host_ip}
-            }
+    'keystone_authtoken':
+    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'auth_plugin': 'password',
+     'project_domain_id': 'default',
+     'user_domain_id': 'default',
+     'project_name': 'service',
+     'username': 'nova',
+     'password': nova_pass},
+
+    'oslo_concurrency':
+    {'lock_path': '/var/lock/nova'},
+
+    'glance':
+    {'host': host_ip}
+    }
 
 apply_config('/etc/nova/nova.conf', nova_conf)
 

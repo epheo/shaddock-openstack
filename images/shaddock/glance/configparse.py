@@ -21,7 +21,7 @@ import os
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
 glance_pass = os.environ.get('GLANCE_PASS')
-glance_db_pass = os.environ.get('GLANCE_DB_PASS')
+glance_dbpass = os.environ.get('GLANCE_DBPASS')
 
 
 def apply_config(configfile, dict):
@@ -53,7 +53,7 @@ glance_api_conf = {
 
     'database':
     {'connection':
-     'mysql://glance:%s@%s/glance' % (glance_db_pass, mysql_host_ip)},
+     'mysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000/v2.0' % keystone_host_ip,
@@ -77,7 +77,7 @@ glance_registry_conf = {
 
     'database':
     {'connection':
-     'mysql://glance:%s@%s/glance' % (glance_db_pass, mysql_host_ip)},
+     'mysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000/v2.0' % keystone_host_ip,

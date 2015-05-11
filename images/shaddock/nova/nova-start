@@ -38,32 +38,20 @@ then
             IDENTIFIED BY '${NOVA_DBPASS}';"
     
     echo "Creating Nova user..."
-    keystone \
-        user-create \
-        --name nova \
-        --pass ${NOVA_PASS} \
-        --email=nova@${EMAIL_ADDRESS}
+    openstack user create --password ${NOVA_PASS} nova
     
-    keystone \
-        user-role-add \
-        --user nova \
-        --tenant service \
-        --role admin
+    openstack role add --project service --user nova admin
     
     echo "Registering Nova API and EndPoints..."
-    keystone \
-        service-create \
-        --name nova \
-        --type compute \
-        --description "OpenStack Compute"
+    openstack service create --type compute \
+        --description "OpenStack Compute" nova
 
-    keystone \
-        endpoint-create \
-        --service-id $(keystone service-list | awk '/ compute / {print $2}') \
+    openstack endpoint create \
         --publicurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
         --internalurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
         --adminurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
-        --region regionOne
+        --region RegionOne \
+        compute
     
 else
 

@@ -1,7 +1,9 @@
 #!/bin/bash
 
 echo "Updating conf file..."
-python3 /usr/local/bin/configparse.py
+cp /opt/keystone/etc/keystone.conf.sample \
+   /opt/keystone/etc/keystone.conf
+configparse.py
 
 echo "Create database..."
 echo "=> Creating ${SERVICE} database"
@@ -20,13 +22,6 @@ mysql \
     -u${MYSQL_USER} \
     -p${MYSQL_PASSWORD} \
     -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' \
-        IDENTIFIED BY '${KEYSTONE_DBPASS}';"
-
-mysql \
-    -h${MYSQL_HOST_IP} \
-    -u${MYSQL_USER} \
-    -p${MYSQL_PASSWORD} \
-    -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'${HOST_NAME}' \
         IDENTIFIED BY '${KEYSTONE_DBPASS}';"
 
 mysql \

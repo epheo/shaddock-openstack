@@ -18,7 +18,7 @@
 import ConfigParser
 import os
 
-keystone_db_pass = os.environ.get('KEYSTONE_DB_PASS')
+keystone_dbpass = os.environ.get('KEYSTONE_DBPASS')
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 admin_token = os.environ.get('ADMIN_TOKEN')
 
@@ -45,31 +45,20 @@ def apply_config(configfile, dict):
     return True
 
 keystone_conf = {
-            'DEFAULT':
-            {'admin_token': admin_token,
-             'verbose': 'True'},
+    'DEFAULT':
+    {'admin_token': admin_token,
+     'verbose': 'True'},
 
-            'database':
-            {'connection':
-             'mysql://keystone:%s@%s/keystone' % (keystone_db_pass, mysql_host_ip)},
+    'database':
+    {'connection':
+     'mysql://keystone:%s@%s/keystone' % (keystone_dbpass, mysql_host_ip)},
 
+    'token':
+    {'provider': 'keystone.token.providers.uuid.Provider',
+     'driver': 'keystone.token.persistence.backends.sql.Token'},
 
-configfile = '/opt/keystone/etc/keystone.conf.sample'
-config = ConfigParser()
-config.read(configfile)
+    'revoke':
+    {'driver': 'keystone.contrib.revoke.backends.sql.Revoke'}
+    }
 
-config['DEFAULT']['admin_token'] = os.environ.get('ADMIN_TOKEN')
-
-config['database']['connection'] = 'mysql://keystone:%s@%s/keystone' % (os.environ.get('KEYSTONE_DBPASS'),
-                                                                        os.environ.get('MYSQL_HOST_IP'))
-
-config['token']['provider'] = 'keystone.token.providers.uuid.Provider'
-config['token']['driver'] = 'keystone.token.persistence.backends.sql.Token'
-config['revoke']['driver'] = 'keystone.contrib.revoke.backends.sql.Revoke'
-config['DEFAULT']['verbose'] = 'True'
-
-configfile = '/opt/keystone/etc/keystone.conf'
-print('Parsing of %s...' % configfile)
-with open(configfile, 'w') as configfile:
-    config.write(configfile)
-print('Done')
+apply_config('/opt/keystone/etc/keystone.conf', keystone_conf)
