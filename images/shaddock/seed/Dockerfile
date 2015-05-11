@@ -5,7 +5,8 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 RUN apt-get -y update
 
 RUN apt-get -y install ubuntu-cloud-keyring
-RUN echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu trusty-updates/juno main" > /etc/apt/sources.list.d/cloudarchive-juno.list
+RUN echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu" \
+         "trusty-updates/kilo main" > /etc/apt/sources.list.d/cloudarchive-kilo.list
 
 RUN \
      apt-get -y update && apt-get -y dist-upgrade &&\

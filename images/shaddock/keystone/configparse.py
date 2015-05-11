@@ -15,8 +15,44 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from configparser import ConfigParser
+import ConfigParser
 import os
+
+keystone_db_pass = os.environ.get('KEYSTONE_DB_PASS')
+mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
+admin_token = os.environ.get('ADMIN_TOKEN')
+
+def apply_config(configfile, dict):
+    config = ConfigParser.RawConfigParser()
+    config.read(configfile)
+
+    for section in dict.keys():
+        if not set([section]).issubset(config.sections()) \
+                and section != 'DEFAULT':
+            config.add_section(section)
+        inner_dict = dict.get(section)
+        for key in inner_dict.keys():
+            config.set(section, key, inner_dict.get(key))
+            print('Writing %s : %s in section %s of the file %s'
+                  % (key,
+                     inner_dict.get(key),
+                     section,
+                     configfile))
+
+    with open(configfile, 'w') as configfile:
+        config.write(configfile)
+    print('Done')
+    return True
+
+keystone_conf = {
+            'DEFAULT':
+            {'admin_token': admin_token,
+             'verbose': 'True'},
+
+            'database':
+            {'connection':
+             'mysql://keystone:%s@%s/keystone' % (keystone_db_pass, mysql_host_ip)},
+
 
 configfile = '/opt/keystone/etc/keystone.conf.sample'
 config = ConfigParser()
