@@ -3,7 +3,7 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 # Install Keystone
 
-RUN pip uninstall -y oslo.config
+RUN pip uninstall -y oslo.config oslo.i18n
 
 RUN git clone https://github.com/openstack/keystone /opt/keystone/ &&\
     cd /opt/keystone && git checkout stable/juno  && python setup.py install
