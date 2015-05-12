@@ -18,55 +18,79 @@
 import ConfigParser
 import os
 
-# nova.conf
-###########
+nova_db_pass = os.environ.get('NOVA_DBPASS')
+mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
+rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
+rabbit_pass = os.environ.get('RABBIT_PASS')
+nova_host_ip = os.environ.get('NOVA_HOST_IP')
+keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
+nova_pass = os.environ.get('NOVA_PASS')
+host_ip = os.environ.get('HOST_IP')
 
-configfile = '/opt/nova/etc/nova/nova.conf'
-config = ConfigParser.RawConfigParser()
 
-section = 'database'
-config.add_section(section)
-config.set(section, 'connection',
-                    'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
-                                                 os.environ.get('HOST_IP')))
+def apply_config(configfile, dict):
+    config = ConfigParser.RawConfigParser()
+    config.read(configfile)
 
-section = 'DEFAULT'
-config.set(section, 'rpc_backend', 'rabbit')
-config.set(section, 'rabbit_host', os.environ.get('HOST_IP'))
-config.set(section, 'rabbit_password', os.environ.get('RABBIT_PASS'))
-config.set(section, 'auth_strategy', 'keystone')
-config.set(section, 'my_ip', os.environ.get('HOST_IP'))
-config.set(section, 'vncserver_listen', os.environ.get('HOST_IP'))
-config.set(section, 'vncserver_proxyclient_address', os.environ.get('HOST_IP'))
-config.set(section, 'verbose', 'True')
+    for section in dict.keys():
+        if not set([section]).issubset(config.sections()) \
+                and section != 'DEFAULT':
+            config.add_section(section)
+        inner_dict = dict.get(section)
+        for key in inner_dict.keys():
+            config.set(section, key, inner_dict.get(key))
+            print('Writing %s : %s in section %s of the file %s'
+                  % (key,
+                     inner_dict.get(key),
+                     section,
+                     configfile))
 
-# NOVA-NETWORK
-config.set(section, 'network_api_class', 'nova.network.api.API')
-config.set(section, 'security_group_api', 'nova')
+    with open(configfile, 'w') as configfile:
+        config.write(configfile)
+    print('Done')
+    return True
 
-section = 'keystone_authtoken'
-config.add_section(section)
-config.set(section, 'auth_uri',
-                    'http://%s:5000/v2.0' % os.environ.get('HOST_IP'))
-config.set(section, 'identity_uri',
-                    'http://%s:35357' % os.environ.get('HOST_IP'))
-config.set(section, 'admin_tenant_name', 'service')
-config.set(section, 'admin_user', 'nova')
-config.set(section, 'admin_password', os.environ.get('NOVA_PASS'))
 
-section = 'glance'
-config.add_section(section)
-config.set(section, 'host', os.environ.get('HOST_IP'))
+nova_conf = {
+    'DEFAULT':
+    {'rpc_backend': 'rabbit',
+     'auth_strategy': 'keystone',
+     'my_ip': nova_host_ip,
+     'vncserver_listen': nova_host_ip,
+     'vncserver_proxyclient_address': nova_host_ip,
+     'verbose': 'True'},
 
-print('Parsing of %s...' % configfile)
-with open(configfile, 'w') as configfile:
-    config.write(configfile)
-print('Done')
+    'oslo_messaging_rabbit':
+    {'rabbit_host': rabbit_host_ip,
+     'rabbit_password': rabbit_pass},
+
+    'database':
+    {'connection':
+     'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
+
+    'keystone_authtoken':
+    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'auth_plugin': 'password',
+     'project_domain_id': 'default',
+     'user_domain_id': 'default',
+     'project_name': 'service',
+     'username': 'nova',
+     'password': nova_pass},
+
+    'oslo_concurrency':
+    {'lock_path': '/var/lock/nova'},
+
+    'glance':
+    {'host': host_ip}
+    }
+
+apply_config('/etc/nova/nova.conf', nova_conf)
 
 
 def neutron_config():
     # neutron.conf
-    ##############
+    ###############
 
     configfile = '/etc/neutron/neutron.conf'
     config.read(configfile)
@@ -75,12 +99,12 @@ def neutron_config():
     if not set([section]).issubset(config.sections()):
         config.add_section(section)
     config.set(section, 'connection',
-                        'mysql://neutron:%s@%s/neutron' 
+                        'mysql://neutron:%s@%s/neutron'
                         % (os.environ.get('NEUTRON_DBPASS'),
                            os.environ.get('HOST_IP')))
 
     section = 'DEFAULT'
-    #if not set([section]).issubset(config.sections()):
+    # if not set([section]).issubset(config.sections()):
     #    config.add_section(section)
     config.set(section, 'rpc_backend', 'rabbit')
     config.set(section, 'rabbit_host', os.environ.get('HOST_IP'))
@@ -91,10 +115,10 @@ def neutron_config():
     config.set(section, 'allow_overlapping_ips', 'True')
     config.set(section, 'notify_nova_on_port_status_changes', 'True')
     config.set(section, 'notify_nova_on_port_data_changes', 'True')
-    config.set(section, 'nova_url', 'http://%s:8774/v2' % (
-      os.environ.get('HOST_IP')))
-    config.set(section, 'nova_admin_auth_url', 'http://%s:35357/v2' % (
-      os.environ.get('HOST_IP')))
+    config.set(section, 'nova_url', 'http://%s:8774/v2'
+               % os.environ.get('HOST_IP'))
+    config.set(section, 'nova_admin_auth_url', 'http://%s:35357/v2'
+               % os.environ.get('HOST_IP'))
     config.set(section, 'nova_region_name', 'regionOne')
     config.set(section, 'nova_admin_username', 'nova')
     config.set(section, 'nova_admin_tenant_id', 'service')
@@ -104,10 +128,10 @@ def neutron_config():
     section = 'keystone_authtoken'
     if not set([section]).issubset(config.sections()):
         config.add_section(section)
-    config.set(section, 'auth_uri', 'http://%s:5000/v2.0' % (
-      os.environ.get('HOST_IP')))
-    config.set(section, 'identity_uri', 'http://%s:35357' % (
-      os.environ.get('HOST_IP')))
+    config.set(section, 'auth_uri', 'http://%s:5000/v2.0'
+               % os.environ.get('HOST_IP'))
+    config.set(section, 'identity_uri', 'http://%s:35357'
+               % os.environ.get('HOST_IP'))
     config.set(section, 'admin_tenant_name', 'service')
     config.set(section, 'admin_user', 'neutron')
     config.set(section, 'admin_password', os.environ.get('NEUTRON_PASS'))
@@ -117,8 +141,7 @@ def neutron_config():
         config.write(configfile)
     print('Done')
 
-
-    ## ml2_conf.ini
+    # ml2_conf.ini
     ###############
 
     configfile = '/etc/neutron/plugins/ml2/ml2_conf.ini'
@@ -142,35 +165,36 @@ def neutron_config():
     config.set(section, 'enable_security_group', 'True')
     config.set(section, 'enable_ipset', 'True')
     config.set(section, 'firewall_driver',
-        'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver')
+                        'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver')
 
     print('Parsing of %s...' % configfile)
     with open(configfile, 'w') as configfile:
         config.write(configfile)
     print('Done')
 
-
-    ## nova.conf
+    # nova.conf
     ############
 
     configfile = '/etc/nova/nova.conf'
     config.read(configfile)
 
     section = 'DEFAULT'
-    #if not set([section]).issubset(config.sections()):
+    # if not set([section]).issubset(config.sections()):
     #    config.add_section(section)
     config.set(section, 'network_api_class', 'nova.network.neutronv2.api.API')
     config.set(section, 'security_group_api', 'neutron')
-    config.set(section, 'linuxnet_interface_driver', 'nova.network.linux_net.LinuxOVSInterfaceDriver')
-    config.set(section, 'firewall_driver', 'nova.virt.firewall.NoopFirewallDriver')
-
+    config.set(section, 'linuxnet_interface_driver',
+                        'nova.network.linux_net.LinuxOVSInterfaceDriver')
+    config.set(section, 'firewall_driver',
+                        'nova.virt.firewall.NoopFirewallDriver')
 
     section = 'neutron'
     if not set([section]).issubset(config.sections()):
         config.add_section(section)
     config.set(section, 'url', 'http://%s:9696' % os.environ.get('HOST_IP'))
     config.set(section, 'auth_strategy', 'keystone')
-    config.set(section, 'admin_auth_url', 'http://%s:35357/v2.0' % os.environ.get('HOST_IP'))
+    config.set(section, 'admin_auth_url', 'http://%s:35357/v2.0'
+               % os.environ.get('HOST_IP'))
     config.set(section, 'admin_tenant_name', 'service')
     config.set(section, 'admin_username',  section)
     config.set(section, 'admin_password', os.environ.get('NEUTRON_PASS'))
