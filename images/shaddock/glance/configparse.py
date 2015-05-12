@@ -56,11 +56,14 @@ glance_api_conf = {
      'mysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
-    {'auth_uri': 'http://%s:5000/v2.0' % keystone_host_ip,
-     'identity_uri': 'http://%s:35357' % keystone_host_ip,
-     'admin_tenant_name': 'service',
-     'admin_user': 'glance',
-     'admin_password': glance_pass},
+    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'auth_plugin': 'password',
+     'project_domain_id': 'default',
+     'user_domain_id': 'default',
+     'project_name': 'service',
+     'username': 'glance',
+     'password': glance_pass},
 
     'paste_deploy':
     {'flavor': 'keystone'},
@@ -80,11 +83,14 @@ glance_registry_conf = {
      'mysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
-    {'auth_uri': 'http://%s:5000/v2.0' % keystone_host_ip,
-     'identity_uri': 'http://%s:35357' % keystone_host_ip,
-     'admin_tenant_name': 'service',
-     'admin_user': 'glance',
-     'admin_password': glance_pass},
+    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'auth_plugin': 'password',
+     'project_domain_id': 'default',
+     'user_domain_id': 'default',
+     'project_name': 'service',
+     'username': 'glance',
+     'password': glance_pass},
 
     'paste_deploy':
     {'flavor': 'keystone'},
