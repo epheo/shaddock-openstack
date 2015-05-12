@@ -56,7 +56,6 @@ then
         compute
 
     echo "Testing Nova..."
-    nova service-list
     nova endpoints
 
 else
@@ -68,14 +67,12 @@ else
     else
         echo ">>>>>>> Endpoint already created"
         echo "Testing Nova..."
-        nova service-list
         nova endpoints
-        nova image-list
     fi
 fi
 
 echo "Create database tables"
-nova-manage db sync
+python /usr/local/bin/nova-manage --config-file /opt/nova/etc/nova/nova.conf db sync
 
 echo "Starting nova using supervisord..."
 exec /usr/bin/supervisord -n

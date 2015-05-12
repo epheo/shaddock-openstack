@@ -32,7 +32,7 @@ mysql \
         IDENTIFIED BY '${KEYSTONE_DBPASS}'"
 
 echo "Create database tables"
-python /opt/keystone/bin/keystone-manage db_sync
+python /opt/keystone/bin/keystone-manage --config-file /opt/keystone/etc/keystone.conf db_sync
 
 echo "Starting keystone using supervisord..."
 exec /usr/bin/supervisord -n
