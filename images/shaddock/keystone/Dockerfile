@@ -2,10 +2,12 @@ FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 # Install Keystone
-RUN apt-get update
 
-RUN git clone https://github.com/openstack/keystone /opt/keystone/
-RUN cd /opt/keystone && python setup.py install
+RUN pip uninstall -y oslo.config oslo.i18n
+
+RUN git clone https://github.com/openstack/keystone /opt/keystone/ &&\
+    cd /opt/keystone && git checkout stable/juno  && python setup.py install
+
 
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

@@ -5,9 +5,31 @@ Used in order to deploy OpenStack in Docker with the Shaddock project:
 ```
 shaddock start keystone
 ```
+Possible yml configuration with Shaddock
+----------------------------------------
 
-Possible Docker usage:
+```
+- name: keystone
+  image: shaddock/keystone:latest
+  priority: 30
+  ports:
+    - 35357
+    - 5000
+  volumes:
+    - mount: /var/log/keystone
+      host_dir: /var/log/shaddock/keystone
+  depends-on:
+    - {name: mysql, port: 3306}
+  env:
+    MYSQL_HOST_IP: <your_ip>
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+    KEYSTONE_DBPASS: panama
+    ADMIN_TOKEN: panama
+```
 
+Possible Docker usage
+---------------------
 ```
 docker run \
   -p 35357:35357 \

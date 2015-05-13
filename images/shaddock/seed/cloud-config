@@ -1,51 +1,40 @@
 #!/bin/bash
 
-## KEYSTONE
+export OS_URL=http://${MYSQL_HOST_IP}:35357/v2.0
+export OS_TOKEN=${ADMIN_TOKEN}
 
-export OS_SERVICE_ENDPOINT=http://${MYSQL_HOST_IP}:35357/v2.0
-export OS_SERVICE_TOKEN=${ADMIN_TOKEN}
+openstack service create --type identity \
+      --description "OpenStack Identity" keystone
 
-echo "Creating Keystone user..."
-keystone user-create --name=keystone --pass=${KEYSTONE_PASS} --email=keystone@${EMAIL_DOMAIN}
-keystone user-role-add --user=keystone --tenant=service --role=admin
+openstack endpoint create \
+      --publicurl http://${KEYSTONE_HOST_IP}:5000/v2.0 \
+      --internalurl http://${KEYSTONE_HOST_IP}:5000/v2.0 \
+      --adminurl http://${KEYSTONE_HOST_IP}:35357/v2.0 \
+      --region RegionOne \
+      identity
 
-echo "Create tenants, users, and roles..."
-keystone tenant-create --name admin --description "Admin Tenant"
-keystone user-create --name admin --pass ${ADMIN_PASS} --email admin@${EMAIL_DOMAIN}
-keystone role-create --name admin
-keystone user-role-add --user admin --tenant admin --role admin
+openstack project create --description "Admin Project" admin
 
-keystone tenant-create --name demo --description "Demo Tenant"
-keystone user-create --name demo --tenant demo --pass ${DEMO_PASS} --email demo@${EMAIL_DOMAIN}
-keystone tenant-create --name service --description "Service Tenant"
+openstack user create --password ${ADMIN_PASS} admin
 
-echo "Registering Keystone API and EndPoints..."
-keystone service-create --name keystone --type identity \
---description "OpenStack Identity"
+openstack role create admin
 
-keystone service-create --name keystonev3 --type identityv3 \
---description "OpenStack Identity v3"
+openstack role add --project admin --user admin admin
 
-keystone endpoint-create \
---service keystone \
---publicurl http://${KEYSTONE_HOST_IP}:5000/v2.0 \
---internalurl http://${KEYSTONE_HOST_IP}:5000/v2.0 \
---adminurl http://${KEYSTONE_HOST_IP}:35357/v2.0 \
---region regionOne
+openstack project create --description "Service Project" service
 
-keystone endpoint-create \
---service keystonev3 \
---publicurl http://${KEYSTONE_HOST_IP}:5000/v3 \
---internalurl http://${KEYSTONE_HOST_IP}:5000/v3 \
---adminurl http://${KEYSTONE_HOST_IP}:35357/v3 \
---region regionOne
+openstack project create --description "Demo Project" demo
 
+openstack user create --password ${DEMO_PASS} demo
 
-## Tests
-unset OS_SERVICE_TOKEN OS_SERVICE_ENDPOINT
+openstack role create _member_
 
-echo "Checking configuration by geting a token..."
-keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} \
-      --os-auth-url http://${KEYSTONE_HOST_IP}:35357/v2.0 token-get
+openstack role add --project demo --user demo _member_
+
+unset OS_TOKEN OS_URL
+
+openstack --os-auth-url http://${KEYSTONE_HOST_IP}:35357 \
+  --os-project-name admin --os-username admin --os-password ${ADMIN_PASS} \
+  token issue
 
 echo "#END"

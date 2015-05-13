@@ -18,96 +18,105 @@
 import ConfigParser
 import os
 
-    
-## nova.conf
-############
+nova_db_pass = os.environ.get('NOVA_DBPASS')
+mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
+rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
+rabbit_pass = os.environ.get('RABBIT_PASS')
+nova_host_ip = os.environ.get('NOVA_HOST_IP')
+keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
+nova_pass = os.environ.get('NOVA_PASS')
+host_ip = os.environ.get('HOST_IP')
 
 
+def apply_config(configfile, dict):
+    config = ConfigParser.RawConfigParser()
+    config.read(configfile)
 
-configfile = '/etc/nova/nova.conf'
-config = ConfigParser.RawConfigParser()
-config.read(configfile)
+    for section in dict.keys():
+        if not set([section]).issubset(config.sections()) \
+                and section != 'DEFAULT':
+            config.add_section(section)
+        inner_dict = dict.get(section)
+        for key in inner_dict.keys():
+            config.set(section, key, inner_dict.get(key))
+            print('Writing %s : %s in section %s of the file %s'
+                  % (key,
+                     inner_dict.get(key),
+                     section,
+                     configfile))
 
-section = 'database'
-if not set([section]).issubset(config.sections()):
-    config.add_section(section)
-config.set(section, 'connection',  'mysql://nova:%s@%s/nova' % (os.environ.get('NOVA_DBPASS'),
-                                                                os.environ.get('MYSQL_HOST_IP')))
-
-section = 'DEFAULT'
-#if not set([section]).issubset(config.sections()):
-#    config.add_section(section)
-config.set(section, 'rpc_backend', 'rabbit')
-config.set(section, 'rabbit_host', os.environ.get('RABBIT_HOST_IP'))
-config.set(section, 'rabbit_password', os.environ.get('RABBIT_PASS'))
-config.set(section, 'auth_strategy', 'keystone')
-config.set(section, 'my_ip', os.environ.get('HOST_IP'))
-config.set(section, 'vncserver_listen', os.environ.get('HOST_IP'))
-config.set(section, 'vncserver_proxyclient_address', os.environ.get('HOST_IP'))
-config.set(section, 'verbose', 'True')
-config.set(section, 'vnc_enabled', 'True')
-config.set(section, 'vncserver_listen', '0.0.0.0')
-config.set(section, 'vncserver_proxyclient_address', os.environ.get('HOST_IP'))
-config.set(section, 'novncproxy_base_url', 'http://%s:6080/vnc_auto.html' % os.environ.get('HOST_IP'))
-
-# If Qemu:
-config.set(section, 'compute_driver', 'libvirt.LibvirtDriver')
-
-# Nova-network
-config.set(section, 'network_api_class', 'nova.network.api.API')
-config.set(section, 'security_group_api', 'nova')
-config.set(section, 'firewall_driver', 'nova.virt.libvirt.firewall.IptablesFirewallDriver')
-config.set(section, 'network_manager', 'nova.network.manager.FlatDHCPManager')
-config.set(section, 'network_size', '254')
-config.set(section, 'allow_same_net_traffic', 'False')
-config.set(section, 'multi_host', 'True')
-config.set(section, 'send_arp_for_ha', 'True')
-config.set(section, 'share_dhcp_address', 'True')
-config.set(section, 'force_dhcp_release', 'True')
-config.set(section, 'flat_network_bridge', 'br100')
-config.set(section, 'flat_interface', 'eth0')
-config.set(section, 'public_interface', 'eth0')
+    with open(configfile, 'w') as configfile:
+        config.write(configfile)
+    print('Done')
+    return True
 
 
-section = 'libvirt'
-if not set([section]).issubset(config.sections()):
-    config.add_section(section)
-config.set(section, 'virt_type', 'qemu')
+nova_conf = {
+    'DEFAULT':
+    {'rpc_backend': 'rabbit',
+     'auth_strategy': 'keystone',
+     'my_ip': nova_host_ip,
+     'vncserver_listen': '0.0.0.0',
+     'vncserver_proxyclient_address': nova_host_ip,
+     'verbose': 'True',
+     'vnc_enabled': 'True',
+     'novncproxy_base_url': 'http://%s:6080/vnc_auto.html' % host_ip,
 
+     # If Qemu
+     'compute_driver': 'libvirt.LibvirtDriver',
 
-section = 'keystone_authtoken'
-if not set([section]).issubset(config.sections()):
-    config.add_section(section)
-config.set(section, 'auth_uri', 'http://%s:5000/v2.0' % os.environ.get('HOST_IP'))
-config.set(section, 'identity_uri', 'http://%s:35357' % os.environ.get('HOST_IP'))
-config.set(section, 'admin_tenant_name', 'service')
-config.set(section, 'admin_user', 'nova')
-config.set(section, 'admin_password', os.environ.get('NOVA_PASS'))
+     # If Nova-Networ
+     'network_api_class': 'nova.network.api.API',
+     'security_group_api': 'nova',
+     'firewall_driver': 'nova.virt.libvirt.firewall.IptablesFirewallDriver',
+     'network_manager': 'nova.network.manager.FlatDHCPManager',
+     'network_size': '254',
+     'allow_same_net_traffic': 'False',
+     'multi_host': 'True',
+     'send_arp_for_ha': 'True',
+     'share_dhcp_address': 'True',
+     'force_dhcp_release': 'True',
+     'flat_network_bridge': 'br100',
+     'flat_interface': 'eth0',
+     'public_interface': 'eth0'},
 
-section = 'glance'
-if not set([section]).issubset(config.sections()):
-    config.add_section(section)
-config.set(section, 'host', os.environ.get('HOST_IP'))
+     'oslo_messaging_rabbit':
+     {'rabbit_host': rabbit_host_ip,
+      'rabbit_password': rabbit_pass},
 
-print('Parsing of %s...' % configfile)
-with open(configfile, 'w') as configfile:
-    config.write(configfile)
-print('Done')
+    'database':
+    {'connection':
+     'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
 
+    'keystone_authtoken':
+    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'auth_plugin': 'password',
+     'project_domain_id': 'default',
+     'user_domain_id': 'default',
+     'project_name': 'service',
+     'username': 'nova',
+     'password': nova_pass},
 
-configfile = '/etc/nova/nova-compute.conf'
-config = ConfigParser.RawConfigParser()
-config.read(configfile)
+    'glance':
+    {'host': host_ip},
 
-section = 'DEFAULT'
-config.set(section, 'compute_driver', 'libvirt.LibvirtDriver')
+    'oslo_concurrency':
+    {'lock_path': '/var/lock/nova'},
 
-section = 'libvirt'
-if not set([section]).issubset(config.sections()):
-    config.add_section(section)
-config.set(section, 'virt_type', 'qemu')
+    'libvirt':
+    {'virt_type': 'qemu'}
 
-print('Parsing of %s...' % configfile)
-with open(configfile, 'w') as configfile:
-    config.write(configfile)
-print('Done')
+    }
+
+nova_compute_conf = {
+    'DEFAULT':
+    {'compute_driver': 'libvirt.LibvirtDriver'},
+
+    'libvirt':
+    {'virt_type': 'qemu'}
+
+    }
+
+apply_config('/etc/nova/nova.conf', nova_conf)
+apply_config('/etc/nova/nova-compute.conf', nova_compute_conf)

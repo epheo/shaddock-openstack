@@ -15,58 +15,87 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from configparser import ConfigParser
+import ConfigParser
 import os
 
-config = ConfigParser()
+mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
+keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
+glance_pass = os.environ.get('GLANCE_PASS')
+glance_dbpass = os.environ.get('GLANCE_DBPASS')
 
-configfile = '/etc/glance/glance-api.conf'
-config.read(configfile)
 
-config['database']['connection'] = 'mysql://glance:%s@%s/glance' % (os.environ.get('GLANCE_DBPASS'),
-                                                                    os.environ.get('MYSQL_HOST_IP'))
+def apply_config(configfile, dict):
+    config = ConfigParser.RawConfigParser()
+    config.read(configfile)
 
-config['keystone_authtoken']['auth_uri'] = 'http://%s:5000/v2.0' % os.environ.get('KEYSTONE_HOST_IP')
-config['keystone_authtoken']['identity_uri'] = 'http://%s:35357' % os.environ.get('KEYSTONE_HOST_IP')
-config['keystone_authtoken']['admin_tenant_name'] = 'service'
-config['keystone_authtoken']['admin_user'] = 'glance'
-config['keystone_authtoken']['admin_password'] = os.environ.get('GLANCE_PASS')
+    for section in dict.keys():
+        if not set([section]).issubset(config.sections()) \
+                and section != 'DEFAULT':
+            config.add_section(section)
+        inner_dict = dict.get(section)
+        for key in inner_dict.keys():
+            config.set(section, key, inner_dict.get(key))
+            print('Writing %s : %s in section %s of the file %s'
+                  % (key,
+                     inner_dict.get(key),
+                     section,
+                     configfile))
 
-config['paste_deploy']['flavor'] = 'keystone'
+    with open(configfile, 'w') as configfile:
+        config.write(configfile)
+    print('Done')
+    return True
 
-config['glance_store']['default_store'] = 'file'
-config['glance_store']['filesystem_store_datadir'] = '/var/lib/glance/images/'
+glance_api_conf = {
+    'DEFAULT':
+    {'notification_driver': 'noop',
+     'verbose': 'True'},
 
-config['DEFAULT']['notification_driver'] = 'noop'
+    'database':
+    {'connection':
+     'mysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
 
-config['DEFAULT']['verbose'] = 'True'
+    'keystone_authtoken':
+    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'auth_plugin': 'password',
+     'project_domain_id': 'default',
+     'user_domain_id': 'default',
+     'project_name': 'service',
+     'username': 'glance',
+     'password': glance_pass},
 
-print('Parsing of %s...' % configfile)
-with open(configfile, 'w') as configfile:
-    config.write(configfile)
-print('Done')
+    'paste_deploy':
+    {'flavor': 'keystone'},
 
-####
+    'glance_store':
+    {'default_store': 'file',
+     'filesystem_store_datadir': '/var/lib/glance/images/'}
+    }
 
-configfile = '/etc/glance/glance-registry.conf'
-config.read(configfile)
+glance_registry_conf = {
+    'DEFAULT':
+    {'notification_driver': 'noop',
+     'verbose': 'True'},
 
-config['database']['connection'] = 'mysql://glance:%s@%s/glance' % (os.environ.get('GLANCE_DBPASS'),
-                                                                    os.environ.get('MYSQL_HOST_IP'))
+    'database':
+    {'connection':
+     'mysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
 
-config['keystone_authtoken']['auth_uri'] = 'http://%s:5000/v2.0' % os.environ.get('KEYSTONE_HOST_IP')
-config['keystone_authtoken']['identity_uri'] = 'http://%s:35357' % os.environ.get('KEYSTONE_HOST_IP')
-config['keystone_authtoken']['admin_tenant_name'] = 'service'
-config['keystone_authtoken']['admin_user'] = 'glance'
-config['keystone_authtoken']['admin_password'] = os.environ.get('GLANCE_PASS')
+    'keystone_authtoken':
+    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'auth_plugin': 'password',
+     'project_domain_id': 'default',
+     'user_domain_id': 'default',
+     'project_name': 'service',
+     'username': 'glance',
+     'password': glance_pass},
 
-config['paste_deploy']['flavor'] = 'keystone'
+    'paste_deploy':
+    {'flavor': 'keystone'},
 
-config['DEFAULT']['notification_driver'] = 'noop'
+    }
 
-config['DEFAULT']['verbose'] = 'True'
-
-print('Parsing of %s...' % configfile)
-with open(configfile, 'w') as configfile:
-    config.write(configfile)
-print('Done')
+apply_config('/etc/glance/glance-api.conf', glance_api_conf)
+apply_config('/etc/glance/glance-registry.conf', glance_registry_conf)

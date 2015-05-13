@@ -5,7 +5,6 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 RUN git clone https://github.com/openstack/nova /opt/nova/
 RUN cd /opt/nova && python setup.py install
 
-#Setup supervisord
 ADD supervisord.conf /etc/supervisord.conf
 
 VOLUME  ["/var/log/nova"]

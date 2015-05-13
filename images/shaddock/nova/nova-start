@@ -9,7 +9,7 @@ configparse.py
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS} 
 export OS_TENANT_NAME=admin
-export OS_AUTH_URL=http://${HOST_IP}:35357/v2.0
+export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v2.0
 
 endpoint=`openstack endpoint list -f csv -q |grep nova`
 
@@ -18,53 +18,45 @@ then
     echo ">>>>>>> Endpoint not created"
     echo "Creating database"
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "CREATE DATABASE nova;"
 
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' \
             IDENTIFIED BY '${NOVA_DBPASS}';"
 
     mysql \
-        -h${MYSQL_DB} \
+        -h${MYSQL_HOST_IP} \
         -u${MYSQL_USER} \
         -p${MYSQL_PASSWORD} \
         -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' \
             IDENTIFIED BY '${NOVA_DBPASS}';"
     
     echo "Creating Nova user..."
-    keystone \
-        user-create \
-        --name nova \
-        --pass ${NOVA_PASS} \
-        --email=nova@${EMAIL_ADDRESS}
+    openstack user create --password ${NOVA_PASS} nova
     
-    keystone \
-        user-role-add \
-        --user nova \
-        --tenant service \
-        --role admin
+    openstack role add --project service --user nova admin
     
     echo "Registering Nova API and EndPoints..."
-    keystone \
-        service-create \
-        --name nova \
-        --type compute \
-        --description "OpenStack Compute"
+    openstack service create --type compute \
+        --description "OpenStack Compute" nova
 
-    keystone \
-        endpoint-create \
-        --service-id $(keystone service-list | awk '/ compute / {print $2}') \
-        --publicurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
-        --internalurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
-        --adminurl http://${HOST_IP}:8774/v2/%\(tenant_id\)s \
-        --region regionOne
-    
+    openstack endpoint create \
+        --publicurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
+        --internalurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
+        --adminurl http://${KEYSTONE_HOST_IP}:8774/v2/%\(tenant_id\)s \
+        --region RegionOne \
+        compute
+
+    echo "Testing Nova..."
+    nova service-list
+    nova endpoints
+
 else
 
     if [[ $endpoint == *"ERROR"* ]]
@@ -73,6 +65,10 @@ else
         exit
     else
         echo ">>>>>>> Endpoint already created"
+        echo "Testing Nova..."
+        nova service-list
+        nova endpoints
+        nova image-list
     fi
 fi
 

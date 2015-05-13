@@ -15,25 +15,50 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from configparser import ConfigParser
+import ConfigParser
 import os
 
-configfile = '/opt/keystone/etc/keystone.conf.sample'
-config = ConfigParser()
-config.read(configfile)
+keystone_dbpass = os.environ.get('KEYSTONE_DBPASS')
+mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
+admin_token = os.environ.get('ADMIN_TOKEN')
 
-config['DEFAULT']['admin_token'] = os.environ.get('ADMIN_TOKEN')
+def apply_config(configfile, dict):
+    config = ConfigParser.RawConfigParser()
+    config.read(configfile)
 
-config['database']['connection'] = 'mysql://keystone:%s@%s/keystone' % (os.environ.get('KEYSTONE_DBPASS'),
-                                                                        os.environ.get('MYSQL_HOST_IP'))
+    for section in dict.keys():
+        if not set([section]).issubset(config.sections()) \
+                and section != 'DEFAULT':
+            config.add_section(section)
+        inner_dict = dict.get(section)
+        for key in inner_dict.keys():
+            config.set(section, key, inner_dict.get(key))
+            print('Writing %s : %s in section %s of the file %s'
+                  % (key,
+                     inner_dict.get(key),
+                     section,
+                     configfile))
 
-config['token']['provider'] = 'keystone.token.providers.uuid.Provider'
-config['token']['driver'] = 'keystone.token.persistence.backends.sql.Token'
-config['revoke']['driver'] = 'keystone.contrib.revoke.backends.sql.Revoke'
-config['DEFAULT']['verbose'] = 'True'
+    with open(configfile, 'w') as configfile:
+        config.write(configfile)
+    print('Done')
+    return True
 
-configfile = '/opt/keystone/etc/keystone.conf'
-print('Parsing of %s...' % configfile)
-with open(configfile, 'w') as configfile:
-    config.write(configfile)
-print('Done')
+keystone_conf = {
+    'DEFAULT':
+    {'admin_token': admin_token,
+     'verbose': 'True'},
+
+    'database':
+    {'connection':
+     'mysql://keystone:%s@%s/keystone' % (keystone_dbpass, mysql_host_ip)},
+
+    'token':
+    {'provider': 'keystone.token.providers.uuid.Provider',
+     'driver': 'keystone.token.persistence.backends.sql.Token'},
+
+    'revoke':
+    {'driver': 'keystone.contrib.revoke.backends.sql.Revoke'}
+    }
+
+apply_config('/opt/keystone/etc/keystone.conf', keystone_conf)
