@@ -18,7 +18,7 @@
 import ConfigParser
 import os
 
-nova_db_pass = os.environ.get('NOVA_DBPASS')
+nova_dbpass = os.environ.get('NOVA_DBPASS')
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
@@ -66,7 +66,7 @@ nova_conf = {
 
     'database':
     {'connection':
-     'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
+     'mysql://nova:%s@%s/nova' % (nova_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
@@ -85,7 +85,7 @@ nova_conf = {
     {'host': host_ip}
     }
 
-apply_config('/etc/nova/nova.conf', nova_conf)
+apply_config('/opt/nova/etc/nova/nova.conf', nova_conf)
 
 
 def neutron_config():

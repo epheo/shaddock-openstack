@@ -1,9 +1,9 @@
 FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-RUN apt-get update
-RUN apt-get install -y nova-api nova-cert nova-conductor nova-consoleauth \
-                       nova-novncproxy nova-scheduler python-novaclient
+#Install Nova from Master branch
+RUN git clone https://github.com/openstack/nova /opt/nova/
+RUN cd /opt/nova && python setup.py install
 
 ADD supervisord.conf /etc/supervisord.conf
 
