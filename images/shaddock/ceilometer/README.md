@@ -6,21 +6,21 @@ Used in order to deploy OpenStack in Docker with the Shaddock project:
 
 
 ```
-shaddock start cinder
+shaddock start ceilometer
 ```
 
 Possible yml configuration with Shaddock
 ----------------------------------------
 
 ```
-- name: cinder
-  image: shaddock/cinder:latest
+- name: ceilometer
+  image: shaddock/ceilometer:latest
   priority: 50
   ports:
     - 8776
   volumes:
-    - mount: /var/log/cinder
-      host_dir: /var/log/shaddock/cinder
+    - mount: /var/log/ceilometer
+      host_dir: /var/log/shaddock/ceilometer
   depends-on:
     - {name: seed, status: stopped}
     - {name: mysql, port: 3306}
@@ -32,8 +32,8 @@ Possible yml configuration with Shaddock
     MYSQL_USER: admin
     MYSQL_PASSWORD: password
     ADMIN_PASS: panama
-    CINDER_DBPASS: panama
-    CINDER_PASS: panama
+    CEILOMETER_DBPASS: panama
+    CEILOMETER_PASS: panama
 ```
 
 
@@ -44,10 +44,10 @@ Possible Docker usage:
 docker run \
   -p 9292:9292 \
   -p 4324:4324 \
-  -v /var/log/cinder:/var/log/cinder \
-  -e "CINDER_DBPASS=$CINDER_DBPASS" \
+  -v /var/log/ceilometer:/var/log/ceilometer \
+  -e "CEILOMETER_DBPASS=$CEILOMETER_DBPASS" \
   -e "HOST_IP=$HOST_IP" \
-  -e "CINDER_PASS=$CINDER_PASS" \
+  -e "CEILOMETER_PASS=$CEILOMETER_PASS" \
   -e "ADMIN_PASS=$ADMIN_PASS" \
   -t shaddock/keystone
 ```

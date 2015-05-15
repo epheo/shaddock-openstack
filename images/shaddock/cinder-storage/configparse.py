@@ -23,6 +23,7 @@ keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
 cinder_pass = os.environ.get('CINDER_PASS')
 cinder_dbpass = os.environ.get('CINDER_DBPASS')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
+glance_host_ip = os.environ.get('GLANCE_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
 
 
@@ -53,7 +54,9 @@ cinder_conf = {
     {'rpc_backend': 'rabbit',
      'my_ip': nova_host_ip,
      'auth_strategy': 'keystone',
-     'verbose': 'True'},
+     'verbose': 'True',
+     'enabled_backends': 'lvm',
+     'glance_host': glance_host_ip},
 
     'oslo_messaging_rabbit':
     {'rabbit_host': rabbit_host_ip,
@@ -75,6 +78,13 @@ cinder_conf = {
 
     'oslo_concurrency':
     {'lock_path': '/var/lock/cinder'},
+
+    'lvm':
+    {'volume_driver': 'cinder.volume.drivers.lvm.LVMVolumeDriver',
+     'volume_group': 'cinder-volumes',
+     'iscsi_protocol': 'iscsi',
+     'iscsi_helper': 'tgtadm'},
+
 
     }
 

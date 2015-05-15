@@ -45,20 +45,24 @@ then
 
     echo "Registering Cinder API and EndPoints..."
     openstack service create --type image \
-        --description "OpenStack Image service" cinder
+        --description "OpenStack Block Storage" cinder
+
+    openstack service create --type volumev2 \
+        --description "OpenStack Block Storage" cinderv2
 
     openstack endpoint create \
-        --publicurl http://${KEYSTONE_HOST_IP}:9292 \
-        --internalurl http://${KEYSTONE_HOST_IP}:9292 \
-        --adminurl http://${KEYSTONE_HOST_IP}:9292 \
-        --region RegionOne \
-        image
+          --publicurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --internalurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --adminurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --region RegionOne \
+          volume
 
-    # mkdir /tmp/images
-    # wget -P /tmp/images http://download.cirros-cloud.net/0.3.3/cirros-0.3.3-x86_64-disk.img
-    # cinder image-create --name "cirros-0.3.3-x86_64" --file /tmp/images/cirros-0.3.3-x86_64-disk.img \
-        # --disk-format qcow2 --container-format bare --visibility public --progress
-    # cinder image-list
+      openstack endpoint create \
+          --publicurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --internalurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --adminurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --region RegionOne \
+          volumev2
 
 else
 
@@ -72,7 +76,7 @@ else
 fi
 
 echo "Create database tables"
-cinder-manage db_sync
+cinder-manage db sync
 
 echo "Starting cinder using supervisord..."
 exec /usr/bin/supervisord -n

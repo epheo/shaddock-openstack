@@ -17,8 +17,7 @@ Possible yml configuration with Shaddock
   image: shaddock/cinder:latest
   priority: 50
   ports:
-    - 9292
-    - 4324
+    - 8776
   volumes:
     - mount: /var/log/cinder
       host_dir: /var/log/shaddock/cinder

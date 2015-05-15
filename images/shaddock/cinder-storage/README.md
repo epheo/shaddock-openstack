@@ -49,5 +49,5 @@ docker run \
   -e "HOST_IP=$HOST_IP" \
   -e "CINDER_PASS=$CINDER_PASS" \
   -e "ADMIN_PASS=$ADMIN_PASS" \
-  -t shaddock/keystone
+  -t shaddock/cinder-storage
 ```

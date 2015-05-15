@@ -1,19 +1,19 @@
 FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-#install cinder
+#install heat
 RUN apt-get -y update
 RUN pip uninstall -y pbr
-RUN apt-get install -y --force-yes cinder-api cinder-scheduler python-cinderclient
+RUN apt-get install -y --force-yes heat-api heat-api-cfn heat-engine python-heatclient
 
 ADD supervisord.conf /etc/supervisord.conf
 
-VOLUME  ["/var/log/cinder"]
-
-ADD cinder-start /usr/local/bin/
+ADD heat-start /usr/local/bin/
 ADD configparse.py /usr/local/bin/
-RUN chmod +x /usr/local/bin/cinder-start
+RUN chmod +x /usr/local/bin/heat-start
 RUN chmod +x /usr/local/bin/configparse.py
 
-EXPOSE 8776
-CMD ["cinder-start"]
+EXPOSE 8000
+EXPOSE 8004
+
+CMD ["heat-start"]

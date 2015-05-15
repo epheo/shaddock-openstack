@@ -20,11 +20,11 @@ import os
 
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
-cinder_pass = os.environ.get('CINDER_PASS')
-cinder_dbpass = os.environ.get('CINDER_DBPASS')
+heat_pass = os.environ.get('HEAT_PASS')
+heat_dbpass = os.environ.get('HEAT_DBPASS')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
-
+heat_domain_pass = os.environ.get('HEAT_DOMAIN_PASS')
 
 def apply_config(configfile, dict):
     config = ConfigParser.RawConfigParser()
@@ -48,36 +48,39 @@ def apply_config(configfile, dict):
     print('Done')
     return True
 
-cinder_conf = {
+heat_conf = {
     'DEFAULT':
     {'rpc_backend': 'rabbit',
      'my_ip': nova_host_ip,
      'auth_strategy': 'keystone',
-     'verbose': 'True'},
-
-    'oslo_messaging_rabbit':
-    {'rabbit_host': rabbit_host_ip,
-     'rabbit_password': rabbit_pass},
+     'verbose': 'True',
+     'rabbit_host': rabbit_host_ip,
+     'rabbit_password': rabbit_pass,
+     'heat_metadata_server_url': 'http://%s:8000' % host_ip,
+     'heat_waitcondition_server_url': 'http://%s:8000/v1/waitcondition' % host_ip,
+     'stack_domain_admin': 'heat_domain_admin',
+     'stack_domain_admin_password': heat_domain_pass,
+     'stack_user_domain_name': 'heat_user_domain'},
 
     'database':
     {'connection':
-     'mysql://cinder:%s@%s/cinder' % (cinder_dbpass, mysql_host_ip)},
+     'mysql://heat:%s@%s/heat' % (heat_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
-    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
-     'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
-     'project_name': 'service',
-     'username': 'cinder',
-     'password': cinder_pass},
+    {'auth_uri': 'http://%s:5000/v2.0' % keystone_host_ip,
+     'identity_uri': 'http://%s:35357' % keystone_host_ip,
+     'admin_tenant_name': 'service',
+     'admin_user': 'heat',
+     'admin_password': heat_pass},
 
     'oslo_concurrency':
-    {'lock_path': '/var/lock/cinder'},
+    {'lock_path': '/var/lock/heat'},
+
+    'ec2authtoken':
+    {'auth_uri': 'http://%s:5000/v2.0' % keystone_host_ip},
 
     }
 
 
 
-apply_config('/etc/cinder/cinder.conf', cinder_conf)
+apply_config('/etc/heat/heat.conf', heat_conf)

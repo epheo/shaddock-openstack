@@ -1,19 +1,19 @@
 FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-#install cinder
+#install ceilometer
 RUN apt-get -y update
 RUN pip uninstall -y pbr
-RUN apt-get install -y --force-yes cinder-api cinder-scheduler python-cinderclient
+RUN apt-get install -y --force-yes ceilometer-api ceilometer-scheduler python-ceilometerclient
 
 ADD supervisord.conf /etc/supervisord.conf
 
-VOLUME  ["/var/log/cinder"]
+VOLUME  ["/var/log/ceilometer"]
 
-ADD cinder-start /usr/local/bin/
+ADD ceilometer-start /usr/local/bin/
 ADD configparse.py /usr/local/bin/
-RUN chmod +x /usr/local/bin/cinder-start
+RUN chmod +x /usr/local/bin/ceilometer-start
 RUN chmod +x /usr/local/bin/configparse.py
 
 EXPOSE 8776
-CMD ["cinder-start"]
+CMD ["ceilometer-start"]

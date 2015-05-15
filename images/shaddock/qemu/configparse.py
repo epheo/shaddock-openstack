@@ -26,6 +26,8 @@ nova_host_ip = os.environ.get('NOVA_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
 nova_pass = os.environ.get('NOVA_PASS')
 host_ip = os.environ.get('HOST_IP')
+qemu = os.environ.get('QEMU')
+nova_network = os.environ.get('NOVA_NETWORK')
 
 
 def apply_config(configfile, dict):
@@ -60,25 +62,7 @@ nova_conf = {
      'vncserver_proxyclient_address': nova_host_ip,
      'verbose': 'True',
      'vnc_enabled': 'True',
-     'novncproxy_base_url': 'http://%s:6080/vnc_auto.html' % host_ip,
-
-     # If Qemu
-     'compute_driver': 'libvirt.LibvirtDriver',
-
-     # If Nova-Networ
-     'network_api_class': 'nova.network.api.API',
-     'security_group_api': 'nova',
-     'firewall_driver': 'nova.virt.libvirt.firewall.IptablesFirewallDriver',
-     'network_manager': 'nova.network.manager.FlatDHCPManager',
-     'network_size': '254',
-     'allow_same_net_traffic': 'False',
-     'multi_host': 'True',
-     'send_arp_for_ha': 'True',
-     'share_dhcp_address': 'True',
-     'force_dhcp_release': 'True',
-     'flat_network_bridge': 'br100',
-     'flat_interface': 'eth0',
-     'public_interface': 'eth0'},
+     'novncproxy_base_url': 'http://%s:6080/vnc_auto.html' % host_ip},
 
      'oslo_messaging_rabbit':
      {'rabbit_host': rabbit_host_ip,
@@ -109,6 +93,28 @@ nova_conf = {
 
     }
 
+nova_conf_qemu = {
+    'DEFAULT':
+    {'compute_driver': 'libvirt.LibvirtDriver'}
+    }
+
+nova_conf_nova_network = {
+    'DEFAULT':
+    {'network_api_class': 'nova.network.api.API',
+     'security_group_api': 'nova',
+     'firewall_driver': 'nova.virt.libvirt.firewall.IptablesFirewallDriver',
+     'network_manager': 'nova.network.manager.FlatDHCPManager',
+     'network_size': '254',
+     'allow_same_net_traffic': 'False',
+     'multi_host': 'True',
+     'send_arp_for_ha': 'True',
+     'share_dhcp_address': 'True',
+     'force_dhcp_release': 'True',
+     'flat_network_bridge': 'br100',
+     'flat_interface': 'eth0',
+     'public_interface': 'eth0'},
+    }
+
 nova_compute_conf = {
     'DEFAULT':
     {'compute_driver': 'libvirt.LibvirtDriver'},
@@ -119,4 +125,11 @@ nova_compute_conf = {
     }
 
 apply_config('/etc/nova/nova.conf', nova_conf)
+
+if qemu is True:
+    apply_config('/etc/nova/nova.conf', nova_conf_qemu)
+
+if nova_network is True:
+    apply_config('/etc/nova/nova.conf', nova_conf_nova_network)
+
 apply_config('/etc/nova/nova-compute.conf', nova_compute_conf)

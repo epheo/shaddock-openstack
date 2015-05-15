@@ -16,4 +16,6 @@ RUN chmod +x /usr/local/bin/glance-start
 RUN chmod +x /usr/local/bin/configparse.py
 
 EXPOSE 9292
+EXPOSE 9191
+
 CMD ["glance-start"]

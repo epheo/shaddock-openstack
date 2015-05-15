@@ -18,7 +18,7 @@ Possible yml configuration with Shaddock
   priority: 50
   ports:
     - 9292
-    - 4324
+    - 9191
   volumes:
     - mount: /var/log/glance
       host_dir: /var/log/shaddock/glance

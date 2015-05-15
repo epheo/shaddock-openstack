@@ -4,7 +4,7 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 #install cinder
 RUN apt-get -y update
 RUN pip uninstall -y pbr
-RUN apt-get install -y --force-yes cinder python-cinderclient
+RUN apt-get install -y --force-yes cinder-api cinder-scheduler python-cinderclient
 
 ADD supervisord.conf /etc/supervisord.conf
 
@@ -15,5 +15,5 @@ ADD configparse.py /usr/local/bin/
 RUN chmod +x /usr/local/bin/cinder-start
 RUN chmod +x /usr/local/bin/configparse.py
 
-EXPOSE 9292
+EXPOSE 8776
 CMD ["cinder-start"]

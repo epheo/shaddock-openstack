@@ -20,8 +20,8 @@ import os
 
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
-cinder_pass = os.environ.get('CINDER_PASS')
-cinder_dbpass = os.environ.get('CINDER_DBPASS')
+ceilometer_pass = os.environ.get('CEILOMETER_PASS')
+ceilometer_dbpass = os.environ.get('CEILOMETER_DBPASS')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
 
@@ -48,7 +48,7 @@ def apply_config(configfile, dict):
     print('Done')
     return True
 
-cinder_conf = {
+ceilometer_conf = {
     'DEFAULT':
     {'rpc_backend': 'rabbit',
      'my_ip': nova_host_ip,
@@ -61,7 +61,7 @@ cinder_conf = {
 
     'database':
     {'connection':
-     'mysql://cinder:%s@%s/cinder' % (cinder_dbpass, mysql_host_ip)},
+     'mysql://ceilometer:%s@%s/ceilometer' % (ceilometer_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
@@ -70,14 +70,14 @@ cinder_conf = {
      'project_domain_id': 'default',
      'user_domain_id': 'default',
      'project_name': 'service',
-     'username': 'cinder',
-     'password': cinder_pass},
+     'username': 'ceilometer',
+     'password': ceilometer_pass},
 
     'oslo_concurrency':
-    {'lock_path': '/var/lock/cinder'},
+    {'lock_path': '/var/lock/ceilometer'},
 
     }
 
 
 
-apply_config('/etc/cinder/cinder.conf', cinder_conf)
+apply_config('/etc/ceilometer/ceilometer.conf', ceilometer_conf)
