@@ -3,7 +3,6 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install ceilometer
 RUN apt-get -y update
-RUN pip uninstall -y pbr
 RUN apt-get install -y --force-yes ceilometer-api ceilometer-scheduler python-ceilometerclient
 
 ADD supervisord.conf /etc/supervisord.conf

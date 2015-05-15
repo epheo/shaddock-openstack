@@ -3,7 +3,6 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install heat
 RUN apt-get -y update
-RUN pip uninstall -y pbr stevedore python-novaclient python-neutronclient python-keystoneclient python-glanceclient python-cinderclient oslo.utils oslo.serialization oslo.i18n oslo.config
 RUN apt-get install -y --force-yes heat-api heat-api-cfn heat-engine python-heatclient
 
 ADD supervisord.conf /etc/supervisord.conf

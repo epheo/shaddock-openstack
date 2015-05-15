@@ -3,7 +3,6 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install glance
 RUN apt-get -y update
-RUN pip uninstall -y pbr
 RUN apt-get install -y --force-yes glance python-glanceclient
 
 ADD supervisord.conf /etc/supervisord.conf

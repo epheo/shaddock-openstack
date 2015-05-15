@@ -3,7 +3,6 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install cinder
 RUN apt-get -y update
-RUN pip uninstall -y pbr
 RUN apt-get install -y --force-yes cinder-volume python-mysqldb lvm2
 
 ADD supervisord.conf /etc/supervisord.conf

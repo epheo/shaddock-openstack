@@ -2,7 +2,6 @@ FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install nova
-RUN pip uninstall -y pbr
 RUN apt-get update
 RUN apt-get install -y --force-yes nova-compute sysfsutils qemu libguestfs-tools nova-network nova-api-metadata
 
