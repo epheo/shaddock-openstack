@@ -1,0 +1,82 @@
+#!/bin/bash
+
+echo "Removing cinder DB..."
+rm /var/lib/cinder/cinder.sqlite
+
+echo "Updating conf file..."
+configparse.py
+
+export OS_USERNAME=admin
+export OS_PASSWORD=${ADMIN_PASS}
+export OS_TENANT_NAME=admin
+export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v2.0
+
+endpoint=`openstack endpoint list -f csv -q |grep cinder`
+
+if [ -z "$endpoint" ]
+then
+    echo ">>>>>>> Endpoint not yet created"
+    echo "Creating database"
+    mysql \
+        -h${MYSQL_HOST_IP} \
+        -u${MYSQL_USER} \
+        -p${MYSQL_PASSWORD} \
+        -e "CREATE DATABASE cinder;"
+
+    mysql \
+        -h${MYSQL_HOST_IP} \
+        -u${MYSQL_USER} \
+        -p${MYSQL_PASSWORD} \
+        -e "GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'localhost' \
+            IDENTIFIED BY '${CINDER_DBPASS}';"
+
+    mysql \
+        -h${MYSQL_HOST_IP} \
+        -u${MYSQL_USER} \
+        -p${MYSQL_PASSWORD} \
+        -e "GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'%' \
+            IDENTIFIED BY '${CINDER_DBPASS}'"
+
+
+    echo "Creating Cinder user..."
+    openstack user create --password ${CINDER_PASS} cinder
+
+    openstack role add --project service --user cinder admin
+
+    echo "Registering Cinder API and EndPoints..."
+    openstack service create --type image \
+        --description "OpenStack Block Storage" cinder
+
+    openstack service create --type volumev2 \
+        --description "OpenStack Block Storage" cinderv2
+
+    openstack endpoint create \
+          --publicurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --internalurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --adminurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --region RegionOne \
+          volume
+
+      openstack endpoint create \
+          --publicurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --internalurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --adminurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
+          --region RegionOne \
+          volumev2
+
+else
+
+    if [[ $endpoint == *"ERROR"* ]]
+    then
+        echo ">>>>>>> Cannot connect to Keystone"
+        exit
+    else
+        echo ">>>>>>> Endpoint already created"
+    fi
+fi
+
+echo "Create database tables"
+cinder-manage db sync
+
+echo "Starting cinder using supervisord..."
+exec /usr/bin/supervisord -n
