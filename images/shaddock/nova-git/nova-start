@@ -71,7 +71,7 @@ else
     fi
 fi
 
-echo "Create database tables"
+echo "Updating database tables"
 python /usr/local/bin/nova-manage --config-file /opt/nova/etc/nova/nova.conf db sync
 
 echo "Starting nova using supervisord..."

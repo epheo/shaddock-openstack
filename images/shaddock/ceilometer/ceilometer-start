@@ -75,7 +75,7 @@ else
     fi
 fi
 
-echo "Create database tables"
+echo "Updating database tables"
 ceilometer-manage db sync
 
 echo "Starting ceilometer using supervisord..."

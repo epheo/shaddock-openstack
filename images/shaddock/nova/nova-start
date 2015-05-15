@@ -72,7 +72,7 @@ else
     fi
 fi
 
-echo "Create database tables"
+echo "Updating database tables"
 nova-manage db sync
 
 echo "Starting nova using supervisord..."

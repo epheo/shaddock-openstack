@@ -75,7 +75,7 @@ else
     fi
 fi
 
-echo "Create database tables"
+echo "Updating database tables"
 cinder-manage db sync
 
 echo "Starting cinder using supervisord..."
