@@ -13,10 +13,8 @@ RUN \
      apt-get -y install supervisor wget python-pip \
                         mysql-client mysql-common \
                         python-mysqldb git python-dev \
-                        libffi-dev libssl-dev
-
-RUN \
-     pip install python-openstackclient
+                        libffi-dev libssl-dev \
+                        python-openstackclient
 
 ADD cloud-config /usr/local/bin/
 RUN chmod +x /usr/local/bin/cloud-config
