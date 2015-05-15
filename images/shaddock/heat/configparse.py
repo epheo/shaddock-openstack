@@ -18,12 +18,13 @@
 import ConfigParser
 import os
 
-mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
-heat_pass = os.environ.get('HEAT_PASS')
-heat_dbpass = os.environ.get('HEAT_DBPASS')
+host_ip = os.environ.get('HOST_IP')
+mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
+heat_pass = os.environ.get('HEAT_PASS')
+heat_dbpass = os.environ.get('HEAT_DBPASS')
 heat_domain_pass = os.environ.get('HEAT_DOMAIN_PASS')
 
 def apply_config(configfile, dict):
