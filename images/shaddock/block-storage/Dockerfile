@@ -15,5 +15,5 @@ ADD configparse.py /usr/local/bin/
 RUN chmod +x /usr/local/bin/cinder-start
 RUN chmod +x /usr/local/bin/configparse.py
 
-EXPOSE 8776
+EXPOSE 3260
 CMD ["cinder-start"]
