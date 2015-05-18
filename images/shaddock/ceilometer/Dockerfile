@@ -3,7 +3,9 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install ceilometer
 RUN apt-get -y update
-RUN apt-get install -y --force-yes ceilometer-api ceilometer-scheduler python-ceilometerclient
+RUN apt-get install -y --force-yes mongodb-clients python-pymongo ceilometer-api ceilometer-collector ceilometer-agent-central \
+  ceilometer-agent-notification ceilometer-alarm-evaluator ceilometer-alarm-notifier \
+  python-ceilometerclient
 
 ADD supervisord.conf /etc/supervisord.conf
 

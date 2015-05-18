@@ -1,0 +1,20 @@
+#!/bin/bash
+
+echo "Removing cinder DB..."
+rm /var/lib/cinder/cinder.sqlite
+
+echo "Updating conf file..."
+configparse.py
+
+device=`losetup -a |grep /var/lib/cindervols/backingdevice`
+
+if [ -z "$device" ]
+then
+    fallocate /var/lib/cindervols/backingdevice -l 8G
+    backd=`losetup --find --show /var/lib/cindervols/backingdevice`
+    pvcreate $backd
+    vgcreate cindervolumes $backd
+fi
+
+echo "Starting cinder using supervisord..."
+exec /usr/bin/supervisord -n

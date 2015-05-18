@@ -44,7 +44,7 @@ then
     openstack role add --project service --user cinder admin
 
     echo "Registering Cinder API and EndPoints..."
-    openstack service create --type image \
+    openstack service create --type volume \
         --description "OpenStack Block Storage" cinder
 
     openstack service create --type volumev2 \

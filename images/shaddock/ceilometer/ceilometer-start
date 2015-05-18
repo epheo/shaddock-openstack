@@ -17,25 +17,12 @@ if [ -z "$endpoint" ]
 then
     echo ">>>>>>> Endpoint not yet created"
     echo "Creating database"
-    mysql \
-        -h${MYSQL_HOST_IP} \
-        -u${MYSQL_USER} \
-        -p${MYSQL_PASSWORD} \
-        -e "CREATE DATABASE ceilometer;"
 
-    mysql \
-        -h${MYSQL_HOST_IP} \
-        -u${MYSQL_USER} \
-        -p${MYSQL_PASSWORD} \
-        -e "GRANT ALL PRIVILEGES ON ceilometer.* TO 'ceilometer'@'localhost' \
-            IDENTIFIED BY '${CEILOMETER_DBPASS}';"
-
-    mysql \
-        -h${MYSQL_HOST_IP} \
-        -u${MYSQL_USER} \
-        -p${MYSQL_PASSWORD} \
-        -e "GRANT ALL PRIVILEGES ON ceilometer.* TO 'ceilometer'@'%' \
-            IDENTIFIED BY '${CEILOMETER_DBPASS}'"
+    mongo --host ${MONGODB_HOST_IP} --eval '
+      db = db.getSiblingDB("ceilometer");
+      db.addUser({user: "ceilometer",
+      pwd: ${CEILOMETER_DBPASS},
+      roles: [ "readWrite", "dbAdmin" ]})'
 
 
     echo "Creating Ceilometer user..."
@@ -44,25 +31,15 @@ then
     openstack role add --project service --user ceilometer admin
 
     echo "Registering Ceilometer API and EndPoints..."
-    openstack service create --type image \
-        --description "OpenStack Block Storage" ceilometer
-
-    openstack service create --type volumev2 \
-        --description "OpenStack Block Storage" ceilometerv2
+    openstack service create --type metering \
+        --description "Telemetry" ceilometer
 
     openstack endpoint create \
-          --publicurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-          --internalurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-          --adminurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-          --region RegionOne \
-          volume
-
-      openstack endpoint create \
-          --publicurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-          --internalurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-          --adminurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-          --region RegionOne \
-          volumev2
+        --publicurl http://${KEYSTONE_HOST_IP}:8777 \
+        --internalurl http://${KEYSTONE_HOST_IP}:8777 \
+        --adminurl http://${KEYSTONE_HOST_IP}:8777 \
+        --region RegionOne \
+        metering
 
 else
 

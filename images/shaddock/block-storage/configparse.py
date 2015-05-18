@@ -81,7 +81,7 @@ cinder_conf = {
 
     'lvm':
     {'volume_driver': 'cinder.volume.drivers.lvm.LVMVolumeDriver',
-     'volume_group': 'cinder-volumes',
+     'volume_group': 'cindervolumes',
      'iscsi_protocol': 'iscsi',
      'iscsi_helper': 'tgtadm'},
 
