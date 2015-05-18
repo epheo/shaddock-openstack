@@ -1,10 +1,7 @@
 FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-# Install Keystone
-
-RUN git clone https://github.com/openstack/keystone /opt/keystone/ &&\
-    cd /opt/keystone && git checkout stable/juno  && python setup.py install
+RUN apt-get install -y keystone
 
 
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf

@@ -16,5 +16,7 @@ then
     vgcreate cindervolumes $backd
 fi
 
+cinder-manage db sync
+
 echo "Starting cinder using supervisord..."
 exec /usr/bin/supervisord -n
