@@ -1,7 +1,7 @@
 FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-RUN apt-get update \
+RUN apt-get update &&\
     apt-get install -y keystone
 
 
