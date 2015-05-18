@@ -8,6 +8,7 @@ RUN apt-get install -y --force-yes cinder-volume python-mysqldb lvm2
 ADD supervisord.conf /etc/supervisord.conf
 
 VOLUME  ["/var/log/cinder"]
+VOLUME  ["/var/lib/cindervols"]
 
 ADD cinder-start /usr/local/bin/
 ADD configparse.py /usr/local/bin/

@@ -20,6 +20,7 @@ import os
 
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
+nova_host_ip = os.environ.get('NOVA_HOST_IP')
 cinder_pass = os.environ.get('CINDER_PASS')
 cinder_dbpass = os.environ.get('CINDER_DBPASS')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
