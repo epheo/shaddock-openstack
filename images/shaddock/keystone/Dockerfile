@@ -1,7 +1,8 @@
 FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-RUN apt-get install -y keystone
+RUN apt-get update \
+    apt-get install -y keystone
 
 
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
