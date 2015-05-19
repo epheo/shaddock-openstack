@@ -18,13 +18,13 @@
 import ConfigParser
 import os
 
-nova_db_pass = os.environ.get('NOVA_DBPASS')
+neutron_db_pass = os.environ.get('NEUTRON_DBPASS')
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
 nova_host_ip = os.environ.get('NOVA_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
-nova_pass = os.environ.get('NOVA_PASS')
+neutron_pass = os.environ.get('NEUTRON_PASS')
 host_ip = os.environ.get('HOST_IP')
 
 
@@ -51,13 +51,13 @@ def apply_config(configfile, dict):
     return True
 
 
-nova_conf = {
+neutron_conf = {
     'DEFAULT':
     {'rpc_backend': 'rabbit',
      'auth_strategy': 'keystone',
-     'my_ip': nova_host_ip,
-     'vncserver_listen': nova_host_ip,
-     'vncserver_proxyclient_address': nova_host_ip,
+     'my_ip': neutron_host_ip,
+     'vncserver_listen': neutron_host_ip,
+     'vncserver_proxyclient_address': neutron_host_ip,
      'verbose': 'True'},
 
     'oslo_messaging_rabbit':
@@ -66,7 +66,7 @@ nova_conf = {
 
     'database':
     {'connection':
-     'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
+     'mysql://neutron:%s@%s/neutron' % (neutron_db_pass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
@@ -75,15 +75,15 @@ nova_conf = {
      'project_domain_id': 'default',
      'user_domain_id': 'default',
      'project_name': 'service',
-     'username': 'nova',
-     'password': nova_pass},
+     'username': 'neutron',
+     'password': neutron_pass},
 
     'oslo_concurrency':
-    {'lock_path': '/var/lock/nova'},
+    {'lock_path': '/var/lock/neutron'},
 
     'glance':
     {'host': host_ip}
     }
 
-apply_config('/etc/nova/nova.conf', nova_conf)
+apply_config('/etc/neutron/neutron.conf', neutron_conf)
 

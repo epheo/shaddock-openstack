@@ -24,6 +24,7 @@ cinder_pass = os.environ.get('CINDER_PASS')
 cinder_dbpass = os.environ.get('CINDER_DBPASS')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
+nova_host_ip = os.environ.get('NOVA_HOST_IP')
 
 
 def apply_config(configfile, dict):

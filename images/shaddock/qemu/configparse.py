@@ -132,4 +132,7 @@ if qemu is True:
 if nova_network is True:
     apply_config('/etc/nova/nova.conf', nova_conf_nova_network)
 
+if neutron is True:
+    apply_config('/etc/neutron/neutron.conf', neutron_conf)
+
 apply_config('/etc/nova/nova-compute.conf', nova_compute_conf)
