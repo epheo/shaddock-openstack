@@ -5,7 +5,10 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 RUN apt-get update
 RUN apt-get install -y --force-yes nova-compute sysfsutils qemu \
                                    libguestfs-tools nova-network \
-                                   nova-api-metadata nova-compute-lxd
+                                   nova-api-metadata
+
+RUN git clone https://github.com/lxc/nova-compute-lxd &&\
+    cd nova-compute-lxd && python setup.py install
 
 #Setup supervisord
 ADD supervisord.conf /etc/supervisord.conf
