@@ -131,11 +131,6 @@ nova_compute_conf = {
 
 apply_config('/etc/nova/nova.conf', nova_conf)
 
-if qemu is True:
-    apply_config('/etc/nova/nova.conf', nova_conf_qemu)
-
-if lxd is True:
-    apply_config('/etc/nova/nova.conf', nova_conf_lxd)
 
 if nova_network is True:
     apply_config('/etc/nova/nova.conf', nova_conf_nova_network)
@@ -144,3 +139,9 @@ if neutron is True:
     apply_config('/etc/neutron/neutron.conf', neutron_conf)
 
 apply_config('/etc/nova/nova-compute.conf', nova_compute_conf)
+
+if qemu is True:
+    apply_config('/etc/nova/nova.conf', nova_conf_qemu)
+
+if lxd is True:
+    apply_config('/etc/nova/nova.conf', nova_conf_lxd)
