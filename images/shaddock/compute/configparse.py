@@ -98,6 +98,11 @@ nova_conf_qemu = {
     {'compute_driver': 'libvirt.LibvirtDriver'}
     }
 
+nova_conf_lxd = {
+    'DEFAULT':
+    {'compute_driver': 'nclxd.nova.virt.lxd.LXDDriver'}
+    }
+
 nova_conf_nova_network = {
     'DEFAULT':
     {'network_api_class': 'nova.network.api.API',
@@ -128,6 +133,9 @@ apply_config('/etc/nova/nova.conf', nova_conf)
 
 if qemu is True:
     apply_config('/etc/nova/nova.conf', nova_conf_qemu)
+
+if lxd is True:
+    apply_config('/etc/nova/nova.conf', nova_conf_lxd)
 
 if nova_network is True:
     apply_config('/etc/nova/nova.conf', nova_conf_nova_network)
