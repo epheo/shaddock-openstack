@@ -130,15 +130,15 @@ nova_conf_nova_network = {
 apply_config('/etc/nova/nova.conf', nova_conf)
 
 
-if nova_network is True:
+if bool(nova_network) is True:
     apply_config('/etc/nova/nova.conf', nova_conf_nova_network)
 
-if neutron is True:
+if bool(neutron) is True:
     apply_config('/etc/neutron/neutron.conf', neutron_conf)
 
 
-if qemu is True:
+if bool(qemu) is True:
     apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_qemu)
 
-if lxd is True:
+if bool(lxd) is True:
     apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_lxd)
