@@ -97,7 +97,7 @@ nova_conf = {
 
 nova_compute_conf_qemu = {
     'DEFAULT':
-    {'compute_driver': 'libvirt.LibvirtDriver'}
+    {'compute_driver': 'libvirt.LibvirtDriver'},
 
     'libvirt':
     {'virt_type': 'qemu'}

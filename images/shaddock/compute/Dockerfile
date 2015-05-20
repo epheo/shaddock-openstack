@@ -17,8 +17,9 @@ VOLUME  ["/var/log/nova"]
 
 ADD nova-start /usr/local/bin/
 ADD configparse.py /usr/local/bin/
-RUN chmod +x /usr/local/bin/nova-start
-RUN chmod +x /usr/local/bin/configparse.py
+
+RUN chmod +x /usr/local/bin/configparse.py &&\
+    chmod +x /usr/local/bin/nova-start
 
 EXPOSE 8775 
 
