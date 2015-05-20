@@ -27,6 +27,8 @@ keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
 nova_pass = os.environ.get('NOVA_PASS')
 host_ip = os.environ.get('HOST_IP')
 qemu = os.environ.get('QEMU')
+lxd = os.environ.get('LXD')
+neutron = os.environ.get('NEUTRON')
 nova_network = os.environ.get('NOVA_NETWORK')
 
 
