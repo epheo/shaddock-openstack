@@ -95,12 +95,16 @@ nova_conf = {
 
     }
 
-nova_conf_qemu = {
+nova_compute_conf_qemu = {
     'DEFAULT':
     {'compute_driver': 'libvirt.LibvirtDriver'}
+
+    'libvirt':
+    {'virt_type': 'qemu'}
+
     }
 
-nova_conf_lxd = {
+nova_compute_conf_lxd = {
     'DEFAULT':
     {'compute_driver': 'nclxd.nova.virt.lxd.LXDDriver'}
     }
@@ -122,14 +126,6 @@ nova_conf_nova_network = {
      'public_interface': 'eth0'},
     }
 
-nova_compute_conf = {
-    'DEFAULT':
-    {'compute_driver': 'libvirt.LibvirtDriver'},
-
-    'libvirt':
-    {'virt_type': 'qemu'}
-
-    }
 
 apply_config('/etc/nova/nova.conf', nova_conf)
 
@@ -140,10 +136,9 @@ if nova_network is True:
 if neutron is True:
     apply_config('/etc/neutron/neutron.conf', neutron_conf)
 
-apply_config('/etc/nova/nova-compute.conf', nova_compute_conf)
 
 if qemu is True:
-    apply_config('/etc/nova/nova.conf', nova_conf_qemu)
+    apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_qemu)
 
 if lxd is True:
-    apply_config('/etc/nova/nova.conf', nova_conf_lxd)
+    apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_lxd)
