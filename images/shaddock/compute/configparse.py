@@ -26,10 +26,15 @@ nova_host_ip = os.environ.get('NOVA_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
 nova_pass = os.environ.get('NOVA_PASS')
 host_ip = os.environ.get('HOST_IP')
-qemu = os.environ.get('QEMU')
-lxd = os.environ.get('LXD')
-neutron = os.environ.get('NEUTRON')
-nova_network = os.environ.get('NOVA_NETWORK')
+
+
+def str2bool(v):
+    return v.lower() in ['yes', 'true', 't', '1']
+
+qemu = str2bool(os.environ.get('QEMU'))
+lxd = str2bool(os.environ.get('LXD'))
+neutron = str2bool(os.environ.get('NEUTRON'))
+nova_network = str2bool(os.environ.get('NOVA_NETWORK'))
 
 
 def apply_config(configfile, dict):
@@ -130,15 +135,14 @@ nova_conf_nova_network = {
 apply_config('/etc/nova/nova.conf', nova_conf)
 
 
-if bool(nova_network) is True:
+if nova_network is True:
     apply_config('/etc/nova/nova.conf', nova_conf_nova_network)
 
-if bool(neutron) is True:
+if neutron is True:
     apply_config('/etc/neutron/neutron.conf', neutron_conf)
 
-
-if bool(qemu) is True:
+if qemu is True:
     apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_qemu)
 
-if bool(lxd) is True:
+if lxd is True:
     apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_lxd)
