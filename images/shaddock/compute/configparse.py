@@ -32,6 +32,7 @@ def str2bool(v):
     return str(v).lower() in ['yes', 'true', 't', '1']
 
 qemu = str2bool(os.environ.get('QEMU'))
+kvm = str2bool(os.environ.get('KVM'))
 lxd = str2bool(os.environ.get('LXD'))
 neutron = str2bool(os.environ.get('NEUTRON'))
 nova_network = str2bool(os.environ.get('NOVA_NETWORK'))
@@ -109,6 +110,12 @@ nova_compute_conf_qemu = {
 
     }
 
+nova_compute_conf_kvm = {
+    'DEFAULT':
+    {'compute_driver': 'libvirt.LibvirtDriver'},
+
+    }
+
 nova_compute_conf_lxd = {
     'DEFAULT':
     {'compute_driver': 'nclxd.nova.virt.lxd.LXDDriver'}
@@ -143,6 +150,9 @@ if neutron is True:
 
 if qemu is True:
     apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_qemu)
+
+if kvm is True:
+    apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_kvm)
 
 if lxd is True:
     apply_config('/etc/nova/nova-compute.conf', nova_compute_conf_lxd)
