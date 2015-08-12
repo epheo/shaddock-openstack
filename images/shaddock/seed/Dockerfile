@@ -1,11 +1,6 @@
 FROM ubuntu:14.04
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-ENV https_proxy https://172.16.1.5:8080/
-RUN echo 'Acquire::http::Proxy "http://172.16.1.5:8080/";' > /etc/apt/apt.conf.d/01proxies
-RUN echo 'Acquire::https::Proxy "https://172.16.1.5:8080/";' >> /etc/apt/apt.conf.d/01proxies
-RUN echo 'Acquire::http::Proxy::keg.dev.uswest.hpcloud.net DIRECT;' >> /etc/apt/apt.conf.d/01proxies
-
 
 # OpenStack Repo and packages
 RUN apt-get -y update
