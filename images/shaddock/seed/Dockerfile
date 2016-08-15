@@ -15,8 +15,9 @@ RUN \
                         python-mysqldb git python-dev \
                         libffi-dev libssl-dev
 
-#RUN \
-#     pip install python-openstackclient
+RUN \
+     pip install pytz &&\
+     pip install --upgrade python-openstackclient
 
 ADD cloud-config /usr/local/bin/
 RUN chmod +x /usr/local/bin/cloud-config
