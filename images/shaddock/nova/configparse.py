@@ -54,15 +54,20 @@ def apply_config(configfile, dict):
 nova_conf = {
     'DEFAULT':
     {'rpc_backend': 'rabbit',
+     'enabled_apis': 'osapi_compute,metadata',
      'auth_strategy': 'keystone',
      'my_ip': nova_host_ip,
-     'vncserver_listen': nova_host_ip,
-     'vncserver_proxyclient_address': nova_host_ip,
+     'use_neutron': 'True',
+     'firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
      'verbose': 'True'},
 
     'oslo_messaging_rabbit':
     {'rabbit_host': rabbit_host_ip,
      'rabbit_password': rabbit_pass},
+
+    'api_database':
+    {'connection':
+     'mysql://nova:%s@%s/nova_api' % (nova_db_pass, mysql_host_ip)},
 
     'database':
     {'connection':
@@ -71,18 +76,23 @@ nova_conf = {
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
+     'memcached_servers': '%s:11211' % keystone_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
      'project_name': 'service',
      'username': 'nova',
      'password': nova_pass},
 
     'oslo_concurrency':
-    {'lock_path': '/var/lock/nova'},
+    {'lock_path': '/var/lib/nova/tmp'},
+
+    'vnc':
+    {'vncserver_listen': nova_host_ip,
+     'vncserver_proxyclient_address': nova_host_ip,},
 
     'glance':
-    {'host': host_ip}
+    {'api_servers': 'http://%s:9292' % keystone_host_ip},
     }
 
 apply_config('/etc/nova/nova.conf', nova_conf)
