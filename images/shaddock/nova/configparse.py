@@ -54,15 +54,20 @@ def apply_config(configfile, dict):
 nova_conf = {
     'DEFAULT':
     {'rpc_backend': 'rabbit',
+     'enabled_apis': 'osapi_compute,metadata',
      'auth_strategy': 'keystone',
      'my_ip': nova_host_ip,
-     'vncserver_listen': nova_host_ip,
-     'vncserver_proxyclient_address': nova_host_ip,
+     'use_neutron': 'True',
+     'firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
      'verbose': 'True'},
 
     'oslo_messaging_rabbit':
     {'rabbit_host': rabbit_host_ip,
      'rabbit_password': rabbit_pass},
+
+    'api_database':
+    {'connection':
+     'mysql://nova:%s@%s/nova_api' % (nova_db_pass, mysql_host_ip)},
 
     'database':
     {'connection':
@@ -71,138 +76,23 @@ nova_conf = {
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
+     'memcached_servers': '%s:11211' % keystone_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
      'project_name': 'service',
      'username': 'nova',
      'password': nova_pass},
 
     'oslo_concurrency':
-    {'lock_path': '/var/lock/nova'},
+    {'lock_path': '/var/lib/nova/tmp'},
+
+    'vnc':
+    {'vncserver_listen': nova_host_ip,
+     'vncserver_proxyclient_address': nova_host_ip,},
 
     'glance':
-    {'host': host_ip}
+    {'api_servers': 'http://%s:9292' % keystone_host_ip},
     }
 
 apply_config('/etc/nova/nova.conf', nova_conf)
-
-
-def neutron_config():
-    # neutron.conf
-    ###############
-
-    configfile = '/etc/neutron/neutron.conf'
-    config.read(configfile)
-
-    section = 'database'
-    if not set([section]).issubset(config.sections()):
-        config.add_section(section)
-    config.set(section, 'connection',
-                        'mysql://neutron:%s@%s/neutron'
-                        % (os.environ.get('NEUTRON_DBPASS'),
-                           os.environ.get('HOST_IP')))
-
-    section = 'DEFAULT'
-    # if not set([section]).issubset(config.sections()):
-    #    config.add_section(section)
-    config.set(section, 'rpc_backend', 'rabbit')
-    config.set(section, 'rabbit_host', os.environ.get('HOST_IP'))
-    config.set(section, 'rabbit_password', os.environ.get('RABBIT_PASS'))
-    config.set(section, 'auth_strategy', 'keystone')
-    config.set(section, 'core_plugin', 'ml2')
-    config.set(section, 'service_plugins', 'router')
-    config.set(section, 'allow_overlapping_ips', 'True')
-    config.set(section, 'notify_nova_on_port_status_changes', 'True')
-    config.set(section, 'notify_nova_on_port_data_changes', 'True')
-    config.set(section, 'nova_url', 'http://%s:8774/v2'
-               % os.environ.get('HOST_IP'))
-    config.set(section, 'nova_admin_auth_url', 'http://%s:35357/v2'
-               % os.environ.get('HOST_IP'))
-    config.set(section, 'nova_region_name', 'regionOne')
-    config.set(section, 'nova_admin_username', 'nova')
-    config.set(section, 'nova_admin_tenant_id', 'service')
-    config.set(section, 'nova_admin_password', os.environ.get('NOVA_PASS'))
-    config.set(section, 'verbose', 'True')
-
-    section = 'keystone_authtoken'
-    if not set([section]).issubset(config.sections()):
-        config.add_section(section)
-    config.set(section, 'auth_uri', 'http://%s:5000/v2.0'
-               % os.environ.get('HOST_IP'))
-    config.set(section, 'identity_uri', 'http://%s:35357'
-               % os.environ.get('HOST_IP'))
-    config.set(section, 'admin_tenant_name', 'service')
-    config.set(section, 'admin_user', 'neutron')
-    config.set(section, 'admin_password', os.environ.get('NEUTRON_PASS'))
-
-    print('Parsing of %s...' % configfile)
-    with open(configfile, 'w') as configfile:
-        config.write(configfile)
-    print('Done')
-
-    # ml2_conf.ini
-    ###############
-
-    configfile = '/etc/neutron/plugins/ml2/ml2_conf.ini'
-    config.read(configfile)
-
-    section = 'ml2'
-    if not set([section]).issubset(config.sections()):
-        config.add_section(section)
-    config.set(section, 'type_drivers', 'flat,gre')
-    config.set(section, 'tenant_network_types', 'gre')
-    config.set(section, 'mechanism_drivers', 'openvswitch')
-
-    section = 'ml2_type_gre'
-    if not set([section]).issubset(config.sections()):
-        config.add_section(section)
-    config.set(section, 'tunnel_id_ranges', '1:1000')
-
-    section = 'securitygroup'
-    if not set([section]).issubset(config.sections()):
-        config.add_section(section)
-    config.set(section, 'enable_security_group', 'True')
-    config.set(section, 'enable_ipset', 'True')
-    config.set(section, 'firewall_driver',
-                        'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver')
-
-    print('Parsing of %s...' % configfile)
-    with open(configfile, 'w') as configfile:
-        config.write(configfile)
-    print('Done')
-
-    # nova.conf
-    ############
-
-    configfile = '/etc/nova/nova.conf'
-    config.read(configfile)
-
-    section = 'DEFAULT'
-    # if not set([section]).issubset(config.sections()):
-    #    config.add_section(section)
-    config.set(section, 'network_api_class', 'nova.network.neutronv2.api.API')
-    config.set(section, 'security_group_api', 'neutron')
-    config.set(section, 'linuxnet_interface_driver',
-                        'nova.network.linux_net.LinuxOVSInterfaceDriver')
-    config.set(section, 'firewall_driver',
-                        'nova.virt.firewall.NoopFirewallDriver')
-
-    section = 'neutron'
-    if not set([section]).issubset(config.sections()):
-        config.add_section(section)
-    config.set(section, 'url', 'http://%s:9696' % os.environ.get('HOST_IP'))
-    config.set(section, 'auth_strategy', 'keystone')
-    config.set(section, 'admin_auth_url', 'http://%s:35357/v2.0'
-               % os.environ.get('HOST_IP'))
-    config.set(section, 'admin_tenant_name', 'service')
-    config.set(section, 'admin_username',  section)
-    config.set(section, 'admin_password', os.environ.get('NEUTRON_PASS'))
-
-    print('Parsing of %s...' % configfile)
-    with open(configfile, 'w') as configfile:
-        config.write(configfile)
-    print('Done')
-
-if os.environ.get('NEUTRON') is True:
-    neutron_config()

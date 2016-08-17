@@ -17,6 +17,5 @@ RUN chmod +x /usr/local/bin/configparse.py
 
 EXPOSE 9774
 EXPOSE 8775
-EXPOSE 9696
 
 CMD ["nova-start"]
