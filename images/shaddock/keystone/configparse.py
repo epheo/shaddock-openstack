@@ -54,8 +54,7 @@ keystone_conf = {
      'mysql://keystone:%s@%s/keystone' % (keystone_dbpass, mysql_host_ip)},
 
     'token':
-    {'provider': 'keystone.token.providers.uuid.Provider',
-     'driver': 'keystone.token.persistence.backends.sql.Token'},
+    {'provider': 'fernet'},
 
     'revoke':
     {'driver': 'keystone.contrib.revoke.backends.sql.Revoke'}

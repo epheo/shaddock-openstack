@@ -32,7 +32,7 @@ echo "Updating database tables"
 keystone-manage db_sync
 
 echo "Initialize Fernet keys"
-#keystone-manage fernet_setup --keystone-user admin --keystone-group panama
+keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
 
 echo "Starting keystone using supervisord..."
 exec /usr/bin/supervisord -n
