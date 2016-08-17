@@ -56,8 +56,6 @@ keystone_conf = {
     'token':
     {'provider': 'fernet'},
 
-    'revoke':
-    {'driver': 'keystone.contrib.revoke.backends.sql.Revoke'}
     }
 
 apply_config('/etc/keystone/keystone.conf', keystone_conf)
