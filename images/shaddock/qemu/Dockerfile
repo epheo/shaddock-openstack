@@ -4,7 +4,7 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 #install nova
 RUN pip uninstall -y pbr
 RUN apt-get update
-RUN apt-get install -y nova-compute sysfsutils qemu libguestfs-tools nova-network nova-api-metadata
+RUN apt-get install -y nova-compute sysfsutils qemu libguestfs-tools neutron-linuxbridge-agent
 
 #Setup supervisord
 ADD supervisord.conf /etc/supervisord.conf

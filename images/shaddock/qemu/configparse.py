@@ -56,56 +56,36 @@ nova_conf = {
     {'rpc_backend': 'rabbit',
      'auth_strategy': 'keystone',
      'my_ip': nova_host_ip,
-     'vncserver_listen': '0.0.0.0',
-     'vncserver_proxyclient_address': nova_host_ip,
-     'verbose': 'True',
-     'vnc_enabled': 'True',
-     'novncproxy_base_url': 'http://%s:6080/vnc_auto.html' % host_ip,
+     'use_neutron': 'True',
+     'firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
+     'verbose': 'True'},
 
-     # If Qemu
-     'compute_driver': 'libvirt.LibvirtDriver',
-
-     # If Nova-Networ
-     'network_api_class': 'nova.network.api.API',
-     'security_group_api': 'nova',
-     'firewall_driver': 'nova.virt.libvirt.firewall.IptablesFirewallDriver',
-     'network_manager': 'nova.network.manager.FlatDHCPManager',
-     'network_size': '254',
-     'allow_same_net_traffic': 'False',
-     'multi_host': 'True',
-     'send_arp_for_ha': 'True',
-     'share_dhcp_address': 'True',
-     'force_dhcp_release': 'True',
-     'flat_network_bridge': 'br100',
-     'flat_interface': 'eth0',
-     'public_interface': 'eth0'},
-
-     'oslo_messaging_rabbit':
-     {'rabbit_host': rabbit_host_ip,
-      'rabbit_password': rabbit_pass},
-
-    'database':
-    {'connection':
-     'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
+    'oslo_messaging_rabbit':
+    {'rabbit_host': rabbit_host_ip,
+     'rabbit_password': rabbit_pass},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
+     'memcached_servers': '%s:11211' % keystone_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
      'project_name': 'service',
      'username': 'nova',
      'password': nova_pass},
 
-    'glance':
-    {'host': host_ip},
-
     'oslo_concurrency':
-    {'lock_path': '/var/lock/nova'},
+    {'lock_path': '/var/lib/nova/tmp'},
 
-    'libvirt':
-    {'virt_type': 'qemu'}
+    'vnc':
+    {'enabled': 'True',
+     'vncserver_listen': '0.0.0.0',
+     'vncserver_proxyclient_address': nova_host_ip,
+     'novncproxy_base_url': 'http://%s:6080/vnc_auto.html' % nova_host_ip,},
+
+    'glance':
+    {'api_servers': 'http://%s:9292' % keystone_host_ip},
 
     }
 
