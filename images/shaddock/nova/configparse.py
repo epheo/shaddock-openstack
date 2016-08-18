@@ -93,6 +93,20 @@ nova_conf = {
 
     'glance':
     {'api_servers': 'http://%s:9292' % keystone_host_ip},
+
+    'neutron':
+    {'url': 'http://%s:9696' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
+     'region_name': 'RegionOne',
+     'project_name': 'service',
+     'username': 'neutron',
+     'password': 'panama',
+     'service_metadata_proxy': 'True',
+     'metadata_proxy_shared_secret': 'panama'},
+
     }
 
 apply_config('/etc/nova/nova.conf', nova_conf)
