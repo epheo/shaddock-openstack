@@ -48,7 +48,7 @@ then
         --internalurl http://${KEYSTONE_HOST_IP}:9696 \
         --adminurl http://${KEYSTONE_HOST_IP}:9696 \
         --region RegionOne \
-        compute
+        network
 
     echo "Testing Neutron..."
     #neutron ext-list
