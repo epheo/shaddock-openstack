@@ -107,6 +107,9 @@ nova_conf = {
      'service_metadata_proxy': 'True',
      'metadata_proxy_shared_secret': 'panama'},
 
+    'cinder':
+    {'os_region_name': 'RegionOne'},
+
     }
 
 apply_config('/etc/nova/nova.conf', nova_conf)
