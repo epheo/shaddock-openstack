@@ -116,7 +116,7 @@ neutron_linuxbridge_agent_conf = {
 
     'vxlan':
     {'enable_vxlan': 'True',
-     'local_ip':  os.popen('ifconfig eth0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1'),
+     'local_ip':  os.popen('ifconfig eth0 | grep "inet\ adr" | cut -d: -f2 | cut -d" " -f1').read().rstrip(),
      'l2_population': 'True'},
 
     'securitygroup':
