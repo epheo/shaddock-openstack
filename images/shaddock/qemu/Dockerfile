@@ -16,6 +16,6 @@ ADD configparse.py /usr/local/bin/
 RUN chmod +x /usr/local/bin/nova-start
 RUN chmod +x /usr/local/bin/configparse.py
 
-EXPOSE 8775 
+EXPOSE 8775
 
 CMD ["nova-start"]
