@@ -119,7 +119,9 @@ apply_config('/etc/nova/nova-compute.conf', nova_compute_conf)
 neutron_conf = {
     'DEFAULT':
     {'auth_strategy': 'keystone',
-     'rpc_backend': 'rabbit'},
+     'rpc_backend': 'rabbit',
+     'debug': 'True',
+     'verbose': 'True'},
 
     'oslo_messaging_rabbit':
     {'rabbit_host': os.environ.get('RABBIT_HOST_IP'),

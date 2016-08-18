@@ -54,7 +54,9 @@ neutron_conf = {
      'auth_strategy': 'keystone',
      'notify_nova_on_port_status_changes': 'True',
      'notify_nova_on_port_data_changes': 'True',
-     'rpc_backend': 'rabbit'},
+     'rpc_backend': 'rabbit',
+     'debug': 'True',
+     'verbose': 'True'},
 
     'oslo_messaging_rabbit':
     {'rabbit_host': os.environ.get('RABBIT_HOST_IP'),
