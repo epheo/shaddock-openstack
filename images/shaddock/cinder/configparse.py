@@ -20,8 +20,11 @@ import os
 
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
+rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
+rabbit_pass = os.environ.get('RABBIT_PASS')
+cinder_host_ip = os.environ.get('CINDER_HOST_IP')
 cinder_pass = os.environ.get('CINDER_PASS')
-cinder_dbpass = os.environ.get('CINDER_DBPASS')
+cinder_db_pass = os.environ.get('CINDER_DBPASS')
 
 
 def apply_config(configfile, dict):
@@ -46,56 +49,35 @@ def apply_config(configfile, dict):
     print('Done')
     return True
 
-cinder_api_conf = {
+cinder_conf = {
     'DEFAULT':
-    {'notification_driver': 'noop',
-     'verbose': 'True'},
+    {'rpc_backend': 'rabbit',
+     'auth_strategy': 'keystone',
+     'my_ip': cinder_host_ip},
+
+    'oslo_messaging_rabbit':
+    {'rabbit_host': rabbit_host_ip,
+     'rabbit_password': rabbit_pass},
 
     'database':
     {'connection':
-     'mysql://cinder:%s@%s/cinder' % (cinder_dbpass, mysql_host_ip)},
+     'mysql://cinder:%s@%s/cinder' % (cinder_db_pass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
+     'memcached_servers': '%s:11211' % keystone_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
      'project_name': 'service',
      'username': 'cinder',
      'password': cinder_pass},
 
-    'paste_deploy':
-    {'flavor': 'keystone'},
-
-    'glance_store':
-    {'default_store': 'file',
-     'filesystem_store_datadir': '/var/lib/glance/images/'}
-    }
-
-cinder_registry_conf = {
-    'DEFAULT':
-    {'notification_driver': 'noop',
-     'verbose': 'True'},
-
-    'database':
-    {'connection':
-     'mysql://cinder:%s@%s/cinder' % (cinder_dbpass, mysql_host_ip)},
-
-    'keystone_authtoken':
-    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
-     'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
-     'project_name': 'service',
-     'username': 'cinder',
-     'password': cinder_pass},
-
-    'paste_deploy':
-    {'flavor': 'keystone'},
+    'oslo_concurrency':
+    {'lock_path': '/var/lib/cinder/tmp'},
 
     }
 
-apply_config('/etc/cinder/cinder-api.conf', cinder_api_conf)
-apply_config('/etc/cinder/cinder-registry.conf', cinder_registry_conf)
+apply_config('/etc/cinder/cinder.conf', cinder_conf)
+
