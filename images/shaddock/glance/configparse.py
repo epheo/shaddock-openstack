@@ -49,6 +49,7 @@ def apply_config(configfile, dict):
 glance_api_conf = {
     'DEFAULT':
     {'notification_driver': 'noop',
+     'container_formats': 'ami,ari,aki,bare,ovf,ova,docker',
      'verbose': 'True'},
 
     'database':
