@@ -16,8 +16,9 @@ RUN \
                         libffi-dev libssl-dev
 
 RUN \
-     pip install pytz &&\
-     pip install --upgrade python-openstackclient
+     pip install pytz && \
+     pip install python-memcached && \
+     pip install python-openstackclient
 
 ADD cloud-config /usr/local/bin/
 RUN chmod +x /usr/local/bin/cloud-config
