@@ -1,4 +1,18 @@
 
+Prerequisites
+-------------
+
+Create a LVM volume group cinder-volumes:
+
+```
+sudo dd if=/dev/zero of=/var/disk_lvm.img bs=1M count=40000
+loop=$(sudo losetup  --show --find /var/images/disk_lvm3.img); echo "$loop"
+sudo pvcreate "$loop"
+sudo vgcreate cinder-volumes "$loop"
+
+```
+
+
 
 Used in order to deploy OpenStack in Docker with the Shaddock project:
 
