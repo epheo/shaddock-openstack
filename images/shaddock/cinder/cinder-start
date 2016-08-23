@@ -62,7 +62,7 @@ then
         --internalurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
         --adminurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
         --region RegionOne \
-        volume
+        volumev2
 
 else
 

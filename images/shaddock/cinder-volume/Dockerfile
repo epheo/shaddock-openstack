@@ -6,6 +6,9 @@ RUN apt-get -y update
 RUN pip uninstall -y pbr
 RUN apt-get install -y --force-yes lvm2 tgt cinder-volume
 
+RUN echo "cinder ALL = (root) NOPASSWD:ALL" >> /etc/sudoers && \
+    chmod 0440 /etc/sudoers
+
 ADD supervisord.conf /etc/supervisord.conf
 
 VOLUME  ["/var/log/cinder"]
