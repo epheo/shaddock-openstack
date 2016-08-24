@@ -18,7 +18,10 @@ RUN \
 RUN \
      pip install pytz && \
      pip install python-memcached && \
-     pip install python-openstackclient
+     pip install python-openstackclient==2.6.0
+
+RUN \
+    rm -rf /var/lib/apt/lists/*
 
 ADD cloud-config /usr/local/bin/
 RUN chmod +x /usr/local/bin/cloud-config
