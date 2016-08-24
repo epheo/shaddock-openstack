@@ -49,8 +49,7 @@ def apply_config(configfile, dict):
 neutron_conf = {
     'DEFAULT':
     {'core_plugin': 'ml2',
-     'service_plugins': 'router',
-     'allow_overlapping_ips': 'True',
+     'service_plugins': '',
      'auth_strategy': 'keystone',
      'notify_nova_on_port_status_changes': 'True',
      'notify_nova_on_port_data_changes': 'True',
@@ -94,16 +93,13 @@ apply_config('/etc/neutron/neutron.conf', neutron_conf)
 
 neutron_ml2_conf = {
     'ml2':
-    {'type_drivers': 'flat,vlan,vxlan',
-     'tenant_network_types': 'vxlan',
-     'mechanism_drivers': 'linuxbridge,l2population',
+    {'type_drivers': 'flat,vlan',
+     'tenant_network_types': '',
+     'mechanism_drivers': 'linuxbridge',
      'extension_drivers': 'port_security'},
 
     'ml2_type_flat':
     {'flat_networks': 'provider'},
-
-    'ml2_type_vxlan':
-    {'vni_ranges': '1:1000'},
 
     'securitygroup':
     {'enable_ipset': 'True'},
@@ -117,9 +113,7 @@ neutron_linuxbridge_agent_conf = {
     {'physical_interface_mappings': 'provider:eth0'},
 
     'vxlan':
-    {'enable_vxlan': 'True',
-     'local_ip': os.popen('ifconfig eth0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1').read().rstrip(),
-     'l2_population': 'True'},
+    {'enable_vxlan': 'False'},
 
     'securitygroup':
     {'enable_security_group': 'True',
@@ -129,15 +123,6 @@ neutron_linuxbridge_agent_conf = {
 apply_config('/etc/neutron/plugins/ml2/linuxbridge_agent.ini', neutron_linuxbridge_agent_conf)
 
 
-neutron_l3_agent_conf = {
-    'DEFAULT':
-    {'interface_driver': 'neutron.agent.linux.interface.BridgeInterfaceDriver',
-     'external_network_bridge': ''},
-    }
-
-apply_config('/etc/neutron/l3_agent.ini', neutron_l3_agent_conf)
-
-
 neutron_dhcp_agent_conf = {
     'DEFAULT':
     {'interface_driver': 'neutron.agent.linux.interface.BridgeInterfaceDriver',
@@ -145,7 +130,7 @@ neutron_dhcp_agent_conf = {
      'enable_isolated_metadata': 'True'},
     }
 
-apply_config('/etc/neutron/dhcp_agent.ini', neutron_l3_agent_conf)
+apply_config('/etc/neutron/dhcp_agent.ini', neutron_dhcp_agent_conf)
 
 
 neutron_metadata_agent_conf = {

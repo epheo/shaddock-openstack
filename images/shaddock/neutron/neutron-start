@@ -3,10 +3,14 @@
 echo "Updating conf file..."
 configparse.py
 
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS}
-export OS_TENANT_NAME=admin
-export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v2.0
+export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
 
 endpoint=`openstack endpoint list -f csv -q |grep neutron`
 
@@ -35,7 +39,7 @@ then
             IDENTIFIED BY '${NEUTRON_DBPASS}';"
 
     echo "Creating Neutron user..."
-    openstack user create --password ${NEUTRON_PASS} neutron
+    openstack user create --domain default --password ${NEUTRON_PASS} neutron
 
     openstack role add --project service --user neutron admin
 
@@ -43,12 +47,14 @@ then
     openstack service create --name neutron \
         --description "OpenStack Networking" network
 
-    openstack endpoint create \
-        --publicurl http://${KEYSTONE_HOST_IP}:9696 \
-        --internalurl http://${KEYSTONE_HOST_IP}:9696 \
-        --adminurl http://${KEYSTONE_HOST_IP}:9696 \
-        --region RegionOne \
-        network
+    openstack endpoint create --region RegionOne \
+        network public http://${KEYSTONE_HOST_IP}:9696
+
+    openstack endpoint create --region RegionOne \
+        network internal http://${KEYSTONE_HOST_IP}:9696
+
+    openstack endpoint create --region RegionOne \
+        network admin http://${KEYSTONE_HOST_IP}:9696
 
     echo "Testing Neutron..."
     #neutron ext-list
