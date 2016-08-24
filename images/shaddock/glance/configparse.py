@@ -48,20 +48,21 @@ def apply_config(configfile, dict):
 
 glance_api_conf = {
     'DEFAULT':
-    {'notification_driver': 'noop',
-     'container_formats': 'ami,ari,aki,bare,ovf,ova,docker',
+    {'container_formats': 'ami,ari,aki,bare,ovf,ova,docker',
      'verbose': 'True'},
 
     'database':
     {'connection':
-     'mysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
+     'mysql+pymysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip),
+     'backend': 'mysql'},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'memcached_servers': '%s:11211' % keystone_host_ip,
      'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
      'project_name': 'service',
      'username': 'glance',
      'password': glance_pass},
@@ -70,25 +71,26 @@ glance_api_conf = {
     {'flavor': 'keystone'},
 
     'glance_store':
-    {'default_store': 'file',
+    {'stores': 'file,http',
+     'default_store': 'file',
      'filesystem_store_datadir': '/var/lib/glance/images/'}
     }
 
 glance_registry_conf = {
     'DEFAULT':
-    {'notification_driver': 'noop',
-     'verbose': 'True'},
+    {'verbose': 'True'},
 
     'database':
     {'connection':
-     'mysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
+     'mysql+pymysql://glance:%s@%s/glance' % (glance_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'memcached_servers': '%s:11211' % keystone_host_ip,
      'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
      'project_name': 'service',
      'username': 'glance',
      'password': glance_pass},
@@ -100,3 +102,4 @@ glance_registry_conf = {
 
 apply_config('/etc/glance/glance-api.conf', glance_api_conf)
 apply_config('/etc/glance/glance-registry.conf', glance_registry_conf)
+
