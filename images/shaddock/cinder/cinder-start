@@ -6,10 +6,14 @@ rm /var/lib/cinder/cinder.sqlite
 echo "Updating conf file..."
 configparse.py
 
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS}
-export OS_TENANT_NAME=admin
-export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v2.0
+export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
 
 endpoint=`openstack endpoint list -f csv -q |grep cinder`
 
@@ -39,7 +43,7 @@ then
 
 
     echo "Creating Cinder user..."
-    openstack user create --password ${CINDER_PASS} cinder
+    openstack user create --domain default --password ${CINDER_PASS} cinder
 
     openstack role add --project service --user cinder admin
 
@@ -50,19 +54,24 @@ then
     openstack service create --name cinderv2 \
         --description "OpenStack Block Storage" volumev2
 
-    openstack endpoint create \
-        --publicurl http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s \
-        --internalurl http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s \
-        --adminurl http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s \
-        --region RegionOne \
-        volume
+    openstack endpoint create --region RegionOne \
+        volume public http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s
 
-    openstack endpoint create \
-        --publicurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-        --internalurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-        --adminurl http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s \
-        --region RegionOne \
-        volumev2
+    openstack endpoint create --region RegionOne \
+        volume internal http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s
+
+    openstack endpoint create --region RegionOne \
+        volume admin http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s
+
+
+    openstack endpoint create --region RegionOne \
+        volumev2 public http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s
+
+    openstack endpoint create --region RegionOne \
+        volumev2 internal http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s
+
+    openstack endpoint create --region RegionOne \
+        volumev2 admin http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s
 
 else
 
