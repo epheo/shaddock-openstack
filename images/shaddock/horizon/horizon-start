@@ -10,12 +10,8 @@ sed -i -e "s/^#OPENSTACK_KEYSTONE_DEFAULT_DOMAIN.*/OPENSTACK_KEYSTONE_DEFAULT_DO
 sed -i -e "s/^#OPENSTACK_API_VERSIONS.*/OPENSTACK_API_VERSIONS = {/g" /etc/openstack-dashboard/local_settings.py
 sed -i -e '/OPENSTACK_API_VERSIONS/a }' /etc/openstack-dashboard/local_settings.py
 sed -i -e '/OPENSTACK_API_VERSIONS/a     "image": 2,' /etc/openstack-dashboard/local_settings.py
-sed -i -e 's/^"image": 2,/    "image": 2,/g' /etc/openstack-dashboard/local_settings.py
 sed -i -e '/OPENSTACK_API_VERSIONS/a     "volume": 2,' /etc/openstack-dashboard/local_settings.py
-sed -i -e 's/^"volume": 2,/    "volume": 2,/g' /etc/openstack-dashboard/local_settings.py
 sed -i -e '/OPENSTACK_API_VERSIONS/a     "identity": 3,' /etc/openstack-dashboard/local_settings.py
-sed -i -e 's/^"identity": 3,/    "identity": 3,/g' /etc/openstack-dashboard/local_settings.py
-
 
 echo "Starting horizon using supervisord..."
 exec /usr/bin/supervisord -n
