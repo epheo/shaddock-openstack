@@ -20,12 +20,11 @@ import os
 
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
-cinder_pass = os.environ.get('CINDER_PASS')
-cinder_dbpass = os.environ.get('CINDER_DBPASS')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
-nova_host_ip = os.environ.get('NOVA_HOST_IP')
-
+cinder_host_ip = os.environ.get('CINDER_HOST_IP')
+cinder_pass = os.environ.get('CINDER_PASS')
+cinder_db_pass = os.environ.get('CINDER_DBPASS')
 
 def apply_config(configfile, dict):
     config = ConfigParser.RawConfigParser()
@@ -52,9 +51,8 @@ def apply_config(configfile, dict):
 cinder_conf = {
     'DEFAULT':
     {'rpc_backend': 'rabbit',
-     'my_ip': nova_host_ip,
      'auth_strategy': 'keystone',
-     'verbose': 'True'},
+     'my_ip': cinder_host_ip},
 
     'oslo_messaging_rabbit':
     {'rabbit_host': rabbit_host_ip,
@@ -62,23 +60,22 @@ cinder_conf = {
 
     'database':
     {'connection':
-     'mysql://cinder:%s@%s/cinder' % (cinder_dbpass, mysql_host_ip)},
+     'mysql://cinder:%s@%s/cinder' % (cinder_db_pass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_plugin': 'password',
-     'project_domain_id': 'default',
-     'user_domain_id': 'default',
+     'memcached_servers': '%s:11211' % keystone_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
      'project_name': 'service',
      'username': 'cinder',
      'password': cinder_pass},
 
     'oslo_concurrency':
-    {'lock_path': '/var/lock/cinder'},
+    {'lock_path': '/var/lib/cinder/tmp'},
 
     }
-
-
 
 apply_config('/etc/cinder/cinder.conf', cinder_conf)

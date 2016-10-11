@@ -23,8 +23,10 @@ mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
 nova_host_ip = os.environ.get('NOVA_HOST_IP')
+neutron_host_ip = os.environ.get('NEUTRON_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
 nova_pass = os.environ.get('NOVA_PASS')
+neutron_pass = os.environ.get('NEUTRON_PASS')
 host_ip = os.environ.get('HOST_IP')
 
 
@@ -54,7 +56,6 @@ def apply_config(configfile, dict):
 nova_conf = {
     'DEFAULT':
     {'rpc_backend': 'rabbit',
-     'enabled_apis': 'osapi_compute,metadata',
      'auth_strategy': 'keystone',
      'my_ip': nova_host_ip,
      'use_neutron': 'True',
@@ -64,14 +65,6 @@ nova_conf = {
     'oslo_messaging_rabbit':
     {'rabbit_host': rabbit_host_ip,
      'rabbit_password': rabbit_pass},
-
-    'api_database':
-    {'connection':
-     'mysql://nova:%s@%s/nova_api' % (nova_db_pass, mysql_host_ip)},
-
-    'database':
-    {'connection':
-     'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
@@ -88,14 +81,16 @@ nova_conf = {
     {'lock_path': '/var/lib/nova/tmp'},
 
     'vnc':
-    {'vncserver_listen': nova_host_ip,
-     'vncserver_proxyclient_address': nova_host_ip,},
+    {'enabled': 'True',
+     'vncserver_listen': '0.0.0.0',
+     'vncserver_proxyclient_address': nova_host_ip,
+     'novncproxy_base_url': 'http://%s:6080/vnc_auto.html' % nova_host_ip,},
 
     'glance':
     {'api_servers': 'http://%s:9292' % keystone_host_ip},
 
     'neutron':
-    {'url': 'http://%s:9696' % keystone_host_ip,
+    {'url': 'http://%s:9696' % neutron_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
      'auth_type': 'password',
      'project_domain_name': 'default',
@@ -103,13 +98,60 @@ nova_conf = {
      'region_name': 'RegionOne',
      'project_name': 'service',
      'username': 'neutron',
-     'password': 'panama',
+     'password': neutron_pass,
      'service_metadata_proxy': 'True',
-     'metadata_proxy_shared_secret': 'panama'},
+     'metadata_proxy_shared_secret': neutron_pass},
 
-    'cinder':
-    {'os_region_name': 'RegionOne'},
+    }
+
+nova_compute_conf = {
+    'DEFAULT':
+    {'compute_driver': 'novadocker.virt.docker.DockerDriver'},
 
     }
 
 apply_config('/etc/nova/nova.conf', nova_conf)
+apply_config('/etc/nova/nova-compute.conf', nova_compute_conf)
+
+neutron_conf = {
+    'DEFAULT':
+    {'auth_strategy': 'keystone',
+     'rpc_backend': 'rabbit',
+     'debug': 'True',
+     'verbose': 'True'},
+
+    'oslo_messaging_rabbit':
+    {'rabbit_host': os.environ.get('RABBIT_HOST_IP'),
+     'rabbit_password': os.environ.get('RABBIT_PASS')},
+
+    'keystone_authtoken':
+    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
+     'auth_url': 'http://%s:35357' % keystone_host_ip,
+     'memcached_servers': '%s:11211' % keystone_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
+     'project_name': 'service',
+     'username': 'neutron',
+     'password': neutron_pass},
+
+    }
+
+apply_config('/etc/neutron/neutron.conf', neutron_conf)
+
+
+neutron_linuxbridge_agent_conf = {
+    'linux_bridge':
+    {'physical_interface_mappings': 'provider:eth0'},
+
+    'vxlan':
+    {'enable_vxlan': 'True',
+     'local_ip': os.popen('ifconfig eth0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1').read().rstrip(),
+     'l2_population': 'True'},
+
+    'securitygroup':
+    {'enable_security_group': 'True',
+     'firewall_driver': 'neutron.agent.linux.iptables_firewall.IptablesFirewallDriver'},
+    }
+
+apply_config('/etc/neutron/plugins/ml2/linuxbridge_agent.ini', neutron_linuxbridge_agent_conf)

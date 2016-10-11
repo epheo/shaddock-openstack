@@ -18,15 +18,10 @@
 import ConfigParser
 import os
 
-neutron_db_pass = os.environ.get('NEUTRON_DBPASS')
-mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
-rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
-rabbit_pass = os.environ.get('RABBIT_PASS')
-nova_host_ip = os.environ.get('NOVA_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
+nova_host_ip = os.environ.get('NOVA_HOST_IP')
+nova_pass = os.environ.get('NOVA_PASS')
 neutron_pass = os.environ.get('NEUTRON_PASS')
-host_ip = os.environ.get('HOST_IP')
-
 
 def apply_config(configfile, dict):
     config = ConfigParser.RawConfigParser()
@@ -53,6 +48,7 @@ def apply_config(configfile, dict):
 
 neutron_conf = {
     'DEFAULT':
+<<<<<<< HEAD
     {'rpc_backend': 'rabbit',
      'auth_strategy': 'keystone',
      'my_ip': neutron_host_ip,
@@ -67,23 +63,114 @@ neutron_conf = {
     'database':
     {'connection':
      'mysql://neutron:%s@%s/neutron' % (neutron_db_pass, mysql_host_ip)},
+=======
+    {'core_plugin': 'ml2',
+     'service_plugins': '',
+     'auth_strategy': 'keystone',
+     'notify_nova_on_port_status_changes': 'True',
+     'notify_nova_on_port_data_changes': 'True',
+     'rpc_backend': 'rabbit',
+     'debug': 'True',
+     'verbose': 'True'},
+
+    'oslo_messaging_rabbit':
+    {'rabbit_host': os.environ.get('RABBIT_HOST_IP'),
+     'rabbit_password': os.environ.get('RABBIT_PASS')},
+
+    'database':
+    {'connection':
+     'mysql://neutron:%s@%s/neutron' % (os.environ.get('NEUTRON_DBPASS'), os.environ.get('MYSQL_HOST_IP'))},
+>>>>>>> mitaka
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
+<<<<<<< HEAD
      'auth_plugin': 'password',
      'project_domain_id': 'default',
      'user_domain_id': 'default',
+=======
+     'memcached_servers': '%s:11211' % keystone_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
+>>>>>>> mitaka
      'project_name': 'service',
      'username': 'neutron',
      'password': neutron_pass},
 
+<<<<<<< HEAD
     'oslo_concurrency':
     {'lock_path': '/var/lock/neutron'},
 
     'glance':
     {'host': host_ip}
+=======
+    'nova':
+    {'auth_url': 'http://%s:35357' % nova_host_ip,
+     'auth_type': 'password',
+     'project_domain_name': 'default',
+     'user_domain_name': 'default',
+     'region_name': 'RegionOne',
+     'project_name': 'service',
+     'username': 'nova',
+     'password': nova_pass},
+
+>>>>>>> mitaka
     }
 
 apply_config('/etc/neutron/neutron.conf', neutron_conf)
 
+<<<<<<< HEAD
+=======
+
+neutron_ml2_conf = {
+    'ml2':
+    {'type_drivers': 'flat,vlan',
+     'tenant_network_types': '',
+     'mechanism_drivers': 'linuxbridge',
+     'extension_drivers': 'port_security'},
+
+    'ml2_type_flat':
+    {'flat_networks': 'provider'},
+
+    'securitygroup':
+    {'enable_ipset': 'True'},
+    }
+
+apply_config('/etc/neutron/plugins/ml2/ml2_conf.ini', neutron_ml2_conf)
+
+
+neutron_linuxbridge_agent_conf = {
+    'linux_bridge':
+    {'physical_interface_mappings': 'provider:eth0'},
+
+    'vxlan':
+    {'enable_vxlan': 'False'},
+
+    'securitygroup':
+    {'enable_security_group': 'True',
+     'firewall_driver': 'neutron.agent.linux.iptables_firewall.IptablesFirewallDriver'},
+    }
+
+apply_config('/etc/neutron/plugins/ml2/linuxbridge_agent.ini', neutron_linuxbridge_agent_conf)
+
+
+neutron_dhcp_agent_conf = {
+    'DEFAULT':
+    {'interface_driver': 'neutron.agent.linux.interface.BridgeInterfaceDriver',
+     'dhcp_driver': 'neutron.agent.linux.dhcp.Dnsmasq',
+     'enable_isolated_metadata': 'True'},
+    }
+
+apply_config('/etc/neutron/dhcp_agent.ini', neutron_dhcp_agent_conf)
+
+
+neutron_metadata_agent_conf = {
+    'DEFAULT':
+    {'nova_metadata_ip': os.environ.get('HOST_IP'),
+     'metadata_proxy_shared_secret': os.environ.get('NEUTRON_PASS')},
+    }
+
+apply_config('/etc/neutron/metadata_agent.ini', neutron_metadata_agent_conf)
+>>>>>>> mitaka
