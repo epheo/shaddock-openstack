@@ -29,4 +29,5 @@
 
 
 - name: seed
+  priority: 0
   image: shaddock/seed:latest

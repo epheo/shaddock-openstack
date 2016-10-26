@@ -1,17 +1,18 @@
-FROM shaddock/seed:latest
+FROM archlinux:latest
 MAINTAINER epheo <shaddock@epheo.eu>
 
+# Base Archlinux docker image is outdated crap
+# We should do a Jenkins job to autobuild and propose dailybuilds.
+#
 
-WORKDIR /opt/openstack/
-RUN git clone $GIT_URL
+ENV http_proxy  http://10.154.61.3:3128
+ENV https_proxy http://10.154.61.3:3128
 
-WORKDIR `echo $GIT_URL \
-         | sed -e 's/\/$//' \
-         | awk -F/ '{print $NF}' \
-         | sed -e 's/.git$//' \
-        `
+RUN pacman -Syu --noconfirm python2-virtualenv git
 
-RUN if [ ! -d "venv" ]; then; virtualenv venv; fi
-RUN . venv/bin/activate
+RUN mkdir /opt/openstack/
+WORKDIR   /opt/openstack/
 
-RUN pip install .
+ADD builder.sh ./
+
+ENTRYPOINT ["/bin/bash","builder.sh"]
