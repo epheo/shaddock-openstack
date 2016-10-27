@@ -1,0 +1,298 @@
+################################################
+## SHADDOCK: Services Architecture Definition ##
+################################################
+
+
+- name: rabbitmq
+  image: weezhard/rabbitmq:latest
+  host: node-01
+  priority: 10
+  ports:
+    - 5672
+    - 15672
+  volumes:
+    - mount: /data/log
+      host_dir: /var/log/shaddock/rabbitmq/log
+  env:
+    RABBIT_PASS: panama
+
+
+- name: mysql
+  image: weezhard/mysql:latest
+  host: node-01
+  priority: 20
+  ports:
+    - 3306
+  volumes:
+    - mount: /var/log/mysql
+      host_dir: /var/log/shaddock/mysql
+  env:
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+
+
+- name: keystone
+  image: weezhard/keystone:latest
+  priority: 30
+  ports:
+    - 35357
+    - 5000
+  volumes:
+    - mount: /var/log/keystone
+      host_dir: /var/log/shaddock/keystone
+  depends-on:
+    - {name: mysql, port: 3306}
+  env:
+    MYSQL_HOST_IP: 192.168.1.250
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+    KEYSTONE_DBPASS: panama
+    ADMIN_TOKEN: panama
+
+
+- name: seed
+  image: weezhard/seed:latest
+  priority: 35
+  depends-on:
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+  env:
+    MYSQL_HOST_IP: 192.168.1.250
+    KEYSTONE_HOST_IP: 192.168.1.250
+    ADMIN_TOKEN: panama
+    KEYSTONE_PASS: panama
+    ADMIN_PASS: panama
+    DEMO_PASS: panama
+    EMAIL_DOMAIN: example.org
+
+- name: glance
+  image: weezhard/glance:latest
+  priority: 40
+  ports:
+    - 9292
+    - 9191
+  volumes:
+    - mount: /var/log/glance
+      host_dir: /var/log/shaddock/glance
+  depends-on:
+    - {name: seed, status: stopped}
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+  env:
+    MYSQL_HOST_IP: 192.168.1.250
+    KEYSTONE_HOST_IP: 192.168.1.250
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+    ADMIN_PASS: panama
+    GLANCE_DBPASS: panama
+    GLANCE_PASS: panama
+
+- name: nova
+  image: weezhard/nova-legacy:latest
+  priority: 45
+  ports:
+    - 8774
+  privileged: True
+  volumes:
+    - mount: /var/log/nova
+      host_dir: /var/log/shaddock/nova
+  depends-on:
+    - {name: seed, status: stopped}
+    - {name: mysql, port: 3306}
+    - {name: rabbitmq, port: 5672}
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+  env:
+    MYSQL_HOST_IP: 192.168.1.250
+    KEYSTONE_HOST_IP: 192.168.1.250
+    RABBIT_HOST_IP: 192.168.1.250
+    NOVA_HOST_IP: 192.168.1.250
+    HOST_IP: 192.168.1.250
+    KEYSTONE_HOST_IP: 192.168.1.250
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+    ADMIN_PASS: panama
+    RABBIT_PASS: panama
+    NOVA_DBPASS: panama
+    NOVA_PASS: panama
+
+- name: horizon
+  image: weezhard/horizon:latest
+  priority: 55
+  ports:
+    - 80
+    - 11211
+  volumes:
+    - mount: /var/log/horizon
+      host_dir: /var/log/shaddock/horizon
+  depends-on:
+    - {name: seed, status: stopped}
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+  env:
+    KEYSTONE_HOST_IP: 192.168.1.250
+
+- name: cinder
+  image: weezhard/cinder:latest
+  priority: 60
+  ports:
+    - 8776
+  volumes:
+    - mount: /var/log/cinder
+      host_dir: /var/log/shaddock/cinder
+  depends-on:
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+  env:
+    KEYSTONE_HOST_IP: 192.168.1.250
+    RABBIT_HOST_IP: 192.168.1.250
+    MYSQL_HOST_IP: 192.168.1.250
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+    ADMIN_PASS: panama
+    CINDER_HOST_IP: 192.168.1.250
+    HOST_IP: 192.168.1.250
+    RABBIT_PASS: panama
+    CINDER_DBPASS: panama
+    CINDER_PASS: panama
+
+- name: cinder-volume
+  image: weezhard/cinder-volume:latest
+  priority: 65
+  volumes:
+    - mount: /var/log/cinder
+      host_dir: /var/log/shaddock/volume
+    - mount: /rootfs:ro
+      host_dir: /
+    - mount: /sys:ro
+      host_dir: /sys
+    - mount: /dev
+      host_dir: /dev
+    - mount: /var/run
+      host_dir: /var/run
+  privileged: True
+  depends-on:
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+    - {name: cinder}
+  env:
+    KEYSTONE_HOST_IP: 192.168.1.250
+    RABBIT_HOST_IP: 192.168.1.250
+    MYSQL_HOST_IP: 192.168.1.250
+    GLANCE_HOST_IP: 192.168.1.250
+    CINDER_HOST_IP: 192.168.1.250
+    HOST_IP: 192.168.1.250
+    RABBIT_PASS: panama
+    CINDER_DBPASS: panama
+    CINDER_PASS: panama
+
+- name: manila
+  image: weezhard/manila:latest
+  priority: 70
+  ports:
+    - 8786
+  volumes:
+    - mount: /var/log/manila
+      host_dir: /var/log/shaddock/manila
+  depends-on:
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+  env:
+    KEYSTONE_HOST_IP: 192.168.1.250
+    RABBIT_HOST_IP: 192.168.1.250
+    MYSQL_HOST_IP: 192.168.1.250
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+    ADMIN_PASS: panama
+    MANILA_HOST_IP: 192.168.1.250
+    HOST_IP: 192.168.1.250
+    RABBIT_PASS: panama
+    MANILA_DBPASS: panama
+    MANILA_PASS: panama
+
+- name: manila-share
+  image: weezhard/manila-share:latest
+  priority: 75
+  volumes:
+    - mount: /var/log/manila
+      host_dir: /var/log/shaddock/share
+    - mount: /rootfs:ro
+      host_dir: /
+    - mount: /sys:ro
+      host_dir: /sys
+    - mount: /dev
+      host_dir: /dev
+    - mount: /var/run
+      host_dir: /var/run
+  privileged: True
+  depends-on:
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+    - {name: manila}
+  env:
+    KEYSTONE_HOST_IP: 192.168.1.250
+    RABBIT_HOST_IP: 192.168.1.250
+    MYSQL_HOST_IP: 192.168.1.250
+    MANILA_HOST_IP: 192.168.1.250
+    HOST_IP: 192.168.1.250
+    RABBIT_PASS: panama
+    MANILA_DBPASS: panama
+    MANILA_PASS: panama
+
+- name: nova-qemu
+  image: weezhard/nova-legacy-qemu:latest
+  priority: 90
+  ports:
+    - 8775
+  volumes:
+    - mount: /var/log/nova
+      host_dir: /var/log/shaddock/compute
+    - mount: /lib/modules:ro
+      host_dir: /lib/modules
+  privileged: True
+  network_mode: host
+  depends-on:
+    - {name: nova}
+  env:
+    KEYSTONE_HOST_IP: 192.168.1.250
+    RABBIT_HOST_IP: 192.168.1.250
+    MYSQL_HOST_IP: 192.168.1.250
+    NOVA_HOST_IP: 192.168.1.250
+    NEUTRON_HOST_IP: 192.168.1.250
+    HOST_IP: 192.168.1.250
+    RABBIT_PASS: panama
+    NOVA_PASS: panama
+    NEUTRON_PASS: panama
+
+
+- name: heat
+  image: weezhard/heat:latest
+  priority: 100
+  ports:
+    - 8000
+    - 8004
+  volumes:
+    - mount: /var/log/heat
+      host_dir: /var/log/shaddock/heat
+  depends-on:
+    - {name: mysql, port: 3306}
+    - {name: keystone, port: 5000, get: '/v3'}
+    - {name: keystone, port: 35357, get: '/v3'}
+  env:
+    KEYSTONE_HOST_IP: 192.168.1.250
+    RABBIT_HOST_IP: 192.168.1.250
+    RABBIT_PASS: panama
+    MYSQL_HOST_IP: 192.168.1.250
+    MYSQL_USER: admin
+    MYSQL_PASSWORD: password
+    ADMIN_PASS: panama
+    HOST_IP: 192.168.1.250
+    HEAT_HOST_IP: 192.168.1.250
+    HEAT_DBPASS: panama
+    HEAT_PASS: panama
