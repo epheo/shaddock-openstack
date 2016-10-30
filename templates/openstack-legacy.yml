@@ -57,13 +57,14 @@
     - {name: keystone, port: 5000, get: '/v3'}
     - {name: keystone, port: 35357, get: '/v3'}
   env:
-    MYSQL_HOST_IP: 192.168.1.250
     KEYSTONE_HOST_IP: 192.168.1.250
-    ADMIN_TOKEN: panama
     KEYSTONE_PASS: panama
-    ADMIN_PASS: panama
+    DEMO_EMAIL: demo.example.org
     DEMO_PASS: panama
-    EMAIL_DOMAIN: example.org
+    ADMIN_EMAIL: admin.example.org
+    ADMIN_PASS: panama
+    ADMIN_TOKEN: panama
+
 
 - name: glance
   image: weezhard/glance:latest
