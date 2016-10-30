@@ -25,7 +25,6 @@ rabbit_pass = os.environ.get('RABBIT_PASS')
 nova_host_ip = os.environ.get('NOVA_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
 nova_pass = os.environ.get('NOVA_PASS')
-host_ip = os.environ.get('HOST_IP')
 
 
 def apply_config(configfile, dict):

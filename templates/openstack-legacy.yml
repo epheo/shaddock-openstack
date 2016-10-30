@@ -108,17 +108,16 @@
     - {name: keystone, port: 35357, get: '/v3'}
   env:
     MYSQL_HOST_IP: 192.168.1.250
-    KEYSTONE_HOST_IP: 192.168.1.250
-    RABBIT_HOST_IP: 192.168.1.250
-    NOVA_HOST_IP: 192.168.1.250
-    HOST_IP: 192.168.1.250
-    KEYSTONE_HOST_IP: 192.168.1.250
     MYSQL_USER: admin
     MYSQL_PASSWORD: password
-    ADMIN_PASS: panama
+    RABBIT_HOST_IP: 192.168.1.250
     RABBIT_PASS: panama
+    KEYSTONE_HOST_IP: 192.168.1.250
+    NOVA_HOST_IP: 192.168.1.250
     NOVA_DBPASS: panama
     NOVA_PASS: panama
+    ADMIN_PASS: panama
+
 
 - name: horizon
   image: weezhard/horizon:latest
