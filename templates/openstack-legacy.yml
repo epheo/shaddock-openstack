@@ -121,6 +121,7 @@
 
 - name: horizon
   image: weezhard/horizon:latest
+  host: node-02
   priority: 55
   ports:
     - 80
@@ -135,6 +136,7 @@
     - {name: keystone, port: 35357, get: '/v3'}
   env:
     KEYSTONE_HOST_IP: 192.168.1.250
+    HORIZON_HOST_IP: 192.168.1.252
 
 - name: cinder
   image: weezhard/cinder:latest
