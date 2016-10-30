@@ -1,10 +1,8 @@
 FROM shaddock/seed:latest
-MAINTAINER Thibaut Lapierre <root@epheo.eu>
+MAINTAINER epheo <github@epheo.eu>
 
-#install cinder
-RUN apt-get -y update
-RUN pip uninstall -y pbr
-RUN apt-get install -y --force-yes lvm2 tgt cinder-volume
+RUN pacman -Sy --noconfirm lvm2 sudo
+ADD supervisord.conf /etc/supervisord.conf
 
 RUN echo "cinder ALL = (root) NOPASSWD:ALL" >> /etc/sudoers && \
     chmod 0440 /etc/sudoers

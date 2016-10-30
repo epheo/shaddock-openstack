@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#    Copyright (C) 2014 Thibaut Lapierre <root@epheo.eu>. All Rights Reserved.
+#    Copyright (C) 2014 Thibaut Lapierre <github@epheo.eu>. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -26,29 +26,6 @@ rabbit_pass = os.environ.get('RABBIT_PASS')
 cinder_host_ip = os.environ.get('CINDER_HOST_IP')
 cinder_pass = os.environ.get('CINDER_PASS')
 cinder_db_pass = os.environ.get('CINDER_DBPASS')
-
-
-def apply_config(configfile, dict):
-    config = ConfigParser.RawConfigParser()
-    config.read(configfile)
-
-    for section in dict.keys():
-        if not set([section]).issubset(config.sections()) \
-                and section != 'DEFAULT':
-            config.add_section(section)
-        inner_dict = dict.get(section)
-        for key in inner_dict.keys():
-            config.set(section, key, inner_dict.get(key))
-            print('Writing %s : %s in section %s of the file %s'
-                  % (key,
-                     inner_dict.get(key),
-                     section,
-                     configfile))
-
-    with open(configfile, 'w') as configfile:
-        config.write(configfile)
-    print('Done')
-    return True
 
 cinder_conf = {
     'DEFAULT':
@@ -87,6 +64,30 @@ cinder_conf = {
     {'lock_path': '/var/lib/cinder/tmp'},
 
     }
+
+
+def apply_config(configfile, dict):
+    config = ConfigParser.RawConfigParser()
+    config.read(configfile)
+
+    for section in dict.keys():
+        if not set([section]).issubset(config.sections()) \
+                and section != 'DEFAULT':
+            config.add_section(section)
+        inner_dict = dict.get(section)
+        for key in inner_dict.keys():
+            config.set(section, key, inner_dict.get(key))
+            print('Writing %s : %s in section %s of the file %s'
+                  % (key,
+                     inner_dict.get(key),
+                     section,
+                     configfile))
+
+    with open(configfile, 'w') as configfile:
+        config.write(configfile)
+    print('Done')
+    return True
+
 
 apply_config('/etc/cinder/cinder.conf', cinder_conf)
 

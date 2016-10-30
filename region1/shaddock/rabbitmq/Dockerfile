@@ -1,20 +1,10 @@
 FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
-# Based on https://github.com/dockerfile/rabbitmq
-
-# Add files.
 ADD rabbitmq-start /usr/local/bin/
+RUN chmod +x /usr/local/bin/rabbitmq-start
 
-# Install RabbitMQ.
-RUN \
-    wget -qO - https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | apt-key add - && \
-    echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y rabbitmq-server && \
-    rm -rf /var/lib/apt/lists/* && \
-    rabbitmq-plugins enable rabbitmq_management && \
-    chmod +x /usr/local/bin/rabbitmq-start
+RUN pacman -Sy --noconfirm rabbitmq 
 
 # Define environment variables.
 ENV RABBITMQ_LOG_BASE /data/log
@@ -23,12 +13,9 @@ ENV RABBITMQ_MNESIA_BASE /data/mnesia
 # Define mount points.
 VOLUME ["/data/log", "/data/mnesia"]
 
-# Define working directory.
 WORKDIR /data
 
-# Define default command.
-CMD ["rabbitmq-start"]
-
-# Expose ports.
 EXPOSE 5672
 EXPOSE 15672
+
+CMD ["rabbitmq-start"]

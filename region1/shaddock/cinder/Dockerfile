@@ -1,10 +1,5 @@
 FROM shaddock/seed:latest
-MAINTAINER Thibaut Lapierre <root@epheo.eu>
-
-#install cinder
-RUN apt-get -y update
-RUN pip uninstall -y pbr
-RUN apt-get install -y --force-yes cinder-api cinder-scheduler
+MAINTAINER epheo <github@epheo.eu>
 
 ADD supervisord.conf /etc/supervisord.conf
 

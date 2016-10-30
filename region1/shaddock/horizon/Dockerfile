@@ -1,13 +1,12 @@
 FROM shaddock/seed:latest
-MAINTAINER Thibaut Lapierre <root@epheo.eu>
+MAINTAINER epheo <github@epheo.eu>
 
-#install horizon
-RUN apt-get update
-RUN apt-get install -y openstack-dashboard apache2 libapache2-mod-wsgi memcached python-memcache
-RUN apt-get remove -y --purge openstack-dashboard-ubuntu-theme
+RUN pacman -Sy --noconfirm apache \
+                           mod_wsgi2 \
+                           python2-memcached \
+                           memcached
 
-#Setup supervisord
-ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+ADD supervisord.conf /etc/supervisord.conf
 
 VOLUME ["/var/log/horizon"]
 

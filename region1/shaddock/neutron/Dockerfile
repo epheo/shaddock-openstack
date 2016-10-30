@@ -1,10 +1,5 @@
 FROM shaddock/seed:latest
-MAINTAINER Thibaut Lapierre <root@epheo.eu>
-
-RUN pip uninstall -y pbr
-RUN apt-get update &&\
-    apt-get install -y neutron-server neutron-plugin-ml2 neutron-linuxbridge-agent \
-                       neutron-l3-agent neutron-dhcp-agent neutron-metadata-agent
+MAINTAINER epheo <github@epheo.eu>
 
 ADD supervisord.conf /etc/supervisord.conf
 

@@ -1,10 +1,5 @@
 FROM shaddock/seed:latest
-MAINTAINER Thibaut Lapierre <root@epheo.eu>
-
-#Install heat
-RUN apt-get -y update
-RUN pip uninstall -y pbr
-RUN apt-get install -y --force-yes heat-api heat-api-cfn heat-engine
+MAINTAINER epheo <github@epheo.eu>
 
 ADD supervisord.conf /etc/supervisord.conf
 

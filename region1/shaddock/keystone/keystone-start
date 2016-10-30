@@ -37,6 +37,5 @@ keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
 chown -R keystone:keystone /etc/keystone
 chown -R keystone:keystone /var/log/keystone
 
-
 echo "Starting keystone using supervisord..."
 exec /usr/bin/supervisord -n
