@@ -1,0 +1,5 @@
+
+---
+def_password: 'panama'
+mysql_password: 'p4ss0rd'
+public_vip: '10.0.42.6'
