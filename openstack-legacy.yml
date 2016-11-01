@@ -9,7 +9,7 @@ clusters:
   - name: cluster1
     vars: !include vars/default.yml
     hosts: !include hosts/all.yml
-    images: region1/
+    images: images/region1/
 
     services:
       - name: rabbitmq
@@ -42,7 +42,7 @@ clusters:
   - name: cluster2
     vars: !include vars/default.yml
     hosts: !include hosts/all.yml
-    images: region1/
+    images: images/region1/
 
     services:     
       - name: keystone
@@ -55,6 +55,8 @@ clusters:
         volumes:
           - mount: /var/log/keystone
             host_dir: /var/log/shaddock/keystone
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         depends-on:
           - {name: mysql, port: 3306}
         env:
@@ -90,6 +92,8 @@ clusters:
         volumes:
           - mount: /var/log/glance
             host_dir: /var/log/shaddock/glance
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         depends-on:
           - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
@@ -114,6 +118,8 @@ clusters:
         volumes:
           - mount: /var/log/nova
             host_dir: /var/log/shaddock/nova
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         depends-on:
           - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
@@ -144,6 +150,8 @@ clusters:
         volumes:
           - mount: /var/log/horizon
             host_dir: /var/log/shaddock/horizon
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         depends-on:
           - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
@@ -161,6 +169,8 @@ clusters:
         volumes:
           - mount: /var/log/cinder
             host_dir: /var/log/shaddock/cinder
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         depends-on:
           - {name: mysql, port: 3306}
           - {name: keystone, port: 5000, get: '/v3'}
@@ -193,6 +203,8 @@ clusters:
             host_dir: /dev
           - mount: /var/run
             host_dir: /var/run
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         privileged: True
         depends-on:
           - {name: mysql, port: 3306}
@@ -219,6 +231,8 @@ clusters:
         volumes:
           - mount: /var/log/manila
             host_dir: /var/log/shaddock/manila
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         depends-on:
           - {name: mysql, port: 3306}
           - {name: keystone, port: 5000, get: '/v3'}
@@ -251,6 +265,8 @@ clusters:
             host_dir: /dev
           - mount: /var/run
             host_dir: /var/run
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         privileged: True
         depends-on:
           - {name: mysql, port: 3306}
@@ -278,6 +294,8 @@ clusters:
             host_dir: /var/log/shaddock/compute
           - mount: /lib/modules:ro
             host_dir: /lib/modules
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         privileged: True
         network_mode: host
         depends-on:
@@ -303,6 +321,8 @@ clusters:
         volumes:
           - mount: /var/log/heat
             host_dir: /var/log/shaddock/heat
+          - mount: /opt/openstack
+            host_dir: /opt/openstack
         depends-on:
           - {name: mysql, port: 3306}
           - {name: keystone, port: 5000, get: '/v3'}
