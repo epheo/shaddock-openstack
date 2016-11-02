@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Removing cinder DB..."
+rm /var/lib/cinder/cinder.sqlite
+
+echo "Updating conf file..."
+configparse.py
+
+echo "Starting cinder using supervisord..."
+exec /usr/bin/supervisord -n

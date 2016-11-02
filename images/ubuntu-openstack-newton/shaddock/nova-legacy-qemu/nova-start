@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "Removing nova DB..."
+rm -f /var/lib/nova/nova.sqlite
+
+echo "Updating conf file..."
+configparse.py
+
+echo "Add kvm group"
+chown root:kvm /dev/kvm
+
+echo "Starting nova using supervisord..."
+exec /usr/bin/supervisord -n

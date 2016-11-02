@@ -1,0 +1,38 @@
+#!/bin/bash
+
+echo "Updating conf file..."
+cp /opt/keystone/etc/keystone.conf.sample \
+   /opt/keystone/etc/keystone.conf
+configparse.py
+
+echo "Create database..."
+echo "=> Creating ${SERVICE} database"
+echo "=> DB ${MYSQL_HOST_IP}"
+echo "=> User ${MYSQL_USER}"
+echo "=> Password ${MYSQL_PASSWORD}"
+
+mysql \
+    -h${MYSQL_HOST_IP} \
+    -u${MYSQL_USER} \
+    -p${MYSQL_PASSWORD} \
+    -e "CREATE DATABASE keystone;"
+
+mysql \
+    -h${MYSQL_HOST_IP} \
+    -u${MYSQL_USER} \
+    -p${MYSQL_PASSWORD} \
+    -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' \
+        IDENTIFIED BY '${KEYSTONE_DBPASS}';"
+
+mysql \
+    -h${MYSQL_HOST_IP} \
+    -u${MYSQL_USER} \
+    -p${MYSQL_PASSWORD} \
+    -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' \
+        IDENTIFIED BY '${KEYSTONE_DBPASS}'"
+
+echo "Create database tables"
+python /opt/keystone/bin/keystone-manage --config-file /opt/keystone/etc/keystone.conf db_sync
+
+echo "Starting keystone using supervisord..."
+exec /usr/bin/supervisord -n

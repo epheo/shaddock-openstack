@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Updating conf file..."
+configparse.py
+
+echo "Starting Manila share using supervisord..."
+exec /usr/bin/supervisord -n
