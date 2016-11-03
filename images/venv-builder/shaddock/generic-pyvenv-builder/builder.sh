@@ -9,6 +9,12 @@ then
     exit 1
 fi
 
+if [ -z "$GIT_BRANCH" ]
+then    
+    echo "You need to run the builder with -e GIT_BRANCH=your_git_branch"
+    exit 1
+fi
+
 if [ -z "$1" ]
 then    
     echo "You need give a path as first argument to this script"
@@ -23,7 +29,7 @@ PROJECT_NAME=`echo $GIT_URL           \
              `
 GIT_DIR=$1/$PROJECT_NAME-$DATE
 
-git clone $GIT_URL $GIT_DIR
+git clone -b $GIT_BRANCH $GIT_URL $GIT_DIR
 cd $GIT_DIR
 if [ ! -d "venv" ]; then virtualenv2 .; fi
 . bin/activate

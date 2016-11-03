@@ -1,6 +1,11 @@
 #!/bin/bash
 
-configparse.py
+KEYSTONE_PATH=/opt/openstack/services/keystone/bin/
+
+ln -s /opt/openstack/services/keystone/etc/ /etc/keystone
+mv /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
+
+$KEYSTONE_PATH/python /usr/local/bin/configparse.py
 
 echo "Create database..."
 echo "=> Creating ${SERVICE} database"
@@ -29,13 +34,25 @@ mysql \
         IDENTIFIED BY '${KEYSTONE_DBPASS}'"
 
 echo "Updating database tables"
-keystone-manage db_sync
+/opt/openstack/services/keystone/bin/keystone-manage db_sync
 
 echo "Initialize Fernet keys"
-keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+/opt/openstack/services/keystone/bin/keystone-manage \
+  fernet_setup \
+  --keystone-user http \
+  --keystone-group http
 
-chown -R keystone:keystone /etc/keystone
-chown -R keystone:keystone /var/log/keystone
+/opt/openstack/services/keystone/bin/keystone-manage \
+  credential_setup \
+  --keystone-user http \
+  --keystone-group http
 
-echo "Starting keystone using supervisord..."
-exec /usr/bin/supervisord -n
+/opt/openstack/services/keystone/bin/keystone-manage \
+  --bootstrap-password ${ADMIN_TOKEN} \
+  --bootstrap-admin-url http://${KEYSTONE_HOST_IP}:35357/v3/ \
+  --bootstrap-internal-url http://${KEYSTONE_HOST_IP}:35357/v3/ \
+  --bootstrap-public-url http://${KEYSTONE_HOST_IP}:5000/v3/ \
+  --bootstrap-region-id RegionOne
+
+echo "Starting keystone..."
+exec /usr/sbin/apachectl -D "FOREGROUND" -f /etc/httpd/wsgi-keystone.conf

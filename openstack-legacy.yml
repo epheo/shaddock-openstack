@@ -60,27 +60,12 @@ clusters:
         depends-on:
           - {name: mysql, port: 3306}
         env:
-          MYSQL_HOST_IP: '{{ public_vip }}'
+          MYSQL_HOST_IP: '172.17.0.2'
           MYSQL_USER: admin
           MYSQL_PASSWORD: '{{ mysql_password }}'
           KEYSTONE_DBPASS: '{{ def_password }}'
           ADMIN_TOKEN: '{{ def_password }}'
-      
-      - name: seed
-        image: shaddock/seed:latest
-        host: node001
-        priority: 35
-        depends-on:
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-        env:
           KEYSTONE_HOST_IP: '{{ public_vip }}'
-          KEYSTONE_PASS: '{{ def_password }}'
-          DEMO_EMAIL: demo.example.org
-          DEMO_PASS: '{{ def_password }}'
-          ADMIN_EMAIL: admin.example.org
-          ADMIN_PASS: '{{ def_password }}'
-          ADMIN_TOKEN: '{{ def_password }}'
       
       - name: glance
         image: shaddock/glance:latest
@@ -100,7 +85,7 @@ clusters:
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
         env:
-          MYSQL_HOST_IP: '{{ public_vip }}'
+          MYSQL_HOST_IP: '172.17.0.2'
           KEYSTONE_HOST_IP: '{{ public_vip }}'
           MYSQL_USER: admin
           MYSQL_PASSWORD: '{{ mysql_password }}'
@@ -109,7 +94,7 @@ clusters:
           GLANCE_PASS: '{{ def_password }}'
       
       - name: nova
-        image: shaddock/nova-legacy:latest
+        image: shaddock/nova:latest
         host: node001
         priority: 45
         ports:
