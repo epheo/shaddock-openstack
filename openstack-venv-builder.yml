@@ -146,6 +146,21 @@ clusters:
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
+          depends-on:
+            - {name: openstackclient, status: stopped, sleep: 50, retry: 60}
+            - {name: nova, status: stopped, sleep: 50, retry: 60}
+            - {name: glance, status: stopped, sleep: 50, retry: 60}
+            - {name: glance, status: stopped, sleep: 50, retry: 60}
+            - {name: keystone, status: stopped, sleep: 50, retry: 60}
+            - {name: cinder, status: stopped, sleep: 50, retry: 60}
+            - {name: neutron, status: stopped, sleep: 50, retry: 60}
+            - {name: horizon, status: stopped, sleep: 50, retry: 60}
+            - {name: novaclient, status: stopped, sleep: 50, retry: 60}
+            - {name: glanceclient, status: stopped, sleep: 50, retry: 60}
+            - {name: keystoneclient, status: stopped, sleep: 50, retry: 60}
+            - {name: cinderclient, status: stopped, sleep: 50, retry: 60}
+            - {name: neutronclient, status: stopped, sleep: 50, retry: 60}
+
 
         - name: venv-fixer
           image: shaddock/venv-fixer:latest
@@ -153,3 +168,6 @@ clusters:
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
+          depends-on:
+             - {name: symlinkcreator, status: stopped, sleep: 50, retry: 60} 
+
