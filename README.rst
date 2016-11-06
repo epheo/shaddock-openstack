@@ -6,27 +6,48 @@ All notions and objects of this repository are abstract and redefinable.
 
 **The venv-builder** will build all the openstack projects from the upstream 
 git branch you want.
-It build them in parallel in sparated containers if you "start all".
+It build them in parallel in separated containers if you "start all".
+You will find the venv directories and Python sources in the
+/opt/openstack/venv directory.
 
-shaddock -f openstack-venv-builder.yml -i venv-builder {-d host.yml}
-(shaddock) build keystone
-(shaddock) start keystone
+.. code:: bash
 
+    shaddock -f openstack-venv-builder.yml
+    (shaddock) build all
+    (shaddock) start all
 
-**The config-processor** will parse your j2 configuration files and configure
-the python venv previously created.
-It take the last one built by default but you can set a specific version in 
-your openstack-config-processor.yml
-The jin
+To specify the OpenStack version to build, change the git branch to
+clone in a global jinja2 variable like the following for Newton stable:
 
-shaddock -f openstack-config-processor.yml -i config-processor {-d host.yml}
-(shaddock) build keystone
-(shaddock) start keystone
+.. code:: yaml
 
-**The deployer** will manage all the docker hosts from your platform.
+    - name: venv-builder
+      hosts: !include hosts/all.yml
+      vars:
+        git_branch: 'stable/newton'
+      images: images/venv-builder/
+  
+      services:       
+          - name: nova
+            image: shaddock/generic-pyvenv-builder:latest
+            priority: 10
+            volumes:
+              - mount: /opt/openstack
+                host_dir: /opt/openstack
+            env:
+              GIT_URL: https://github.com/openstack/nova.git
+              GIT_BRANCH: '{{ git_branch }}'
 
+**The deployer** will manage the lifecycle of all the OpenStack services of 
+your platform.
 
-shaddock -f openstack-deployer.yml -i region1 {-d host.yml}
-(shaddock) build keystone
-(shaddock) start keystone
+.. code:: bash
+
+    shaddock -f openstack-deployer.yml
+    (shaddock) build all
+    (shaddock) start all
+
+Before deploying you may want to edit the global variables in the 
+vars/default.yml file.
+
 

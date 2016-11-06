@@ -324,3 +324,10 @@ clusters:
           HEAT_HOST_IP: '{{ public_vip }}'
           HEAT_DBPASS: '{{ def_password }}'
           HEAT_PASS: '{{ def_password }}'
+
+  - name: cluster0
+    images: images/region1/
+    services:
+      - name: seed
+        image: shaddock/seed:latest
+        priority: 0
