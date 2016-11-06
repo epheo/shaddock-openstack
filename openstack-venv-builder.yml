@@ -135,3 +135,21 @@ clusters:
           env:
             GIT_URL: https://github.com/openstack/python-openstackclient.git
             GIT_BRANCH: '{{ git_branch }}'
+
+
+  - name: post-build
+    images: images/venv-builder/
+    services:
+        - name: symlink-creator
+          image: shaddock/symlink-creator:latest
+          priority: 100
+          volumes:
+            - mount: /opt/openstack
+              host_dir: /opt/openstack
+
+        - name: venv-fixer
+          image: shaddock/venv-fixer:latest
+          priority: 110
+          volumes:
+            - mount: /opt/openstack
+              host_dir: /opt/openstack

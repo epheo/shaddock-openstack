@@ -38,6 +38,9 @@ clone in a global jinja2 variable like the following for Newton stable:
               GIT_URL: https://github.com/openstack/nova.git
               GIT_BRANCH: '{{ git_branch }}'
 
+The ./script/create_symlinks.sh will automatically "ln -s" the latest 
+venv builds in the /opt/openstack/services directory.
+
 **The deployer** will manage the lifecycle of all the OpenStack services of 
 your platform.
 

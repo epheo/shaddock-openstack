@@ -46,8 +46,7 @@ def apply_config(configfile, dict):
 
 keystone_conf = {
     'DEFAULT':
-    {'admin_token': admin_token,
-     'verbose': 'True'},
+    {'admin_token': admin_token},
 
     'database':
     {'connection':

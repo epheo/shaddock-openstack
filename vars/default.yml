@@ -1,5 +1,9 @@
 
 ---
-def_password: 'panama'
-mysql_password: 'p4ss0rd'
-public_vip: '10.0.42.6'
+def_password: 'iAehwS04lHJg5LBs'
+admin_password: '5gP6famJjcI48X2O'
+mysql_password: 'nipaixnitreve'
+mysql_admin_user: 'root'
+public_vip: '91.121.67.143'
+internal_vip: '91.121.67.143'
+mysql_vip: '91.121.67.143'

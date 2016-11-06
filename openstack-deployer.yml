@@ -35,7 +35,7 @@ clusters:
           - mount: /var/log/mysql
             host_dir: /var/log/shaddock/mysql
         env:
-          MYSQL_USER: admin
+          MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
 
 
@@ -60,8 +60,8 @@ clusters:
         depends-on:
           - {name: mysql, port: 3306}
         env:
-          MYSQL_HOST_IP: '172.17.0.2'
-          MYSQL_USER: admin
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
+          MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
           KEYSTONE_DBPASS: '{{ def_password }}'
           ADMIN_TOKEN: '{{ def_password }}'
@@ -85,9 +85,9 @@ clusters:
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
         env:
-          MYSQL_HOST_IP: '172.17.0.2'
+          MYSQL_HOST_IP: '{{ mysql_ip }}'
           KEYSTONE_HOST_IP: '{{ public_vip }}'
-          MYSQL_USER: admin
+          MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
           ADMIN_PASS: '{{ def_password }}'
           GLANCE_DBPASS: '{{ def_password }}'
@@ -112,13 +112,13 @@ clusters:
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
         env:
-          MYSQL_HOST_IP: '{{ public_vip }}'
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
           KEYSTONE_HOST_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           NOVA_HOST_IP: '{{ public_vip }}'
           HOST_IP: '{{ public_vip }}'
           KEYSTONE_HOST_IP: '{{ public_vip }}'
-          MYSQL_USER: admin
+          MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
           ADMIN_PASS: '{{ def_password }}'
           RABBIT_PASS: '{{ def_password }}'
@@ -163,8 +163,8 @@ clusters:
         env:
           KEYSTONE_HOST_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
-          MYSQL_HOST_IP: '{{ public_vip }}'
-          MYSQL_USER: admin
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
+          MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
           ADMIN_PASS: '{{ def_password }}'
           CINDER_HOST_IP: '{{ public_vip }}'
@@ -199,7 +199,7 @@ clusters:
         env:
           KEYSTONE_HOST_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
-          MYSQL_HOST_IP: '{{ public_vip }}'
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
           GLANCE_HOST_IP: '{{ public_vip }}'
           CINDER_HOST_IP: '{{ public_vip }}'
           HOST_IP: '{{ public_vip }}'
@@ -225,8 +225,8 @@ clusters:
         env:
           KEYSTONE_HOST_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
-          MYSQL_HOST_IP: '{{ public_vip }}'
-          MYSQL_USER: admin
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
+          MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
           ADMIN_PASS: '{{ def_password }}'
           MANILA_HOST_IP: '{{ public_vip }}'
@@ -261,7 +261,7 @@ clusters:
         env:
           KEYSTONE_HOST_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
-          MYSQL_HOST_IP: '{{ public_vip }}'
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
           MANILA_HOST_IP: '{{ public_vip }}'
           HOST_IP: '{{ public_vip }}'
           RABBIT_PASS: '{{ def_password }}'
@@ -288,7 +288,7 @@ clusters:
         env:
           KEYSTONE_HOST_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
-          MYSQL_HOST_IP: '{{ public_vip }}'
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
           NOVA_HOST_IP: '{{ public_vip }}'
           NEUTRON_HOST_IP: '{{ public_vip }}'
           HOST_IP: '{{ public_vip }}'
@@ -316,8 +316,8 @@ clusters:
           KEYSTONE_HOST_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           RABBIT_PASS: '{{ def_password }}'
-          MYSQL_HOST_IP: '{{ public_vip }}'
-          MYSQL_USER: admin
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
+          MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
           ADMIN_PASS: '{{ def_password }}'
           HOST_IP: '{{ public_vip }}'
@@ -331,3 +331,4 @@ clusters:
       - name: seed
         image: shaddock/seed:latest
         priority: 0
+
