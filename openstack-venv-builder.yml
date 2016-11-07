@@ -78,7 +78,7 @@ clusters:
         
         - name: novaclient
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 20
+          priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -88,7 +88,7 @@ clusters:
         
         - name: glanceclient
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 20
+          priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -98,7 +98,7 @@ clusters:
         
         - name: keystoneclient
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 20
+          priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -108,7 +108,7 @@ clusters:
         
         - name: cinderclient
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 20
+          priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -118,7 +118,7 @@ clusters:
         
         - name: neutronclient
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 20
+          priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -128,7 +128,7 @@ clusters:
         
         - name: openstackclient
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 20
+          priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -147,19 +147,18 @@ clusters:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           depends-on:
-            - {name: openstackclient, status: stopped, sleep: 50, retry: 60}
-            - {name: nova, status: stopped, sleep: 50, retry: 60}
-            - {name: glance, status: stopped, sleep: 50, retry: 60}
-            - {name: glance, status: stopped, sleep: 50, retry: 60}
-            - {name: keystone, status: stopped, sleep: 50, retry: 60}
-            - {name: cinder, status: stopped, sleep: 50, retry: 60}
-            - {name: neutron, status: stopped, sleep: 50, retry: 60}
-            - {name: horizon, status: stopped, sleep: 50, retry: 60}
-            - {name: novaclient, status: stopped, sleep: 50, retry: 60}
-            - {name: glanceclient, status: stopped, sleep: 50, retry: 60}
-            - {name: keystoneclient, status: stopped, sleep: 50, retry: 60}
-            - {name: cinderclient, status: stopped, sleep: 50, retry: 60}
-            - {name: neutronclient, status: stopped, sleep: 50, retry: 60}
+            - {name: glanceclient, status: stopped}
+            - {name: keystoneclient, status: stopped}
+            - {name: cinder, status: stopped}
+            - {name: neutron, status: stopped}
+            - {name: openstackclient, status: stopped}
+            - {name: novaclient, status: stopped}
+            - {name: cinderclient, status: stopped}
+            - {name: neutronclient, status: stopped}
+            - {name: horizon, status: stopped}
+            - {name: glance, status: stopped}
+            - {name: keystone, status: stopped}
+            - {name: nova, status: stopped}
 
 
         - name: venv-fixer
@@ -169,5 +168,4 @@ clusters:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           depends-on:
-             - {name: symlinkcreator, status: stopped, sleep: 50, retry: 60} 
-
+             - {name: symlinkcreator, status: stopped} 
