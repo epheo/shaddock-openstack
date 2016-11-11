@@ -1,7 +1,7 @@
 FROM shaddock/seed:latest
 MAINTAINER epheo <github@epheo.eu> 
 
-RUN pacman -Sy --noconfirm mariadb mariadb-clients
+RUN pacman -S --noconfirm mariadb mariadb-clients
 
 # Remove pre-installed database
 RUN rm -rf /var/lib/mysql/*

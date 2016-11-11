@@ -3,7 +3,12 @@
 def_password: 'iAehwS04lHJg5LBs'
 admin_password: '5gP6famJjcI48X2O'
 mysql_password: '6Iv0e2VGOj9_El6M'
-mysql_admin_user: 'root'
-public_vip: '91.121.67.143'
-internal_vip: '91.121.67.143'
-mysql_vip: '91.121.67.143'
+
+mysql_admin_user: 'admin'
+
+public_vip: '172.17.0.3'
+internal_vip: '172.17.0.3'
+mysql_vip: '172.17.0.2'
+
+keystone_api_ip: '172.17.0.3'
+glance_api_ip: '172.17.0.4'

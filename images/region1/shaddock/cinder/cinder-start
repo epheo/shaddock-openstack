@@ -3,19 +3,24 @@
 echo "Removing cinder DB..."
 rm /var/lib/cinder/cinder.sqlite
 
+CINDER_PATH=/opt/openstack/services/cinder/bin/
+OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
+
+ln -s /opt/openstack/services/cinder/etc/cinder /etc/cinder
+
 echo "Updating conf file..."
-configparse.py
+$CINDER_PATH/python /usr/local/bin/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS}
-export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v3
+export OS_AUTH_URL=http://${KEYSTONE_API_IP}:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
 
-endpoint=`openstack endpoint list -f csv -q |grep cinder`
+endpoint=`$OS_CLI endpoint list -f csv -q |grep cinder`
 
 if [ -z "$endpoint" ]
 then
@@ -43,38 +48,36 @@ then
 
 
     echo "Creating Cinder user..."
-    openstack user create --domain default --password ${CINDER_PASS} cinder
+    $OS_CLI user create --domain default --password ${CINDER_PASS} cinder
 
-    openstack role add --project service --user cinder admin
+    $OS_CLI role add --project service --user cinder admin
 
     echo "Registering Cinder API and EndPoints..."
-    openstack service create --name cinder \
+    $OS_CLI service create --name cinder \
         --description "OpenStack Block Storage" volume
 
-    openstack service create --name cinderv2 \
+    $OS_CLI service create --name cinderv2 \
         --description "OpenStack Block Storage" volumev2
 
-    openstack endpoint create --region RegionOne \
-        volume public http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s
+    $OS_CLI endpoint create --region RegionOne \
+        volume public http://${KEYSTONE_API_IP}:8776/v1/%\(tenant_id\)s
 
-    openstack endpoint create --region RegionOne \
-        volume internal http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s
+    $OS_CLI endpoint create --region RegionOne \
+        volume internal http://${KEYSTONE_API_IP}:8776/v1/%\(tenant_id\)s
 
-    openstack endpoint create --region RegionOne \
-        volume admin http://${KEYSTONE_HOST_IP}:8776/v1/%\(tenant_id\)s
+    $OS_CLI endpoint create --region RegionOne \
+        volume admin http://${KEYSTONE_API_IP}:8776/v1/%\(tenant_id\)s
 
+    $OS_CLI endpoint create --region RegionOne \
+        volumev2 public http://${KEYSTONE_API_IP}:8776/v2/%\(tenant_id\)s
 
-    openstack endpoint create --region RegionOne \
-        volumev2 public http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s
+    $OS_CLI endpoint create --region RegionOne \
+        volumev2 internal http://${KEYSTONE_API_IP}:8776/v2/%\(tenant_id\)s
 
-    openstack endpoint create --region RegionOne \
-        volumev2 internal http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s
-
-    openstack endpoint create --region RegionOne \
-        volumev2 admin http://${KEYSTONE_HOST_IP}:8776/v2/%\(tenant_id\)s
+    $OS_CLI endpoint create --region RegionOne \
+        volumev2 admin http://${KEYSTONE_API_IP}:8776/v2/%\(tenant_id\)s
 
 else
-
     if [[ $endpoint == *"ERROR"* ]]
     then
         echo ">>>>>>> Cannot connect to Keystone"
@@ -85,7 +88,7 @@ else
 fi
 
 echo "Create database tables"
-cinder-manage db sync
+$CINDER_PATH/cinder-manage db sync
 
 echo "Starting cinder using supervisord..."
 exec /usr/bin/supervisord -n
