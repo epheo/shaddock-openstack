@@ -129,7 +129,7 @@ clusters:
       - name: horizon
         image: shaddock/horizon:latest
         host: node001
-        priority: 55
+        priority: 50
         ports:
           - 80
           - 11211
@@ -269,4 +269,4 @@ clusters:
     services:
       - name: seed
         image: shaddock/seed:latest
-        priority: 999
+        priority: 0

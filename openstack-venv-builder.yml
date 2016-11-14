@@ -21,7 +21,7 @@ clusters:
     services:       
         - name: nova
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -31,7 +31,7 @@ clusters:
 
         - name: glance
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -41,7 +41,7 @@ clusters:
         
         - name: keystone
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -51,7 +51,7 @@ clusters:
         
         - name: cinder
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -61,7 +61,7 @@ clusters:
         
         - name: neutron
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -71,7 +71,7 @@ clusters:
         
         - name: horizon
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -141,7 +141,7 @@ clusters:
         
         - name: heat
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -156,29 +156,29 @@ clusters:
     services:
         - name: symlink-creator
           image: shaddock/symlink-creator:latest
-          priority: 100
+          priority: 30
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           depends-on:
-            - {name: glanceclient, status: stopped, retry: 30}
-            - {name: keystoneclient, status: stopped, retry: 30}
-            - {name: cinder, status: stopped, retry: 30}
-            - {name: neutron, status: stopped, retry: 30}
-            - {name: openstackclient, status: stopped, retry: 30}
-            - {name: novaclient, status: stopped, retry: 30}
-            - {name: cinderclient, status: stopped, retry: 30}
-            - {name: neutronclient, status: stopped, retry: 30}
-            - {name: horizon, status: stopped, retry: 30}
-            - {name: glance, status: stopped, retry: 30}
-            - {name: keystone, status: stopped, retry: 30}
-            - {name: nova, status: stopped, retry: 30}
-            - {name: heat, status: stopped, retry: 30}
+            - {name: glanceclient, status: stopped, retry: 40}
+            - {name: keystoneclient, status: stopped, retry: 40}
+            - {name: openstackclient, status: stopped, retry: 40}
+            - {name: novaclient, status: stopped, retry: 40}
+            - {name: cinderclient, status: stopped, retry: 40}
+            - {name: neutronclient, status: stopped, retry: 40}
+            - {name: glance, status: stopped, retry: 80}
+            - {name: keystone, status: stopped, retry: 80}
+            - {name: cinder, status: stopped, retry: 80}
+            - {name: horizon, status: stopped, retry: 80}
+            - {name: heat, status: stopped, retry: 80}
+            - {name: neutron, status: stopped, retry: 80}
+            - {name: nova, status: stopped, retry: 80}
 
 
         - name: venv-fixer
           image: shaddock/venv-fixer:latest
-          priority: 110
+          priority: 35
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack

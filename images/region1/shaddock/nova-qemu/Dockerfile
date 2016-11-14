@@ -2,7 +2,7 @@ FROM shaddock/seed:latest
 MAINTAINER Thibaut Lapierre <root@epheo.eu>
 
 #install nova
-RUN pacman -S --noconfirm sysfsutils qemu libguestfs-tools neutron-linuxbridge-agent
+RUN pacman -S --noconfirm sysfsutils qemu 
 
 #Setup supervisord
 ADD supervisord.conf /etc/supervisord.conf

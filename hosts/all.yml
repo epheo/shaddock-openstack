@@ -4,4 +4,10 @@
   url: unix://var/run/docker.sock
 
 - name: node002
-  url: tcp://192.168.1.252:4243
+  url: tcp://10.0.42.2:4243
+  verion: 1.12
+  tls: False
+  cert_path: None
+  key_path: None
+  cacert_path: None
+  tls_verify: False
