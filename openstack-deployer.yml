@@ -1,0 +1,315 @@
+# OpenStack definition model for Shaddock.
+# ========================================
+#
+# The follwing architecture is currenlty relying on iptables DNAT of the 
+# container ports on the 172.17.0.1 IP address of the default Docker bridge.
+# 
+# cat /usr/lib/systemd/system/docker.service |grep ExecStart
+#
+# ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2376 --ip=172.17.0.1
+# --userland-proxy=false
+# 
+# The services API and WUI are exposed via the bridge address.
+#
+
+---
+
+clusters: 
+
+  - name: openstack-cluster0
+    images: images/ubuntu-mitaka
+    hosts: !include hosts/all.yml
+    vars:
+      default_passwd: T7pqrQGbNViV164c
+      mysql_passwd: VD486ByNgjv7esYa
+      host_ip: 172.17.0.1
+      image_tag: ubuntu-mitaka
+
+    services:     
+      - name: rabbitmq
+        image: 'shaddock/rabbitmq:{{ image_tag }}'
+        host: node001-socket
+        priority: 10
+        ports:
+          - 5672
+          - 15672
+        volumes:
+          - mount: /data/log
+            host_dir: /var/log/shaddock/rabbitmq/log
+        env:
+          RABBIT_PASS: '{{ default_passwd }}'
+      
+      - name: mysql
+        image: 'shaddock/mysql:{{ image_tag }}'
+        host: node001-socket
+        priority: 20
+        ports:
+          - 3306
+        volumes:
+          - mount: /var/log/mysql
+            host_dir: /var/log/shaddock/mysql
+        env:
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: '{{ mysql_passwd }}'
+      
+      - name: keystone
+        image: 'shaddock/keystone:{{ image_tag }}'
+        priority: 30
+        ports:
+          - 35357
+          - 5000
+        volumes:
+          - mount: /var/log/keystone
+            host_dir: /var/log/shaddock/keystone
+        depends-on:
+          - {name: mysql, port: 3306}
+        env:
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: '{{ mysql_passwd }}'
+          KEYSTONE_DBPASS: '{{ default_passwd }}'
+          ADMIN_TOKEN: '{{ default_passwd }}'
+      
+      - name: seed
+        image: 'shaddock/seed:{{ image_tag }}'
+        priority: 35
+        depends-on:
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+        env:
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          KEYSTONE_PASS: '{{ default_passwd }}'
+          DEMO_EMAIL: demo.example.org
+          DEMO_PASS: '{{ default_passwd }}'
+          ADMIN_EMAIL: admin.example.org
+          ADMIN_PASS: '{{ default_passwd }}'
+          ADMIN_TOKEN: '{{ default_passwd }}'
+        command: cloud-config
+      
+      - name: glance
+        image: 'shaddock/glance:{{ image_tag }}'
+        priority: 40
+        ports:
+          - 9292
+          - 9191
+        volumes:
+          - mount: /var/log/glance
+            host_dir: /var/log/shaddock/glance
+        depends-on:
+          - {name: seed, status: stopped}
+          - {name: mysql, port: 3306}
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+        env:
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: '{{ mysql_passwd }}'
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          GLANCE_HOST_IP: '{{ host_ip }}'
+          GLANCE_DBPASS: '{{ default_passwd }}'
+          GLANCE_PASS: '{{ default_passwd }}'
+          ADMIN_PASS: '{{ default_passwd }}'
+      
+      - name: nova
+        image: 'shaddock/nova-legacy:{{ image_tag }}'
+        priority: 45
+        ports:
+          - 8774
+        privileged: True
+        volumes:
+          - mount: /var/log/nova
+            host_dir: /var/log/shaddock/nova
+        depends-on:
+          - {name: seed, status: stopped}
+          - {name: mysql, port: 3306}
+          - {name: rabbitmq, port: 5672}
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+        env:
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: '{{ mysql_passwd }}'
+          RABBIT_HOST_IP: '{{ host_ip }}'
+          RABBIT_PASS: '{{ default_passwd }}'
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          NOVA_HOST_IP: '{{ host_ip }}'
+          NOVA_DBPASS: '{{ default_passwd }}'
+          NOVA_PASS: '{{ default_passwd }}'
+          ADMIN_PASS: '{{ default_passwd }}'
+      
+      - name: horizon
+        image: 'shaddock/horizon:{{ image_tag }}'
+        host: node002-tcp
+        priority: 55
+        ports:
+          - 80
+          - 11211
+        volumes:
+          - mount: /var/log/horizon
+            host_dir: /var/log/shaddock/horizon
+        depends-on:
+          - {name: seed, status: stopped}
+          - {name: mysql, port: 3306}
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+        env:
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          HORIZON_HOST_IP: '{{ host_ip }}'
+      
+      - name: cinder
+        image: 'shaddock/cinder:{{ image_tag }}'
+        priority: 60
+        ports:
+          - 8776
+        volumes:
+          - mount: /var/log/cinder
+            host_dir: /var/log/shaddock/cinder
+        depends-on:
+          - {name: mysql, port: 3306}
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+        env:
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          RABBIT_HOST_IP: '{{ host_ip }}'
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: '{{ mysql_passwd }}'
+          ADMIN_PASS: '{{ default_passwd }}'
+          CINDER_HOST_IP: '{{ host_ip }}'
+          HOST_IP: '{{ host_ip }}'
+          RABBIT_PASS: '{{ default_passwd }}'
+          CINDER_DBPASS: '{{ default_passwd }}'
+          CINDER_PASS: '{{ default_passwd }}'
+      
+      - name: cinder-volume
+        image: 'shaddock/cinder-volume:{{ image_tag }}'
+        priority: 65
+        volumes:
+          - mount: /var/log/cinder
+            host_dir: /var/log/shaddock/volume
+          - mount: /sys:ro
+            host_dir: /sys
+          - mount: /dev
+            host_dir: /dev
+          - mount: /var/run
+            host_dir: /var/run
+        privileged: True
+        depends-on:
+          - {name: mysql, port: 3306}
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+          - {name: cinder}
+        env:
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          RABBIT_HOST_IP: '{{ host_ip }}'
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          GLANCE_HOST_IP: '{{ host_ip }}'
+          CINDER_HOST_IP: '{{ host_ip }}'
+          HOST_IP: '{{ host_ip }}'
+          RABBIT_PASS: '{{ default_passwd }}'
+          CINDER_DBPASS: '{{ default_passwd }}'
+          CINDER_PASS: '{{ default_passwd }}'
+      
+      - name: manila
+        image: 'shaddock/manila:{{ image_tag }}'
+        priority: 70
+        ports:
+          - 8786
+        volumes:
+          - mount: /var/log/manila
+            host_dir: /var/log/shaddock/manila
+        depends-on:
+          - {name: mysql, port: 3306}
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+        env:
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          RABBIT_HOST_IP: '{{ host_ip }}'
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: '{{ mysql_passwd }}'
+          ADMIN_PASS: '{{ default_passwd }}'
+          MANILA_HOST_IP: '{{ host_ip }}'
+          HOST_IP: '{{ host_ip }}'
+          RABBIT_PASS: '{{ default_passwd }}'
+          MANILA_DBPASS: '{{ default_passwd }}'
+          MANILA_PASS: '{{ default_passwd }}'
+      
+      - name: manila-share
+        image: 'shaddock/manila-share:{{ image_tag }}'
+        priority: 75
+        volumes:
+          - mount: /var/log/manila
+            host_dir: /var/log/shaddock/share
+          - mount: /sys:ro
+            host_dir: /sys
+          - mount: /dev
+            host_dir: /dev
+          - mount: /var/run
+            host_dir: /var/run
+        privileged: True
+        depends-on:
+          - {name: mysql, port: 3306}
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+          - {name: manila}
+        env:
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          RABBIT_HOST_IP: '{{ host_ip }}'
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          MANILA_HOST_IP: '{{ host_ip }}'
+          HOST_IP: '{{ host_ip }}'
+          RABBIT_PASS: '{{ default_passwd }}'
+          MANILA_DBPASS: '{{ default_passwd }}'
+          MANILA_PASS: '{{ default_passwd }}'
+      
+      - name: nova-qemu
+        image: 'shaddock/nova-legacy-qemu:{{ image_tag }}'
+        priority: 90
+        ports:
+          - 8775
+        volumes:
+          - mount: /var/log/nova
+            host_dir: /var/log/shaddock/compute
+          - mount: /lib/modules:ro
+            host_dir: /lib/modules
+        privileged: True
+        network_mode: host
+        depends-on:
+          - {name: nova}
+        env:
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          RABBIT_HOST_IP: '{{ host_ip }}'
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          NOVA_HOST_IP: '{{ host_ip }}'
+          NEUTRON_HOST_IP: '{{ host_ip }}'
+          HOST_IP: '{{ host_ip }}'
+          RABBIT_PASS: '{{ default_passwd }}'
+          NOVA_PASS: '{{ default_passwd }}'
+          NEUTRON_PASS: '{{ default_passwd }}'
+      
+      - name: heat
+        image: 'shaddock/heat:{{ image_tag }}'
+        priority: 100
+        ports:
+          - 8000
+          - 8004
+        volumes:
+          - mount: /var/log/heat
+            host_dir: /var/log/shaddock/heat
+        depends-on:
+          - {name: mysql, port: 3306}
+          - {name: keystone, port: 5000, get: '/v3'}
+          - {name: keystone, port: 35357, get: '/v3'}
+        env:
+          KEYSTONE_HOST_IP: '{{ host_ip }}'
+          RABBIT_HOST_IP: '{{ host_ip }}'
+          RABBIT_PASS: '{{ default_passwd }}'
+          MYSQL_HOST_IP: '{{ host_ip }}'
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: '{{ mysql_passwd }}'
+          ADMIN_PASS: '{{ default_passwd }}'
+          HOST_IP: '{{ host_ip }}'
+          HEAT_HOST_IP: '{{ host_ip }}'
+          HEAT_DBPASS: '{{ default_passwd }}'
+          HEAT_PASS: '{{ default_passwd }}'
