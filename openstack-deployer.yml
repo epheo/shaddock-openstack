@@ -1,16 +1,6 @@
 # OpenStack definition model for Shaddock.
 # ========================================
 #
-# The follwing architecture is currenlty relying on iptables DNAT of the 
-# container ports on the 172.17.0.1 IP address of the default Docker bridge.
-# 
-# cat /usr/lib/systemd/system/docker.service |grep ExecStart
-#
-# ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2376 --ip=172.17.0.1
-# --userland-proxy=false
-# 
-# The services API and WUI are exposed via the bridge address.
-#
 
 ---
 
