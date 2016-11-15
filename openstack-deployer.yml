@@ -18,6 +18,13 @@ clusters:
 
   - name: openstack-cluster0
     images: images/ubuntu-mitaka
+    services:
+      - name: seed
+        image: 'shaddock/seed'
+        priority: 0
+
+  - name: openstack-service-cluster
+    images: images/ubuntu-mitaka
     hosts: !include hosts/all.yml
     vars:
       default_passwd: T7pqrQGbNViV164c
@@ -70,8 +77,8 @@ clusters:
           KEYSTONE_DBPASS: '{{ default_passwd }}'
           ADMIN_TOKEN: '{{ default_passwd }}'
       
-      - name: seed
-        image: 'shaddock/seed:{{ image_tag }}'
+      - name: keystone-configure
+        image: 'shaddock/seed'
         priority: 35
         depends-on:
           - {name: keystone, port: 5000, get: '/v3'}
