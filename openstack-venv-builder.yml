@@ -19,7 +19,7 @@ clusters:
     images: images/venv-builder/
 
     services:       
-        - name: nova
+        - name: nova-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 20
           volumes:
@@ -29,7 +29,7 @@ clusters:
             GIT_URL: https://github.com/openstack/nova.git
             GIT_BRANCH: '{{ git_branch }}'
 
-        - name: glance
+        - name: glance-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 20
           volumes:
@@ -39,7 +39,7 @@ clusters:
             GIT_URL: https://github.com/openstack/glance.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: keystone
+        - name: keystone-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 20
           volumes:
@@ -49,7 +49,7 @@ clusters:
             GIT_URL: https://github.com/openstack/keystone.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: cinder
+        - name: cinder-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 20
           volumes:
@@ -59,7 +59,7 @@ clusters:
             GIT_URL: https://github.com/openstack/cinder.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: neutron
+        - name: neutron-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 20
           volumes:
@@ -69,7 +69,7 @@ clusters:
             GIT_URL: https://github.com/openstack/neutron.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: horizon
+        - name: horizon-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 20
           volumes:
@@ -79,7 +79,7 @@ clusters:
             GIT_URL: https://github.com/openstack/horizon.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: novaclient
+        - name: novaclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -89,7 +89,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-novaclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: glanceclient
+        - name: glanceclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -99,7 +99,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-glanceclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: keystoneclient
+        - name: keystoneclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -109,7 +109,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-keystoneclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: cinderclient
+        - name: cinderclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -119,7 +119,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-cinderclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: neutronclient
+        - name: neutronclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -129,7 +129,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-neutronclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: openstackclient
+        - name: openstackclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -139,7 +139,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-openstackclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: heat
+        - name: heat-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 20
           volumes:
