@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export OS_URL=http://${KEYSTONE_HOST_IP}:35357/v3
+export OS_ATH_URL=http://${KEYSTONE_HOST_IP}:35357/v3
 export OS_TOKEN=${ADMIN_TOKEN}
 export OS_IDENTITY_API_VERSION=3
 
