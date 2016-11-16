@@ -1,0 +1,89 @@
+#!/bin/bash
+
+echo "Updating conf file..."
+configparse.py
+
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=${ADMIN_PASS}
+export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+
+endpoint=`openstack endpoint list -f csv -q |grep Manila`
+
+if [ -z "$endpoint" ]
+then
+    echo ">>>>>>> Endpoint not yet created"
+    echo "Creating database"
+    mysql \
+        -h${MYSQL_HOST_IP} \
+        -u${MYSQL_USER} \
+        -p${MYSQL_PASSWORD} \
+        -e "CREATE DATABASE manila;"
+
+    mysql \
+        -h${MYSQL_HOST_IP} \
+        -u${MYSQL_USER} \
+        -p${MYSQL_PASSWORD} \
+        -e "GRANT ALL PRIVILEGES ON manila.* TO 'manila'@'localhost' \
+            IDENTIFIED BY '${MANILA_DBPASS}';"
+
+    mysql \
+        -h${MYSQL_HOST_IP} \
+        -u${MYSQL_USER} \
+        -p${MYSQL_PASSWORD} \
+        -e "GRANT ALL PRIVILEGES ON manila.* TO 'manila'@'%' \
+            IDENTIFIED BY '${MANILA_DBPASS}'"
+
+
+    echo "Creating Manila user..."
+    openstack user create --domain default --password ${MANILA_PASS} manila
+
+    openstack role add --project service --user manila admin
+
+    echo "Registering Manila API and EndPoints..."
+    openstack service create --name manila \
+        --description "OpenStack Shared File Systems" share
+
+    openstack service create --name Manilav2 \
+        --description "OpenStack Shared File Systems" sharev2
+
+
+    openstack endpoint create --region RegionOne \
+        share public http://${KEYSTONE_HOST_IP}:8786/v1/%\(tenant_id\)s
+
+    openstack endpoint create --region RegionOne \
+        share internal http://${KEYSTONE_HOST_IP}:8786/v1/%\(tenant_id\)s
+
+    openstack endpoint create --region RegionOne \
+        share admin http://${KEYSTONE_HOST_IP}:8786/v1/%\(tenant_id\)s
+
+
+    openstack endpoint create --region RegionOne \
+        sharev2 public http://${KEYSTONE_HOST_IP}:8786/v2/%\(tenant_id\)s
+
+    openstack endpoint create --region RegionOne \
+        sharev2 internal http://${KEYSTONE_HOST_IP}:8786/v2/%\(tenant_id\)s
+
+    openstack endpoint create --region RegionOne \
+        sharev2 admin http://${KEYSTONE_HOST_IP}:8786/v2/%\(tenant_id\)s
+
+else
+
+    if [[ $endpoint == *"ERROR"* ]]
+    then
+        echo ">>>>>>> Cannot connect to Keystone"
+        exit
+    else
+        echo ">>>>>>> Endpoint already created"
+    fi
+fi
+
+echo "Create database tables"
+manila-manage db sync
+
+echo "Starting Manila using supervisord..."
+exec /usr/bin/supervisord -n
