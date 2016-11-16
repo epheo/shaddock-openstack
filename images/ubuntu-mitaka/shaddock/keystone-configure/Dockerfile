@@ -25,3 +25,5 @@ RUN \
 
 ADD cloud-config /usr/local/bin/
 RUN chmod +x /usr/local/bin/cloud-config
+
+ENTRYPOINT ["cloud-config"]
