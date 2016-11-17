@@ -139,7 +139,7 @@ clusters:
         host: node002-tcp
         priority: 55
         ports:
-          - 80
+          - 80:8010
           - 11211
         volumes:
           - mount: /var/log/horizon
