@@ -131,7 +131,7 @@ clusters:
         host: node001
         priority: 50
         ports:
-          - 80
+          - 80:8010
           - 11211
         volumes:
           - mount: /var/log/horizon
