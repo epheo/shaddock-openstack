@@ -47,11 +47,11 @@ echo "Initialize Fernet keys"
   --keystone-user http \
   --keystone-group http
 
-/opt/openstack/services/keystone/bin/keystone-manage \
+/opt/openstack/services/keystone/bin/keystone-manage bootstrap \
   --bootstrap-password ${ADMIN_TOKEN} \
-  --bootstrap-admin-url http://${KEYSTONE_HOST_IP}:35357/v3/ \
-  --bootstrap-internal-url http://${KEYSTONE_HOST_IP}:35357/v3/ \
-  --bootstrap-public-url http://${KEYSTONE_HOST_IP}:5000/v3/ \
+  --bootstrap-admin-url http://${KEYSTONE_API_IP}:35357/v3/ \
+  --bootstrap-internal-url http://${KEYSTONE_API_IP}:35357/v3/ \
+  --bootstrap-public-url http://${KEYSTONE_API_IP}:5000/v3/ \
   --bootstrap-region-id RegionOne
 
 echo "Starting keystone..."

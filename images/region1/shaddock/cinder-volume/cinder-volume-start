@@ -1,10 +1,12 @@
 #!/bin/bash
 
+CINDER_PATH=/opt/openstack/services/cinder/bin/
+
 echo "Removing cinder DB..."
 rm /var/lib/cinder/cinder.sqlite
 
 echo "Updating conf file..."
-configparse.py
+$CINDER_PATH/python /usr/local/bin/configparse.py
 
 echo "Starting cinder using supervisord..."
 exec /usr/bin/supervisord -n

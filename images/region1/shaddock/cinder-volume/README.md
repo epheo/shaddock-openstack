@@ -36,7 +36,7 @@ Possible yml configuration with Shaddock
     - {name: keystone, port: 35357, get: '/v3'}
     - {name: cinder}
   env:
-    KEYSTONE_HOST_IP: <your_ip>
+    KEYSTONE_API_IP: <your_ip>
     RABBIT_HOST_IP: <your_ip>
     MYSQL_HOST_IP: <your_ip>
     GLANCE_HOST_IP: <your_ip>

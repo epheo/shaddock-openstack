@@ -23,7 +23,7 @@ mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
 nova_host_ip = os.environ.get('NOVA_HOST_IP')
-keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
+keystone_host_ip = os.environ.get('KEYSTONE_API_IP')
 nova_pass = os.environ.get('NOVA_PASS')
 host_ip = os.environ.get('HOST_IP')
 

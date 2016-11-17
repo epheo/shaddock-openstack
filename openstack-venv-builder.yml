@@ -1,4 +1,7 @@
 
+# OpenStack upstream virtualenv builder
+# =====================================
+
 ---
 clusters: 
 
@@ -16,9 +19,9 @@ clusters:
     images: images/venv-builder/
 
     services:       
-        - name: nova
+        - name: nova-builder
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -26,9 +29,9 @@ clusters:
             GIT_URL: https://github.com/openstack/nova.git
             GIT_BRANCH: '{{ git_branch }}'
 
-        - name: glance
+        - name: glance-builder
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -36,9 +39,9 @@ clusters:
             GIT_URL: https://github.com/openstack/glance.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: keystone
+        - name: keystone-builder
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -46,9 +49,9 @@ clusters:
             GIT_URL: https://github.com/openstack/keystone.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: cinder
+        - name: cinder-builder
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -56,9 +59,9 @@ clusters:
             GIT_URL: https://github.com/openstack/cinder.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: neutron
+        - name: neutron-builder
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -66,9 +69,9 @@ clusters:
             GIT_URL: https://github.com/openstack/neutron.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: horizon
+        - name: horizon-builder
           image: shaddock/generic-pyvenv-builder:latest
-          priority: 10
+          priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
@@ -76,7 +79,7 @@ clusters:
             GIT_URL: https://github.com/openstack/horizon.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: novaclient
+        - name: novaclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -86,7 +89,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-novaclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: glanceclient
+        - name: glanceclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -96,7 +99,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-glanceclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: keystoneclient
+        - name: keystoneclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -106,7 +109,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-keystoneclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: cinderclient
+        - name: cinderclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -116,7 +119,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-cinderclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: neutronclient
+        - name: neutronclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -126,7 +129,7 @@ clusters:
             GIT_URL: https://github.com/openstack/python-neutronclient.git
             GIT_BRANCH: '{{ git_branch }}'
         
-        - name: openstackclient
+        - name: openstackclient-builder
           image: shaddock/generic-pyvenv-builder:latest
           priority: 10
           volumes:
@@ -135,37 +138,51 @@ clusters:
           env:
             GIT_URL: https://github.com/openstack/python-openstackclient.git
             GIT_BRANCH: '{{ git_branch }}'
+        
+        - name: heat-builder
+          image: shaddock/generic-pyvenv-builder:latest
+          priority: 20
+          volumes:
+            - mount: /opt/openstack
+              host_dir: /opt/openstack
+          env:
+            GIT_URL: https://github.com/openstack/heat.git
+            GIT_BRANCH: '{{ git_branch }}'
+
 
 
   - name: post-build
     images: images/venv-builder/
     services:
         - name: symlink-creator
-          image: shaddock/symlink-creator:latest
-          priority: 100
+          image: shaddock/generic-pyvenv-builder:latest
+          priority: 30
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           depends-on:
-            - {name: glanceclient, status: stopped}
-            - {name: keystoneclient, status: stopped}
-            - {name: cinder, status: stopped}
-            - {name: neutron, status: stopped}
-            - {name: openstackclient, status: stopped}
-            - {name: novaclient, status: stopped}
-            - {name: cinderclient, status: stopped}
-            - {name: neutronclient, status: stopped}
-            - {name: horizon, status: stopped}
-            - {name: glance, status: stopped}
-            - {name: keystone, status: stopped}
-            - {name: nova, status: stopped}
+            - {name: glanceclient, status: stopped, retry: 50, sleep: 40}
+            - {name: keystoneclient, status: stopped, retry: 50, sleep: 40}
+            - {name: openstackclient, status: stopped, retry: 50, sleep: 40}
+            - {name: novaclient, status: stopped, retry: 40, sleep: 40}
+            - {name: cinderclient, status: stopped, retry: 40, sleep: 40}
+            - {name: neutronclient, status: stopped, retry: 40, sleep: 40}
+            - {name: glance, status: stopped, retry: 80, sleep: 40}
+            - {name: keystone, status: stopped, retry: 80, sleep: 40}
+            - {name: cinder, status: stopped, retry: 80, sleep: 40}
+            - {name: horizon, status: stopped, retry: 80, sleep: 40}
+            - {name: heat, status: stopped, retry: 80, sleep: 40}
+            - {name: neutron, status: stopped, retry: 80, sleep: 40}
+            - {name: nova, status: stopped, retry: 80, sleep: 40}
+          command: "create_symlinks.sh"
 
 
         - name: venv-fixer
           image: shaddock/venv-fixer:latest
-          priority: 110
+          priority: 35
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           depends-on:
              - {name: symlinkcreator, status: stopped} 
+          command: "openstack-venv-fix.sh"

@@ -19,7 +19,7 @@ import ConfigParser
 import os
 
 mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
-keystone_host_ip = os.environ.get('KEYSTONE_HOST_IP')
+keystone_host_ip = os.environ.get('KEYSTONE_API_IP')
 glance_pass = os.environ.get('GLANCE_PASS')
 glance_dbpass = os.environ.get('GLANCE_DBPASS')
 
@@ -47,9 +47,8 @@ def apply_config(configfile, dict):
     return True
 
 glance_api_conf = {
-    'DEFAULT':
-    {'container_formats': 'ami,ari,aki,bare,ovf,ova,docker',
-     'verbose': 'True'},
+    'image_format':
+    {'container_formats': 'ami,ari,aki,bare,ovf,ova,docker'},
 
     'database':
     {'connection':
@@ -60,7 +59,7 @@ glance_api_conf = {
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
      'auth_url': 'http://%s:35357' % keystone_host_ip,
      'memcached_servers': '%s:11211' % keystone_host_ip,
-     'auth_plugin': 'password',
+     'auth_type': 'password',
      'project_domain_name': 'default',
      'user_domain_name': 'default',
      'project_name': 'service',

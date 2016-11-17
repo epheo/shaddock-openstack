@@ -29,7 +29,7 @@ Possible yml configuration with Shaddock
     - {name: keystone, port: 35357, get: '/v2.0'}
   env:
     MYSQL_HOST_IP: <your_ip>
-    KEYSTONE_HOST_IP: <your_ip>
+    KEYSTONE_API_IP: <your_ip>
     MYSQL_USER: admin
     MYSQL_PASSWORD: password
     ADMIN_PASS: panama

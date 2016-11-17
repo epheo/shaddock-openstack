@@ -4,6 +4,7 @@ echo "Removing nova DB..."
 rm /var/lib/nova/nova.sqlite
 
 NOVA_PATH=/opt/openstack/services/nova/
+OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 
 ln -s $NOVA_PATH/etc/ /etc/nova
 mv /etc/nova/nova.conf.sample /etc/nova/nova.conf
@@ -16,11 +17,11 @@ export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS}
-export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v3
+export OS_AUTH_URL=http://${KEYSTONE_API_IP}:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
 
-endpoint=`openstack endpoint list -f csv -q |grep nova`
+endpoint=`$OS_CLI endpoint list -f csv -q |grep nova`
 
 if [ -z "$endpoint" ]
 then
@@ -68,26 +69,26 @@ then
             IDENTIFIED BY '${NOVA_DBPASS}';"
 
     echo "Creating Nova user..."
-    openstack user create --domain default --password ${NOVA_PASS} nova
+    $OS_CLI user create --domain default --password ${NOVA_PASS} nova
 
-    openstack role add --project service --user nova admin
+    $OS_CLI role add --project service --user nova admin
 
     echo "Registering Nova API and EndPoints..."
-    openstack service create --name nova \
+    $OS_CLI service create --name nova \
         --description "OpenStack Compute" compute
 
-    openstack endpoint create --region RegionOne \
-        compute public http://${KEYSTONE_HOST_IP}:8774/v2.1/%\(tenant_id\)s
+    $OS_CLI endpoint create --region RegionOne \
+        compute public http://${NOVA_API_IP}:8774/v2.1/%\(tenant_id\)s
 
-    openstack endpoint create --region RegionOne \
-        compute internal http://${KEYSTONE_HOST_IP}:8774/v2.1/%\(tenant_id\)s
+    $OS_CLI endpoint create --region RegionOne \
+        compute internal http://${NOVA_API_IP}:8774/v2.1/%\(tenant_id\)s
 
-    openstack endpoint create --region RegionOne \
-        compute admin http://${KEYSTONE_HOST_IP}:8774/v2.1/%\(tenant_id\)s
+    $OS_CLI endpoint create --region RegionOne \
+        compute admin http://${NOVA_API_IP}:8774/v2.1/%\(tenant_id\)s
 
     echo "Testing Nova..."
     #openstack compute service list
-    openstack endpoint list
+    $OS_CLI endpoint list
 
 else
 
@@ -98,14 +99,15 @@ else
     else
         echo ">>>>>>> Endpoint already created"
         echo "Testing Nova..."
-        openstack compute service list
-        openstack endpoint list
+        $OS_CLI compute service list
+        $OS_CLI endpoint list
     fi
 fi
 
 echo "Create databases tables"
-nova-manage api_db sync
-nova-manage db sync
+
+$NOVA_PATH/bin/nova-manage api_db sync
+$NOVA_PATH/bin/nova-manage db sync
 
 echo "Starting nova using supervisord..."
 exec /usr/bin/supervisord -n

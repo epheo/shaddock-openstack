@@ -1,4 +1,6 @@
-FROM archlinux:latest
+FROM shaddock/archlinux:latest
 MAINTAINER epheo <github@epheo.eu>
 
-RUN pacman -Sy --noconfirm supervisor mariadb-clients 
+RUN pacman -Syu --noconfirm supervisor mariadb-clients 
+
+CMD ["sleep", "1"]
