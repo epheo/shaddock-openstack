@@ -9,144 +9,146 @@ clusters:
     images: images/venv-builder/
     services:
         - name: seed
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 0
 
   - name: venv-builder
     hosts: !include hosts/all.yml
     vars:
+      builder_img: 'shaddock/generic-pyvenv-builder:latest'
+      git_repo: 'https://github.com/openstack/'
       git_branch: 'stable/newton'
     images: images/venv-builder/
 
     services:       
         - name: nova-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/nova.git
+            GIT_URL: '{{ git_repo }}nova.git'
             GIT_BRANCH: '{{ git_branch }}'
 
         - name: glance-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/glance.git
+            GIT_URL: '{{ git_repo }}glance.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: keystone-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/keystone.git
+            GIT_URL: '{{ git_repo }}keystone.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: cinder-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/cinder.git
+            GIT_URL: '{{ git_repo }}cinder.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: neutron-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/neutron.git
+            GIT_URL: '{{ git_repo }}neutron.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: horizon-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/horizon.git
+            GIT_URL: '{{ git_repo }}horizon.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: novaclient-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/python-novaclient.git
+            GIT_URL: '{{ git_repo }}python-novaclient.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: glanceclient-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/python-glanceclient.git
+            GIT_URL: '{{ git_repo }}python-glanceclient.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: keystoneclient-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/python-keystoneclient.git
+            GIT_URL: '{{ git_repo }}python-keystoneclient.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: cinderclient-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/python-cinderclient.git
+            GIT_URL: '{{ git_repo }}python-cinderclient.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: neutronclient-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/python-neutronclient.git
+            GIT_URL: '{{ git_repo }}python-neutronclient.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: openstackclient-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 10
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/python-openstackclient.git
+            GIT_URL: '{{ git_repo }}python-openstackclient.git'
             GIT_BRANCH: '{{ git_branch }}'
         
         - name: heat-builder
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 20
           volumes:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           env:
-            GIT_URL: https://github.com/openstack/heat.git
+            GIT_URL: '{{ git_repo }}heat.git'
             GIT_BRANCH: '{{ git_branch }}'
 
 
@@ -155,7 +157,7 @@ clusters:
     images: images/venv-builder/
     services:
         - name: symlink-creator
-          image: shaddock/generic-pyvenv-builder:latest
+          image: '{{ builder_img }}'
           priority: 30
           volumes:
             - mount: /opt/openstack
