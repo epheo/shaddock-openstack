@@ -26,7 +26,7 @@ Possible yml configuration with Shaddock
     - {name: keystone, port: 5000, get: '/v2.0'}
     - {name: keystone, port: 35357, get: '/v2.0'}
   env:
-    KEYSTONE_HOST_IP: <your_ip>
+    KEYSTONE_API_IP: <your_ip>
 ```
 
 Possible Docker usage:

@@ -65,7 +65,7 @@ clusters:
           MYSQL_PASSWORD: '{{ mysql_password }}'
           KEYSTONE_DBPASS: '{{ def_password }}'
           ADMIN_TOKEN: '{{ def_password }}'
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          KEYSTONE_API_IP: '{{ keystone_api_ip }}'
       
       - name: glance
         image: shaddock/glance:latest
@@ -85,8 +85,9 @@ clusters:
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
         env:
-          MYSQL_HOST_IP: '{{ mysql_ip }}'
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          MYSQL_HOST_IP: '{{ mysql_vip }}'
+          KEYSTONE_API_IP: '{{ keystone_api_ip }}'
+          GLANCE_API_IP: '{{ glance_api_ip }}'
           MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
           ADMIN_PASS: '{{ def_password }}'
@@ -113,11 +114,11 @@ clusters:
           - {name: keystone, port: 35357, get: '/v3'}
         env:
           MYSQL_HOST_IP: '{{ mysql_vip }}'
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           NOVA_HOST_IP: '{{ public_vip }}'
           HOST_IP: '{{ public_vip }}'
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          KEYSTONE_API_IP: '{{ public_vip }}'
           MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
           ADMIN_PASS: '{{ def_password }}'
@@ -128,9 +129,9 @@ clusters:
       - name: horizon
         image: shaddock/horizon:latest
         host: node001
-        priority: 55
+        priority: 50
         ports:
-          - 80
+          - 80:8010
           - 11211
         volumes:
           - mount: /var/log/horizon
@@ -143,7 +144,7 @@ clusters:
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
         env:
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          KEYSTONE_API_IP: '{{ public_vip }}'
       
       - name: cinder
         image: shaddock/cinder:latest
@@ -161,7 +162,7 @@ clusters:
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
         env:
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           MYSQL_HOST_IP: '{{ mysql_vip }}'
           MYSQL_USER: '{{ mysql_admin_user }}'
@@ -180,8 +181,6 @@ clusters:
         volumes:
           - mount: /var/log/cinder
             host_dir: /var/log/shaddock/volume
-          - mount: /rootfs:ro
-            host_dir: /
           - mount: /sys:ro
             host_dir: /sys
           - mount: /dev
@@ -197,7 +196,7 @@ clusters:
           - {name: keystone, port: 35357, get: '/v3'}
           - {name: cinder}
         env:
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           MYSQL_HOST_IP: '{{ mysql_vip }}'
           GLANCE_HOST_IP: '{{ public_vip }}'
@@ -207,69 +206,8 @@ clusters:
           CINDER_DBPASS: '{{ def_password }}'
           CINDER_PASS: '{{ def_password }}'
       
-      - name: manila
-        image: shaddock/manila:latest
-        host: node001
-        priority: 70
-        ports:
-          - 8786
-        volumes:
-          - mount: /var/log/manila
-            host_dir: /var/log/shaddock/manila
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
-        depends-on:
-          - {name: mysql, port: 3306}
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-        env:
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
-          RABBIT_HOST_IP: '{{ public_vip }}'
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
-          MYSQL_USER: '{{ mysql_admin_user }}'
-          MYSQL_PASSWORD: '{{ mysql_password }}'
-          ADMIN_PASS: '{{ def_password }}'
-          MANILA_HOST_IP: '{{ public_vip }}'
-          HOST_IP: '{{ public_vip }}'
-          RABBIT_PASS: '{{ def_password }}'
-          MANILA_DBPASS: '{{ def_password }}'
-          MANILA_PASS: '{{ def_password }}'
-      
-      - name: manila-share
-        image: shaddock/manila-share:latest
-        host: node001
-        priority: 75
-        volumes:
-          - mount: /var/log/manila
-            host_dir: /var/log/shaddock/share
-          - mount: /rootfs:ro
-            host_dir: /
-          - mount: /sys:ro
-            host_dir: /sys
-          - mount: /dev
-            host_dir: /dev
-          - mount: /var/run
-            host_dir: /var/run
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
-        privileged: True
-        depends-on:
-          - {name: mysql, port: 3306}
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-          - {name: manila}
-        env:
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
-          RABBIT_HOST_IP: '{{ public_vip }}'
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
-          MANILA_HOST_IP: '{{ public_vip }}'
-          HOST_IP: '{{ public_vip }}'
-          RABBIT_PASS: '{{ def_password }}'
-          MANILA_DBPASS: '{{ def_password }}'
-          MANILA_PASS: '{{ def_password }}'
-      
       - name: nova-qemu
-        image: shaddock/nova-legacy-qemu:latest
+        image: shaddock/nova-qemu:latest
         host: node001
         priority: 90
         ports:
@@ -286,7 +224,7 @@ clusters:
         depends-on:
           - {name: nova}
         env:
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           MYSQL_HOST_IP: '{{ mysql_vip }}'
           NOVA_HOST_IP: '{{ public_vip }}'
@@ -313,7 +251,7 @@ clusters:
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
         env:
-          KEYSTONE_HOST_IP: '{{ public_vip }}'
+          KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           RABBIT_PASS: '{{ def_password }}'
           MYSQL_HOST_IP: '{{ mysql_vip }}'
@@ -325,10 +263,10 @@ clusters:
           HEAT_DBPASS: '{{ def_password }}'
           HEAT_PASS: '{{ def_password }}'
 
+
   - name: cluster0
     images: images/region1/
     services:
       - name: seed
         image: shaddock/seed:latest
         priority: 0
-

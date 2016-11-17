@@ -4,7 +4,7 @@ MAINTAINER Thibaut Lapierre <root@epheo.eu>
 ADD rabbitmq-start /usr/local/bin/
 RUN chmod +x /usr/local/bin/rabbitmq-start
 
-RUN pacman -Sy --noconfirm rabbitmq 
+RUN pacman -S --noconfirm rabbitmq 
 
 # Define environment variables.
 ENV RABBITMQ_LOG_BASE /data/log

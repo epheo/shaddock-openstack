@@ -1,18 +1,24 @@
 #!/bin/bash
 
+NEUTRON_PATH=/opt/openstack/services/neutron/bin/
+OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
+
+ln -s /opt/openstack/services/neutron/etc/ /etc/neutron
+mv /etc/neutron/neutron.conf.sample /etc/neutron/neutron.conf
+
 echo "Updating conf file..."
-configparse.py
+$NEUTRON_PATH/python /usr/local/bin/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=${ADMIN_PASS}
-export OS_AUTH_URL=http://${KEYSTONE_HOST_IP}:35357/v3
+export OS_AUTH_URL=http://${KEYSTONE_API_IP}:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
 
-endpoint=`openstack endpoint list -f csv -q |grep neutron`
+endpoint=`$OS_CLI endpoint list -f csv -q |grep neutron`
 
 if [ -z "$endpoint" ]
 then
@@ -39,22 +45,22 @@ then
             IDENTIFIED BY '${NEUTRON_DBPASS}';"
 
     echo "Creating Neutron user..."
-    openstack user create --domain default --password ${NEUTRON_PASS} neutron
+    $OS_CLI user create --domain default --password ${NEUTRON_PASS} neutron
 
-    openstack role add --project service --user neutron admin
+    $OS_CLI role add --project service --user neutron admin
 
     echo "Registering Neutron API and EndPoints..."
-    openstack service create --name neutron \
+    $OS_CLI service create --name neutron \
         --description "OpenStack Networking" network
 
-    openstack endpoint create --region RegionOne \
-        network public http://${KEYSTONE_HOST_IP}:9696
+    $OS_CLI endpoint create --region RegionOne \
+        network public http://${KEYSTONE_API_IP}:9696
 
-    openstack endpoint create --region RegionOne \
-        network internal http://${KEYSTONE_HOST_IP}:9696
+    $OS_CLI endpoint create --region RegionOne \
+        network internal http://${KEYSTONE_API_IP}:9696
 
-    openstack endpoint create --region RegionOne \
-        network admin http://${KEYSTONE_HOST_IP}:9696
+    $OS_CLI endpoint create --region RegionOne \
+        network admin http://${KEYSTONE_API_IP}:9696
 
     echo "Testing Neutron..."
     #neutron ext-list
@@ -73,7 +79,7 @@ else
 fi
 
 echo "Create databases tables"
-neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head
+$NEUTRON_PATH/neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head
 
 echo "Starting nova using supervisord..."
 exec /usr/bin/supervisord -n

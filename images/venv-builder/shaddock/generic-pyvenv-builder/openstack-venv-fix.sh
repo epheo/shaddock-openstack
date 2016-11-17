@@ -12,3 +12,10 @@ source bin/activate
 echo "In Nova venv"
 pip install vine
 deactivate
+
+cd /opt/openstack/services/glance/
+source bin/activate
+echo "In Glance venv"
+pip install vine
+deactivate
+
