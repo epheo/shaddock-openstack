@@ -12,3 +12,5 @@ mysql_vip: '172.17.0.1'
 
 keystone_api_ip: '172.17.0.1'
 glance_api_ip: '172.17.0.1'
+
+img_tag: 'git-newton'

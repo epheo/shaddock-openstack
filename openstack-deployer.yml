@@ -46,7 +46,7 @@ clusters:
 
     services:     
       - name: keystone
-        image: shaddock/keystone:latest
+        image: 'shaddock/keystone:{{ img_tag }}'
         host: node001
         priority: 30
         ports:
@@ -68,7 +68,7 @@ clusters:
           KEYSTONE_API_IP: '{{ keystone_api_ip }}'
       
       - name: glance
-        image: shaddock/glance:latest
+        image: 'shaddock/glance:{{ img_tag }}'
         host: node001
         priority: 40
         ports:
@@ -95,7 +95,7 @@ clusters:
           GLANCE_PASS: '{{ def_password }}'
       
       - name: nova
-        image: shaddock/nova:latest
+        image: 'shaddock/nova:{{ img_tag }}'
         host: node001
         priority: 45
         ports:
@@ -127,7 +127,7 @@ clusters:
           NOVA_PASS: '{{ def_password }}'
       
       - name: horizon
-        image: shaddock/horizon:latest
+        image: 'shaddock/horizon:{{ img_tag }}'
         host: node001
         priority: 50
         ports:
@@ -147,7 +147,7 @@ clusters:
           KEYSTONE_API_IP: '{{ public_vip }}'
       
       - name: cinder
-        image: shaddock/cinder:latest
+        image: 'shaddock/cinder:{{ img_tag }}'
         host: node001
         priority: 60
         ports:
@@ -175,7 +175,7 @@ clusters:
           CINDER_PASS: '{{ def_password }}'
       
       - name: cinder-volume
-        image: shaddock/cinder-volume:latest
+        image: 'shaddock/cinder-volume:{{ img_tag }}'
         host: node001
         priority: 65
         volumes:
@@ -207,7 +207,7 @@ clusters:
           CINDER_PASS: '{{ def_password }}'
       
       - name: nova-qemu
-        image: shaddock/nova-qemu:latest
+        image: 'shaddock/nova-qemu:{{ img_tag }}'
         host: node001
         priority: 90
         ports:
@@ -235,7 +235,7 @@ clusters:
           NEUTRON_PASS: '{{ def_password }}'
       
       - name: heat
-        image: shaddock/heat:latest
+        image: 'shaddock/heat:{{ img_tag }}'
         host: node001
         priority: 100
         ports:
