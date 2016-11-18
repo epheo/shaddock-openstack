@@ -1,15 +1,16 @@
 
-# OpenStack upstream virtualenv builder
+# UpStrean OpenStack VirtualEnv builder
 # =====================================
 
 ---
+
 clusters: 
 
   - name: seed 
     images: images/venv-builder/
     services:
         - name: seed
-          image: '{{ builder_img }}'
+          image: shaddock/generic-pyvenv-builder:latest
           priority: 0
 
   - name: venv-builder
@@ -155,6 +156,8 @@ clusters:
 
   - name: post-build
     images: images/venv-builder/
+    vars:
+      builder_img: 'shaddock/generic-pyvenv-builder:latest'
     services:
         - name: symlink-creator
           image: '{{ builder_img }}'
@@ -180,7 +183,7 @@ clusters:
 
 
         - name: venv-fixer
-          image: shaddock/venv-fixer:latest
+          image: '{{ builder_img }}'
           priority: 35
           volumes:
             - mount: /opt/openstack
