@@ -189,5 +189,5 @@ clusters:
             - mount: /opt/openstack
               host_dir: /opt/openstack
           depends-on:
-             - {name: symlinkcreator, status: stopped} 
+            - {name: symlink-creator, status: stopped} 
           command: "openstack-venv-fix.sh"
