@@ -6,9 +6,9 @@ mysql_password: '6Iv0e2VGOj9_El6M'
 
 mysql_admin_user: 'admin'
 
-public_vip: '192.168.3.59'
-internal_vip: '192.168.3.59'
-mysql_vip: '192.168.3.59'
+public_vip: '172.17.0.1'
+internal_vip: '172.17.0.1'
+mysql_vip: '172.17.0.1'
 
-keystone_api_ip: '192.168.3.59'
-glance_api_ip: '192.168.3.59'
+keystone_api_ip: '172.17.0.1'
+glance_api_ip: '172.17.0.1'
