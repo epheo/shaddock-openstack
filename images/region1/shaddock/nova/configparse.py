@@ -22,10 +22,11 @@ mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
 keystone_host_ip = os.environ.get('KEYSTONE_API_IP')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
+glance_host_ip = os.environ.get('GLANCE_API_IP')
+neutron_host_ip = os.environ.get('NEUTRON_API_IP')
 nova_host_ip = os.environ.get('NOVA_API_IP')
 nova_db_pass = os.environ.get('NOVA_DBPASS')
 nova_pass = os.environ.get('NOVA_PASS')
-
 
 def apply_config(configfile, dict):
     config = ConfigParser.RawConfigParser()
@@ -56,8 +57,10 @@ nova_conf = {
      'enabled_apis': 'osapi_compute,metadata',
      'auth_strategy': 'keystone',
      'my_ip': nova_host_ip,
-     'use_neutron': 'True',
-     'firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
+     'use_neutron': 'False',
+     'network_api_class': 'nova.network.api.API',
+     'security_group_api': 'nova',
+     '#firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
      'verbose': 'True'},
 
     'oslo_messaging_rabbit':
@@ -91,20 +94,20 @@ nova_conf = {
      'vncserver_proxyclient_address': nova_host_ip,},
 
     'glance':
-    {'api_servers': 'http://%s:9292' % keystone_host_ip},
+    {'api_servers': 'http://%s:9292' % glance_host_ip},
 
-    'neutron':
-    {'url': 'http://%s:9696' % keystone_host_ip,
-     'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_type': 'password',
-     'project_domain_name': 'default',
-     'user_domain_name': 'default',
-     'region_name': 'RegionOne',
-     'project_name': 'service',
-     'username': 'neutron',
-     'password': 'panama',
-     'service_metadata_proxy': 'True',
-     'metadata_proxy_shared_secret': 'panama'},
+    '#neutron':
+    {'#url': 'http://%s:9696' % neutron_host_ip,
+     '#auth_url': 'http://%s:35357' % keystone_host_ip,
+     '#auth_type': 'password',
+     '#project_domain_name': 'default',
+     '#user_domain_name': 'default',
+     '#region_name': 'RegionOne',
+     '#project_name': 'service',
+     '#username': 'neutron',
+     '#password': 'panama',
+     '#service_metadata_proxy': 'True',
+     '#metadata_proxy_shared_secret': 'panama'},
 
     'cinder':
     {'os_region_name': 'RegionOne'},

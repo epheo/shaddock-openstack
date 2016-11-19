@@ -114,6 +114,8 @@ clusters:
           KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           RABBIT_PASS: '{{ def_password }}'
+          GLANCE_API_IP: '{{ public_vip }}'
+          NEUTRON_API_IP: '{{ public_vip }}'
           NOVA_API_IP: '{{ public_vip }}'
           NOVA_DBPASS: '{{ def_password }}'
           NOVA_PASS: '{{ def_password }}'
