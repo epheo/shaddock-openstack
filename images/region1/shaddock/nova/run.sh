@@ -1,12 +1,9 @@
 #!/bin/bash
 
-echo "Removing nova DB..."
-rm /var/lib/nova/nova.sqlite
-
 NOVA_PATH=/opt/openstack/services/nova/
 OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 
-ln -s $NOVA_PATH/etc/ /etc/nova
+ln -s $NOVA_PATH/etc/nova /etc/nova
 mv /etc/nova/nova.conf.sample /etc/nova/nova.conf
 
 echo "Updating conf file..."
