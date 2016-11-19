@@ -9,7 +9,7 @@ OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 ln -s /opt/openstack/services/cinder/etc/cinder /etc/cinder
 
 echo "Updating conf file..."
-$CINDER_PATH/python /usr/local/bin/configparse.py
+$CINDER_PATH/python /opt/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default

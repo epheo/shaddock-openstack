@@ -9,7 +9,7 @@ OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 ln -s /opt/openstack/services/glance/etc/ /etc/glance
 
 echo "Updating conf file..."
-$GLANCE_PATH/python /usr/local/bin/configparse.py
+$GLANCE_PATH/python /opt/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default

@@ -1,13 +1,13 @@
 source /opt/openstack/services/python-openstackclient/bin/activate
 unset OS_DOMAIN_NAME
-export OS_AUTH_URL=http://172.17.0.1:5000/v3
+export OS_AUTH_URL=http://172.17.0.1:35357/v3
 export OS_AUTH_VERSION=3
 export OS_COMPUTE_API_VERSION=2
 export OS_ENDPOINT_TYPE=internalURL
 export OS_IDENTITY_API_VERSION=3
 export OS_INTERFACE=internal
 export OS_PASSWORD=iAehwS04lHJg5LBs
-export OS_PROJECT_DOMAIN_NAME=Default
-export OS_PROJECT_NAME=demo
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
-export OS_USER_DOMAIN_NAME=Default
+export OS_USER_DOMAIN_NAME=default

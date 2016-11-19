@@ -1,8 +1,5 @@
-FROM shaddock/seed:latest
-MAINTAINER Thibaut Lapierre <root@epheo.eu>
-
-ADD rabbitmq-start /usr/local/bin/
-RUN chmod +x /usr/local/bin/rabbitmq-start
+FROM shaddock/seed:arch_based
+MAINTAINER epheo <github@epheo.eu>
 
 RUN pacman -S --noconfirm rabbitmq 
 
@@ -10,12 +7,9 @@ RUN pacman -S --noconfirm rabbitmq
 ENV RABBITMQ_LOG_BASE /data/log
 ENV RABBITMQ_MNESIA_BASE /data/mnesia
 
-# Define mount points.
 VOLUME ["/data/log", "/data/mnesia"]
 
 WORKDIR /data
 
 EXPOSE 5672
 EXPOSE 15672
-
-CMD ["rabbitmq-start"]

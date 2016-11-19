@@ -7,7 +7,6 @@
 clusters: 
 
 
-
   - name: cluster0
     vars: !include vars/default.yml
     hosts: !include hosts/all.yml
@@ -16,7 +15,7 @@ clusters:
     services:
 
       - name: rabbitmq
-        image: shaddock/rabbitmq:latest
+        image: 'shaddock/rabbitmq:{{ img_tag }}'
         host: node001
         priority: 10
         ports:
@@ -29,7 +28,7 @@ clusters:
           RABBIT_PASS: '{{ def_password }}'
       
       - name: mysql
-        image: shaddock/mysql:latest
+        image: 'shaddock/mysql:{{ img_tag }}'
         host: node001
         priority: 20
         ports:
@@ -112,7 +111,7 @@ clusters:
           MYSQL_HOST_IP: '{{ mysql_vip }}'
           KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
-          NOVA_HOST_IP: '{{ public_vip }}'
+          NOVA_API_IP: '{{ public_vip }}'
           HOST_IP: '{{ public_vip }}'
           KEYSTONE_API_IP: '{{ public_vip }}'
           MYSQL_USER: '{{ mysql_admin_user }}'
@@ -264,5 +263,5 @@ clusters:
     images: images/region1/
     services:
       - name: seed
-        image: 'shaddock/seed:latest'
+        image: 'shaddock/seed:arch_based'
         priority: 0

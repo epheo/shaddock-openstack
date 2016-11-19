@@ -4,7 +4,7 @@ OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 HEAT_PATH=/opt/openstack/services/glance/bin/
 
 echo "Updating conf file..."
-$HEAT_PATH/python /usr/local/bin/configparse.py
+$HEAT_PATH/python /opt/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default

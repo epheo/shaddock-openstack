@@ -1,11 +1,8 @@
 #!/bin/bash
 
-echo "Removing nova DB..."
-rm -f /var/lib/nova/nova.sqlite
-
 echo "Updating conf file..."
 NOVA_PATH=/opt/openstack/services/nova/
-$NOVA_PATH/bin/python /usr/local/bin/configparse.py
+$NOVA_PATH/bin/python /opt/configparse.py
 
 echo "Add kvm group"
 chown root:kvm /dev/kvm
