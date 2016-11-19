@@ -7,7 +7,7 @@ RUN pacman -S --noconfirm apache \
                            memcached
 
 RUN mkdir -p /run/httpd/
-
+ADD supervisord.conf /etc/supervisord.conf
 ADD wsgi-horizon.conf /etc/httpd/conf/wsgi-horizon.conf
 
 VOLUME ["/var/log/horizon"]

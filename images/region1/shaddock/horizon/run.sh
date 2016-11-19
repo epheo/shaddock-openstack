@@ -2,7 +2,7 @@
 
 HORIZON_DIR='/opt/openstack/services/horizon'
 
-ln -s \
+cp \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py.example \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
@@ -24,7 +24,7 @@ echo "Updating local_settings.py file..."
 sed -i "s/^OPENSTACK_HOST.*/OPENSTACK_HOST = \"${KEYSTONE_API_IP}\"/g" \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
-sed -i "s/^ALLOWED_HOSTS.*/ALLOWED_HOSTS = \[\'\*\'\]/g" \
+sed -i "s/^#ALLOWED_HOSTS.*/ALLOWED_HOSTS = \[\'\*\'\]/g" \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
 sed -i "s/^OPENSTACK_KEYSTONE_URL.*/OPENSTACK_KEYSTONE_URL = \"http:\/\/%s:5000\/v3\" % OPENSTACK_HOST/g" \
