@@ -1,18 +1,20 @@
 #!/bin/bash
 
-mkdir -p /opt/openstack/services
+d=/opt/openstack/services
 
-SRV_LIST=`ls /opt/openstack/venv \
+mkdir $d && cd $d
+
+srv_list=`ls /opt/openstack/venv \
            |rev \
            |cut -d '-' -f 2- \
            |rev \
            |uniq`
 
-for SRV in $SRV_LIST
+for srv in $srv_list
 do
-  VENV_DIR=`ls /opt/openstack/venv/ \
-             |grep $SRV'-' \
+  venv_dir=`ls /opt/openstack/venv/ \
+             |grep $srv'-' \
              |sort -r \
              |head -n1`
-  ln -snf /opt/openstack/venv/$VENV_DIR /opt/openstack/services/$SRV
+  ln -sf ../venv/$venv_dir $srv
 done
