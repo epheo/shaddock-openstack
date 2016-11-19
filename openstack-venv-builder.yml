@@ -13,6 +13,7 @@ clusters:
           image: shaddock/generic-pyvenv-builder:latest
           priority: 0
 
+
   - name: venv-builder
     hosts: !include hosts/all.yml
     vars:
@@ -151,7 +152,6 @@ clusters:
           env:
             GIT_URL: '{{ git_repo }}heat.git'
             GIT_BRANCH: '{{ git_branch }}'
-
 
 
   - name: post-build

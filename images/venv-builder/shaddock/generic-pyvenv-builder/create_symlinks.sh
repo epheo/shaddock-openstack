@@ -14,5 +14,5 @@ do
              |grep $SRV'-' \
              |sort -r \
              |head -n1`
-  ln -s /opt/openstack/venv/$VENV_DIR /opt/openstack/services/$SRV
+  ln -snf /opt/openstack/venv/$VENV_DIR /opt/openstack/services/$SRV
 done
