@@ -82,7 +82,11 @@ else
 fi
 
 echo "Create database tables"
-glance-manage db_sync
+source $GLANCE_PATH/activate
+pip install pymysql
+pip install python-memcached
+$GLANCE_PATH/glance-manage db_sync
+deactivate
 
 echo "Starting glance using supervisord..."
 exec /usr/bin/supervisord -n

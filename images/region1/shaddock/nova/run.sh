@@ -4,10 +4,10 @@ NOVA_PATH=/opt/openstack/services/nova/
 OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 
 ln -s $NOVA_PATH/etc/nova /etc/nova
-mv /etc/nova/nova.conf.sample /etc/nova/nova.conf
+cp /etc/nova/nova.conf.sample /etc/nova/nova.conf
 
 echo "Updating conf file..."
-$NOVA_PATH/bin/python /usr/local/bin/configparse.py
+$NOVA_PATH/bin/python /opt/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default

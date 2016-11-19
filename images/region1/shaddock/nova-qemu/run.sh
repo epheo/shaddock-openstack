@@ -1,7 +1,11 @@
 #!/bin/bash
 
-echo "Updating conf file..."
 NOVA_PATH=/opt/openstack/services/nova/
+
+ln -s $NOVA_PATH/etc/nova /etc/nova
+cp /etc/nova/nova.conf.sample /etc/nova/nova.conf
+
+echo "Updating conf file..."
 $NOVA_PATH/bin/python /opt/configparse.py
 
 echo "Add kvm group"

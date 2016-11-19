@@ -3,7 +3,7 @@
 KEYSTONE_PATH=/opt/openstack/services/keystone/bin/
 
 ln -s /opt/openstack/services/keystone/etc/ /etc/keystone
-mv /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
+cp /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
 
 $KEYSTONE_PATH/python /opt/configparse.py
 
@@ -53,10 +53,19 @@ echo "Endpoint = ${KEYSTONE_API_IP}"
 
 /opt/openstack/services/keystone/bin/keystone-manage bootstrap \
   --bootstrap-password ${ADMIN_TOKEN} \
+  --bootstrap-username admin \
+  --bootstrap-project-name admin \
+  --bootstrap-role-name admin \
+  --bootstrap-service-name keystone \
+  --bootstrap-region-id RegionOne \
   --bootstrap-admin-url http://${KEYSTONE_API_IP}:35357/v3/ \
   --bootstrap-internal-url http://${KEYSTONE_API_IP}:35357/v3/ \
   --bootstrap-public-url http://${KEYSTONE_API_IP}:5000/v3/ \
   --bootstrap-region-id RegionOne
+
+/opt/openstack/services/keystone/bin/keystone-manage bootstrap \
+  --bootstrap-password ${ADMIN_TOKEN} \
+  --bootstrap-project-name service
 
 echo "[done]"
 echo "# Starting keystone..."
