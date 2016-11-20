@@ -217,14 +217,14 @@ clusters:
         depends-on:
           - {name: nova}
         env:
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
           KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
           RABBIT_PASS: '{{ def_password }}'
-          NOVA_API_IP: '{{ public_vip }}'
-          NOVA_PASS: '{{ def_password }}'
+          GLANCE_API_IP: '{{ public_vip }}'
           NEUTRON_API_IP: '{{ public_vip }}'
           NEUTRON_PASS: '{{ def_password }}'
+          NOVA_API_IP: '{{ public_vip }}'
+          NOVA_PASS: '{{ def_password }}'
 
       - name: heat
         image: 'shaddock/heat:{{ img_tag }}'
