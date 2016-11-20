@@ -4,8 +4,8 @@
 - [x] Rabbitmq
 - [x] Keystone
 - [x] Glance
-- [ ] nova
-- [ ] nova-qemu
+- [x] nova
+- [x] nova-qemu
 - [ ] cinder
 - [ ] cinder-volume
 - [ ] heat

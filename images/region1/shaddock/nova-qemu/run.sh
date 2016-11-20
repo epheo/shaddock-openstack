@@ -1,6 +1,7 @@
 #!/bin/bash
 
-NOVA_PATH=/opt/openstack/services/nova/
+NOVA_PATH=/opt/openstack/services/nova
+mkdir $NOVA_PATH/lib/python2.7/site-packages/instances
 
 ln -s $NOVA_PATH/etc/nova /etc/nova
 cp /etc/nova/nova.conf.sample /etc/nova/nova.conf

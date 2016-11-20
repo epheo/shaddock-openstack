@@ -53,19 +53,15 @@ def apply_config(configfile, dict):
 
 nova_conf = {
     'DEFAULT':
-    {'rpc_backend': 'rabbit',
-     'enabled_apis': 'osapi_compute,metadata',
+    {'enabled_apis': 'osapi_compute,metadata',
      'auth_strategy': 'keystone',
      'my_ip': nova_host_ip,
      'use_neutron': 'False',
      'network_api_class': 'nova.network.api.API',
      'security_group_api': 'nova',
      '#firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
+     'transport_url': 'rabbit://guest:%s@%s/' % (rabbit_pass, rabbit_host_ip),
      'verbose': 'True'},
-
-    'oslo_messaging_rabbit':
-    {'rabbit_host': rabbit_host_ip,
-     'rabbit_password': rabbit_pass},
 
     'api_database':
     {'connection':
