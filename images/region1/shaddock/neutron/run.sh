@@ -7,7 +7,7 @@ ln -s /opt/openstack/services/neutron/etc/ /etc/neutron
 mv /etc/neutron/neutron.conf.sample /etc/neutron/neutron.conf
 
 echo "Updating conf file..."
-$NEUTRON_PATH/python /usr/local/bin/configparse.py
+$NEUTRON_PATH/python /opt/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default

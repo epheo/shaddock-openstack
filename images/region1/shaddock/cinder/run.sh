@@ -1,15 +1,12 @@
 #!/bin/bash
 
-echo "Removing cinder DB..."
-rm /var/lib/cinder/cinder.sqlite
-
 CINDER_PATH=/opt/openstack/services/cinder/bin/
 OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 
 ln -s /opt/openstack/services/cinder/etc/cinder /etc/cinder
 
 echo "Updating conf file..."
-$CINDER_PATH/python /usr/local/bin/configparse.py
+$CINDER_PATH/python /opt/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
@@ -60,22 +57,22 @@ then
         --description "OpenStack Block Storage" volumev2
 
     $OS_CLI endpoint create --region RegionOne \
-        volume public http://${KEYSTONE_API_IP}:8776/v1/%\(tenant_id\)s
+        volume public http://${CINDER_API_IP}:8776/v1/%\(tenant_id\)s
 
     $OS_CLI endpoint create --region RegionOne \
-        volume internal http://${KEYSTONE_API_IP}:8776/v1/%\(tenant_id\)s
+        volume internal http://${CINDER_API_IP}:8776/v1/%\(tenant_id\)s
 
     $OS_CLI endpoint create --region RegionOne \
-        volume admin http://${KEYSTONE_API_IP}:8776/v1/%\(tenant_id\)s
+        volume admin http://${CINDER_API_IP}:8776/v1/%\(tenant_id\)s
 
     $OS_CLI endpoint create --region RegionOne \
-        volumev2 public http://${KEYSTONE_API_IP}:8776/v2/%\(tenant_id\)s
+        volumev2 public http://${CINDER_API_IP}:8776/v2/%\(tenant_id\)s
 
     $OS_CLI endpoint create --region RegionOne \
-        volumev2 internal http://${KEYSTONE_API_IP}:8776/v2/%\(tenant_id\)s
+        volumev2 internal http://${CINDER_API_IP}:8776/v2/%\(tenant_id\)s
 
     $OS_CLI endpoint create --region RegionOne \
-        volumev2 admin http://${KEYSTONE_API_IP}:8776/v2/%\(tenant_id\)s
+        volumev2 admin http://${CINDER_API_IP}:8776/v2/%\(tenant_id\)s
 
 else
     if [[ $endpoint == *"ERROR"* ]]

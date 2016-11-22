@@ -3,11 +3,11 @@
 KEYSTONE_PATH=/opt/openstack/services/keystone/bin/
 
 ln -s /opt/openstack/services/keystone/etc/ /etc/keystone
-mv /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
+cp /etc/keystone/keystone.conf.sample /etc/keystone/keystone.conf
 
-$KEYSTONE_PATH/python /usr/local/bin/configparse.py
+$KEYSTONE_PATH/python /opt/configparse.py
 
-echo "Create database..."
+echo "# Creating database..."
 echo "=> Creating ${SERVICE} database"
 echo "=> DB ${MYSQL_HOST_IP}"
 echo "=> User ${MYSQL_USER}"
@@ -33,10 +33,10 @@ mysql \
     -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' \
         IDENTIFIED BY '${KEYSTONE_DBPASS}'"
 
-echo "Updating database tables"
+echo "# Updating database tables"
 /opt/openstack/services/keystone/bin/keystone-manage db_sync
 
-echo "Initialize Fernet keys"
+echo "# Initializing Fernet keys"
 /opt/openstack/services/keystone/bin/keystone-manage \
   fernet_setup \
   --keystone-user http \
@@ -47,12 +47,26 @@ echo "Initialize Fernet keys"
   --keystone-user http \
   --keystone-group http
 
+echo "# Bootstraping Keystone with:"
+echo "Password = ${ADMIN_TOKEN}"
+echo "Endpoint = ${KEYSTONE_API_IP}"
+
 /opt/openstack/services/keystone/bin/keystone-manage bootstrap \
   --bootstrap-password ${ADMIN_TOKEN} \
+  --bootstrap-username admin \
+  --bootstrap-project-name admin \
+  --bootstrap-role-name admin \
+  --bootstrap-service-name keystone \
+  --bootstrap-region-id RegionOne \
   --bootstrap-admin-url http://${KEYSTONE_API_IP}:35357/v3/ \
   --bootstrap-internal-url http://${KEYSTONE_API_IP}:35357/v3/ \
   --bootstrap-public-url http://${KEYSTONE_API_IP}:5000/v3/ \
   --bootstrap-region-id RegionOne
 
-echo "Starting keystone..."
+/opt/openstack/services/keystone/bin/keystone-manage bootstrap \
+  --bootstrap-password ${ADMIN_TOKEN} \
+  --bootstrap-project-name service
+
+echo "[done]"
+echo "# Starting keystone..."
 exec /usr/sbin/apachectl -D "FOREGROUND" -f /etc/httpd/wsgi-keystone.conf

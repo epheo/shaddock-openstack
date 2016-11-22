@@ -18,17 +18,15 @@
 import ConfigParser
 import os
 
-nova_db_pass = os.environ.get('NOVA_DBPASS')
-mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
+keystone_host_ip = os.environ.get('KEYSTONE_API_IP')
 rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
 rabbit_pass = os.environ.get('RABBIT_PASS')
-nova_host_ip = os.environ.get('NOVA_HOST_IP')
-neutron_host_ip = os.environ.get('NEUTRON_HOST_IP')
-keystone_host_ip = os.environ.get('KEYSTONE_API_IP')
-nova_pass = os.environ.get('NOVA_PASS')
+glance_host_ip = os.environ.get('GLANCE_API_IP')
+neutron_host_ip = os.environ.get('NEUTRON_API_IP')
 neutron_pass = os.environ.get('NEUTRON_PASS')
-host_ip = os.environ.get('HOST_IP')
-
+nova_host_ip = os.environ.get('NOVA_API_IP')
+nova_db_pass = os.environ.get('NOVA_DBPASS')
+nova_pass = os.environ.get('NOVA_PASS')
 
 def apply_config(configfile, dict):
     config = ConfigParser.RawConfigParser()
@@ -58,8 +56,20 @@ nova_conf = {
     {'rpc_backend': 'rabbit',
      'auth_strategy': 'keystone',
      'my_ip': nova_host_ip,
-     'use_neutron': 'True',
+     'use_neutron': 'False',
      'firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
+     'network_api_class': 'nova.network.api.API',
+     'security_group_api': 'nova',
+     'network_manager': 'nova.network.manager.FlatDHCPManager',
+     'network_size': '254',
+     'allow_same_net_traffic': 'False',
+     'multi_host': 'True',
+     'send_arp_for_ha': 'True',
+     'share_dhcp_address': 'True',
+     'force_dhcp_release': 'True',
+     'flat_network_bridge': 'br100',
+     'flat_interface': 'eth0',
+     'public_interface': 'eth0',
      'verbose': 'True'},
 
     'oslo_messaging_rabbit':
@@ -87,20 +97,20 @@ nova_conf = {
      'novncproxy_base_url': 'http://%s:6080/vnc_auto.html' % nova_host_ip,},
 
     'glance':
-    {'api_servers': 'http://%s:9292' % keystone_host_ip},
+    {'api_servers': 'http://%s:9292' % glance_host_ip},
 
-    'neutron':
-    {'url': 'http://%s:9696' % neutron_host_ip,
-     'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'auth_type': 'password',
-     'project_domain_name': 'default',
-     'user_domain_name': 'default',
-     'region_name': 'RegionOne',
-     'project_name': 'service',
-     'username': 'neutron',
-     'password': neutron_pass,
-     'service_metadata_proxy': 'True',
-     'metadata_proxy_shared_secret': neutron_pass},
+    '#neutron':
+    {'#url': 'http://%s:9696' % neutron_host_ip,
+     '#auth_url': 'http://%s:35357' % keystone_host_ip,
+     '#auth_type': 'password',
+     '#project_domain_name': 'default',
+     '#user_domain_name': 'default',
+     '#region_name': 'RegionOne',
+     '#project_name': 'service',
+     '#username': 'neutron',
+     '#password': neutron_pass,
+     '#service_metadata_proxy': 'True',
+     '#metadata_proxy_shared_secret': neutron_pass},
 
     }
 
@@ -140,7 +150,7 @@ neutron_conf = {
 
     }
 
-apply_config('/etc/neutron/neutron.conf', neutron_conf)
+#apply_config('/etc/neutron/neutron.conf', neutron_conf)
 
 
 neutron_linuxbridge_agent_conf = {
@@ -155,4 +165,4 @@ neutron_linuxbridge_agent_conf = {
      'firewall_driver': 'neutron.agent.linux.iptables_firewall.IptablesFirewallDriver'},
     }
 
-apply_config('/etc/neutron/plugins/ml2/linuxbridge_agent.ini', neutron_linuxbridge_agent_conf)
+#apply_config('/etc/neutron/plugins/ml2/linuxbridge_agent.ini', neutron_linuxbridge_agent_conf)

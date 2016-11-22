@@ -9,7 +9,7 @@ OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 ln -s /opt/openstack/services/glance/etc/ /etc/glance
 
 echo "Updating conf file..."
-$GLANCE_PATH/python /usr/local/bin/configparse.py
+$GLANCE_PATH/python /opt/configparse.py
 
 export OS_PROJECT_DOMAIN_NAME=default
 export OS_USER_DOMAIN_NAME=default
@@ -82,7 +82,11 @@ else
 fi
 
 echo "Create database tables"
-glance-manage db_sync
+source $GLANCE_PATH/activate
+pip install pymysql
+pip install python-memcached
+$GLANCE_PATH/glance-manage db_sync
+deactivate
 
 echo "Starting glance using supervisord..."
 exec /usr/bin/supervisord -n

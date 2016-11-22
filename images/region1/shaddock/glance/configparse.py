@@ -46,6 +46,7 @@ def apply_config(configfile, dict):
     print('Done')
     return True
 
+
 glance_api_conf = {
     'image_format':
     {'container_formats': 'ami,ari,aki,bare,ovf,ova,docker'},
@@ -101,4 +102,3 @@ glance_registry_conf = {
 
 apply_config('/etc/glance/glance-api.conf', glance_api_conf)
 apply_config('/etc/glance/glance-registry.conf', glance_registry_conf)
-
