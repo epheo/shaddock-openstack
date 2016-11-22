@@ -6,188 +6,61 @@
 
 clusters: 
 
-  - name: seed 
-    images: images/venv-builder/
-    services:
-        - name: seed
-          image: shaddock/generic-pyvenv-builder:latest
-          priority: 0
-
-
   - name: venv-builder
     hosts: !include hosts/all.yml
+
     vars:
       builder_img: 'shaddock/generic-pyvenv-builder:latest'
       git_repo: 'https://github.com/openstack/'
       git_branch: 'stable/newton'
+      services_list:
+        - 10:neutronclient
+        - 10:glanceclient
+        - 10:keystoneclient
+        - 10:cinderclient
+        - 10:opensckclient
+        - 10:novaclient
+        - 19:nova
+        - 20:glance
+        - 20:keystone
+        - 20:cinder
+        - 20:neutron
+        - 20:horizon
+        - 20:heat
+
     images: images/venv-builder/
 
-    services:       
-        - name: nova-builder
-          image: '{{ builder_img }}'
-          priority: 20
+    services: | 
+        {% for service in services_list %}
+        - name: "{{service.split(':')[1]}}-builder"
+          image: {{builder_img}}
+          priority: "{{service.split(':')[0]}}"
           volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
+            '/opt/openstack': {'bind': '/opt/openstack','mode': 'rw'}
           env:
-            GIT_URL: '{{ git_repo }}nova.git'
-            GIT_BRANCH: '{{ git_branch }}'
+            GIT_URL: "{{ git_repo }}{{service.split(':')[1]}}.git"
+            GIT_BRANCH: {{ git_branch }}
+        {% endfor %}
 
-        - name: glance-builder
-          image: '{{ builder_img }}'
-          priority: 20
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}glance.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: keystone-builder
-          image: '{{ builder_img }}'
-          priority: 20
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}keystone.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: cinder-builder
-          image: '{{ builder_img }}'
-          priority: 20
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}cinder.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: neutron-builder
-          image: '{{ builder_img }}'
-          priority: 20
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}neutron.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: horizon-builder
-          image: '{{ builder_img }}'
-          priority: 20
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}horizon.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: novaclient-builder
-          image: '{{ builder_img }}'
-          priority: 10
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}python-novaclient.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: glanceclient-builder
-          image: '{{ builder_img }}'
-          priority: 10
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}python-glanceclient.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: keystoneclient-builder
-          image: '{{ builder_img }}'
-          priority: 10
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}python-keystoneclient.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: cinderclient-builder
-          image: '{{ builder_img }}'
-          priority: 10
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}python-cinderclient.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: neutronclient-builder
-          image: '{{ builder_img }}'
-          priority: 10
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}python-neutronclient.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: openstackclient-builder
-          image: '{{ builder_img }}'
-          priority: 10
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}python-openstackclient.git'
-            GIT_BRANCH: '{{ git_branch }}'
-        
-        - name: heat-builder
-          image: '{{ builder_img }}'
-          priority: 20
-          volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
-          env:
-            GIT_URL: '{{ git_repo }}heat.git'
-            GIT_BRANCH: '{{ git_branch }}'
-
-
-  - name: post-build
-    images: images/venv-builder/
-    vars:
-      builder_img: 'shaddock/generic-pyvenv-builder:latest'
-    services:
         - name: symlink-creator
           image: '{{ builder_img }}'
           priority: 30
           volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
+            '/opt/openstack': {'bind': '/opt/openstack','mode': 'rw'}
           depends-on:
-            - {name: glanceclient-builder, status: stopped, retry: 50, sleep: 40}
-            - {name: keystoneclient-builder, status: stopped, retry: 50, sleep: 40}
-            - {name: openstackclient-builder, status: stopped, retry: 50, sleep: 40}
-            - {name: novaclient-builder, status: stopped, retry: 40, sleep: 40}
-            - {name: cinderclient-builder, status: stopped, retry: 40, sleep: 40}
-            - {name: neutronclient-builder, status: stopped, retry: 40, sleep: 40}
-            - {name: glance-builder, status: stopped, retry: 80, sleep: 40}
-            - {name: keystone-builder, status: stopped, retry: 80, sleep: 40}
-            - {name: cinder-builder, status: stopped, retry: 80, sleep: 40}
-            - {name: horizon-builder, status: stopped, retry: 80, sleep: 40}
-            - {name: heat-builder, status: stopped, retry: 80, sleep: 40}
-            - {name: neutron-builder, status: stopped, retry: 80, sleep: 40}
-            - {name: nova-builder, status: stopped, retry: 80, sleep: 40}
+            {% for service in services_list %}
+            - name: "{{service.split(':')[1]}}-builder"
+              status: stopped
+              retry: 100
+              sleep: 40}
+            {% endfor %}
           command: "create_symlinks.sh"
-
 
         - name: venv-fixer
           image: '{{ builder_img }}'
           priority: 35
           volumes:
-            - mount: /opt/openstack
-              host_dir: /opt/openstack
+            '/opt/openstack': {'bind': '/opt/openstack','mode': 'rw'}
           depends-on:
             - {name: symlink-creator, status: stopped} 
           command: "openstack-venv-fix.sh"

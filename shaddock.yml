@@ -1,0 +1,10 @@
+
+# UpStrean OpenStack VirtualEnv builder
+# =====================================
+
+---
+
+projects:
+  - !include openstack-venv-builder.yml
+  - !include openstack-deployer.yml
+

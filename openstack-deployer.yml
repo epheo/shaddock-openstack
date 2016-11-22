@@ -20,11 +20,12 @@ clusters:
         host: node001
         priority: 10
         ports:
-          - 5672
-          - 15672
+          5672: 5672
+          15672: 15672
         volumes:
-          - mount: /data/log
-            host_dir: /var/log/shaddock/rabbitmq/log
+          /data/log:
+            bind: /var/log/shaddock/mysql
+            mode: rw
         env:
           RABBIT_PASS: '{{ def_password }}'
       
@@ -33,10 +34,11 @@ clusters:
         host: node001
         priority: 20
         ports:
-          - 3306
+          3306: 3306
         volumes:
-          - mount: /var/log/mysql
-            host_dir: /var/log/shaddock/mysql
+          /var/log/mysql:
+            bind: /var/log/shaddock/mysql
+            mode: rw
         env:
           MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
@@ -46,13 +48,13 @@ clusters:
         host: node001
         priority: 30
         ports:
-          - 35357
-          - 5000
+          35357: 35357
+          5000: 5000
         volumes:
-          - mount: /var/log/keystone
-            host_dir: /var/log/shaddock/keystone
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
+          /var/log/keystone:
+            bind: /var/log/shaddock/keystone
+            mode: rw
+          /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
         depends-on:
           - {name: mysql, port: 3306}
         env:
@@ -68,13 +70,13 @@ clusters:
         host: node001
         priority: 40
         ports:
-          - 9292
-          - 9191
+          9292: 9292
+          9191: 9191
         volumes:
-          - mount: /var/log/glance
-            host_dir: /var/log/shaddock/glance
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
+          /var/log/glance:
+            bind: /var/log/shaddock/glance
+            mode: rw
+          /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
         depends-on:
           - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
@@ -95,13 +97,13 @@ clusters:
         host: node001
         priority: 45
         ports:
-          - 8774
+          8774: 8774
         privileged: True
         volumes:
-          - mount: /var/log/nova
-            host_dir: /var/log/shaddock/nova
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
+          /var/log/nova:
+            bind: /var/log/shaddock/nova
+            mode: rw
+          /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
         depends-on:
           - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
@@ -127,13 +129,13 @@ clusters:
         host: node001
         priority: 50
         ports:
-          - 80:8010
-          - 11211
+          80: 8010
+          11211: 11211
         volumes:
-          - mount: /var/log/horizon
-            host_dir: /var/log/shaddock/horizon
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
+          /var/log/horizon:
+            bind: /var/log/shaddock/horizon
+            mode: rw
+          /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
         depends-on:
           - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
@@ -147,12 +149,12 @@ clusters:
         host: node001
         priority: 60
         ports:
-          - 8776
+          8776: 8776
         volumes:
-          - mount: /var/log/cinder
-            host_dir: /var/log/shaddock/cinder
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
+          /var/log/cinder:
+            bind: /var/log/shaddock/cinder
+            mode: rw
+          /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
         depends-on:
           - {name: mysql, port: 3306}
           - {name: keystone, port: 5000, get: '/v3'}
@@ -175,16 +177,13 @@ clusters:
         host: node001
         priority: 65
         volumes:
-          - mount: /var/log/cinder
-            host_dir: /var/log/shaddock/volume
-          - mount: /sys:ro
-            host_dir: /sys
-          - mount: /dev
-            host_dir: /dev
-          - mount: /var/run
-            host_dir: /var/run
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
+          /var/log/cinder:
+            bind: /var/log/shaddock/volume
+            mode: rw
+          /sys: {'bind': '/sys','mode': 'ro'}
+          /dev: {'bind': '/dev'}
+          /var/run: {'bind': '/var/run'}
+          /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
         privileged: True
         depends-on:
           - {name: mysql, port: 3306}
@@ -207,14 +206,13 @@ clusters:
         host: node001
         priority: 90
         ports:
-          - 8775
+          8775: 8775
         volumes:
-          - mount: /var/log/nova
-            host_dir: /var/log/shaddock/compute
-          - mount: /lib/modules:ro
-            host_dir: /lib/modules
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
+          /var/log/nova:
+            bind: /var/log/shaddock/compute
+            mode: rw
+          /lib/modules: {'bind': '/lib/modules','mode': 'ro'}
+          /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
         privileged: True
         network_mode: host
         depends-on:
@@ -235,13 +233,13 @@ clusters:
         host: node001
         priority: 100
         ports:
-          - 8000
-          - 8004
+          8000: 8000
+          8004: 8004
         volumes:
-          - mount: /var/log/heat
-            host_dir: /var/log/shaddock/heat
-          - mount: /opt/openstack
-            host_dir: /opt/openstack
+          /var/log/heat:
+            bind: /var/log/shaddock/heat
+            mode: rw
+          /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
         depends-on:
           - {name: mysql, port: 3306}
           - {name: keystone, port: 5000, get: '/v3'}
