@@ -36,7 +36,7 @@ clusters:
           image: {{builder_img}}
           priority: "{{service.split(':')[0]}}"
           volumes:
-            '/opt/openstack': {'bind': '/opt/openstack','mode': 'rw'}
+            - /opt/openstack:/opt/openstack:rw
           env:
             GIT_URL: "{{ git_repo }}{{service.split(':')[1]}}.git"
             GIT_BRANCH: {{ git_branch }}
@@ -46,7 +46,7 @@ clusters:
           image: '{{ builder_img }}'
           priority: 30
           volumes:
-            '/opt/openstack': {'bind': '/opt/openstack','mode': 'rw'}
+            /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
           depends-on:
             {% for service in services_list %}
             - name: "{{service.split(':')[1]}}-builder"
@@ -60,7 +60,7 @@ clusters:
           image: '{{ builder_img }}'
           priority: 35
           volumes:
-            '/opt/openstack': {'bind': '/opt/openstack','mode': 'rw'}
+            - /opt/openstack:/opt/openstack:rw
           depends-on:
             - {name: symlink-creator, status: stopped} 
           command: "openstack-venv-fix.sh"

@@ -6,5 +6,7 @@
 
 projects:
   - !include openstack-venv-builder.yml
-  - !include openstack-deployer.yml
 
+  - !include openstack-git-upstream.yml
+
+  - !include openstack-ubuntu-mitaka.yml
