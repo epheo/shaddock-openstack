@@ -6,7 +6,7 @@
 
 clusters:
 
-    - name: openstack-ubuntu-mitaka
+  - name: openstack-ubuntu-mitaka
     images: images/ubuntu-mitaka
     hosts: !include hosts/all.yml
     vars:
@@ -18,7 +18,7 @@ clusters:
     services:     
       - name: rabbitmq
         image: 'shaddock/rabbitmq:{{ image_tag }}'
-        host: node001-socket
+        host: node001
         priority: 10
         ports:
           - 5672:5672
@@ -30,7 +30,7 @@ clusters:
 
       - name: mysql
         image: 'shaddock/mysql:{{ image_tag }}'
-        host: node001-socket
+        host: node001
         priority: 20
         ports:
           - 3306:3306
@@ -124,7 +124,7 @@ clusters:
 
       - name: horizon
         image: 'shaddock/horizon:{{ image_tag }}'
-        host: node002-tcp
+        host: node001
         priority: 55
         ports:
           - 80:8010

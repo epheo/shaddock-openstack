@@ -14,12 +14,12 @@ clusters:
       git_repo: 'https://github.com/openstack/'
       git_branch: 'stable/newton'
       services_list:
-        - 10:neutronclient
-        - 10:glanceclient
-        - 10:keystoneclient
-        - 10:cinderclient
-        - 10:opensckclient
-        - 10:novaclient
+        - 10:python-neutronclient
+        - 10:python-glanceclient
+        - 10:python-keystoneclient
+        - 10:python-cinderclient
+        - 10:python-opensckclient
+        - 10:python-novaclient
         - 19:nova
         - 20:glance
         - 20:keystone
@@ -34,7 +34,7 @@ clusters:
         {% for service in services_list %}
         - name: "{{service.split(':')[1]}}-builder"
           image: {{builder_img}}
-          priority: "{{service.split(':')[0]}}"
+          priority: {{service.split(':')[0]}}
           volumes:
             - /opt/openstack:/opt/openstack:rw
           env:

@@ -7,7 +7,7 @@
 clusters:
 
 
-  - name: openstack-upstream-build
+  - name: openstack-upstream
     vars: !include vars/default.yml
     hosts: !include hosts/all.yml
     images: images/region1/
@@ -231,7 +231,7 @@ clusters:
           HEAT_PASS: '{{ def_password }}'
           ADMIN_PASS: '{{ def_password }}'
 
-  - name: pre-build-cluster
+  - name: base
     images: images/region1/
     services:
       - name: seed

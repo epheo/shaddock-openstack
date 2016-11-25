@@ -22,12 +22,17 @@ then
 fi
 
 DATE=`date -Iseconds |sed -r 's/[^a-zA-Z0-9]//g; s/0000/0/g'`
+echo TimeStamp is: $DATE
+
 PROJECT_NAME=`echo $GIT_URL           \
               | sed -e 's/\/$//'      \
               | awk -F/ '{print $NF}' \
               | sed -e 's/.git$//'    \
              `
+echo Project Name is: $PROJECT_NAME
+
 GIT_DIR=$1/$PROJECT_NAME-$DATE
+echo Git directory is: $GIT_DIR
 
 git clone -b $GIT_BRANCH $GIT_URL $GIT_DIR
 cd $GIT_DIR
