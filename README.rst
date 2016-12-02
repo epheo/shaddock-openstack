@@ -33,8 +33,8 @@ You will find the venv directories and Python sources in the
 And wait until all the containers stop to find your venv built in 
 /opt/openstack.
 
-As this can be very ressource consuming, it's recommended to add ```priority```
-and ```depends-on``` statements to your builders description.
+As this can be very ressource consuming, it's recommended to add ``priority``
+and ``depends-on`` statements to your builders description.
 http://shdk.epheo.eu/#using-the-scheduler
 
 To specify the OpenStack version to build, change the git branch to
