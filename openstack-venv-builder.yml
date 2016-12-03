@@ -14,31 +14,31 @@ clusters:
       git_repo: 'https://github.com/openstack/'
       git_branch: 'stable/newton'
       services_list:
-        - 10:python-neutronclient
-        - 10:python-glanceclient
-        - 10:python-keystoneclient
-        - 10:python-cinderclient
-        - 10:python-opensckclient
-        - 10:python-novaclient
-        - 19:nova
-        - 20:glance
-        - 20:keystone
-        - 20:cinder
-        - 20:neutron
-        - 20:horizon
-        - 20:heat
+        - 10;python-neutronclient
+        - 10;python-glanceclient
+        - 10;python-keystoneclient
+        - 10;python-cinderclient
+        - 10;python-opensckclient
+        - 10;python-novaclient
+        - 19;nova
+        - 20;glance
+        - 20;keystone
+        - 20;cinder
+        - 20;neutron
+        - 20;horizon
+        - 20;heat
 
     images: images/venv-builder/
 
     services: | 
         {% for service in services_list %}
-        - name: "{{service.split(':')[1]}}-builder"
-          image: {{builder_img}}
-          priority: {{service.split(':')[0]}}
+        - name: "{{service.split(';')[1]}}-builder"
+          image: {{ builder_img }}
+          priority: {{ service.split(';')[0] }}
           volumes:
             - /opt/openstack:/opt/openstack:rw
           env:
-            GIT_URL: "{{ git_repo }}{{service.split(':')[1]}}.git"
+            GIT_URL: "{{ git_repo }}{{service.split(';')[1]}}.git"
             GIT_BRANCH: {{ git_branch }}
         {% endfor %}
 
@@ -49,10 +49,10 @@ clusters:
             /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
           depends-on:
             {% for service in services_list %}
-            - name: "{{service.split(':')[1]}}-builder"
+            - name: "{{service.split(';')[1]}}-builder"
               status: stopped
               retry: 100
-              sleep: 40}
+              sleep: 40
             {% endfor %}
           command: "create_symlinks.sh"
 
