@@ -12,7 +12,7 @@ Deploying from the upstream sources
 -------------------------------------
 
 **The seed node** is used as a uniq base image for this platform. It's based on
-a daily built, scratch ArchLinux OS.
+a, scratch, daily built, ArchLinux OS.
     
 .. code:: bash
 
@@ -33,8 +33,9 @@ You will find the venv directories and Python sources in the
 And wait until all the containers stop to find your venv built in 
 /opt/openstack.
 
-As this can be very ressource consuming, it's recommended to add ```priority```
-and ```depends-on``` statements to your builders description.
+As this can be very ressource consuming, it's recommended to add ``priority``
+and ``depends-on`` statements to your builders description.
+
 http://shdk.epheo.eu/#using-the-scheduler
 
 To specify the OpenStack version to build, change the git branch to
@@ -73,6 +74,9 @@ vars/default.yml file.
 
 Deploying Mitaka using .deb binaries
 -------------------------------------
+
+This cluster is relaying on a Ubuntu 14.04 base image to install OpenStack 
+Mitaka from the .deb binary packages.
 
 .. code:: bash
 
