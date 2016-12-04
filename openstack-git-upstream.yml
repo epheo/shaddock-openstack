@@ -68,7 +68,6 @@ clusters:
           - /var/log/glance:/var/log/shaddock/glance:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
-          - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
@@ -93,7 +92,6 @@ clusters:
           - /var/log/nova:/var/log/shaddock/nova:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
-          - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
           - {name: rabbitmq, port: 5672}
           - {name: keystone, port: 5000, get: '/v3'}
@@ -123,7 +121,6 @@ clusters:
           - /var/log/horizon:/var/log/shaddock/horizon:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
-          - {name: seed, status: stopped}
           - {name: mysql, port: 3306}
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
@@ -163,7 +160,7 @@ clusters:
           - /var/log/cinder:/var/log/shaddock/volume:rw
           - /sys:/sys:ro
           - /dev:/dev
-          - /var/run::/var/run
+          - /var/run:/var/run
           - /opt/openstack:/opt/openstack:rw
         privileged: True
         depends-on:
