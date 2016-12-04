@@ -160,7 +160,7 @@ clusters:
           - /var/log/cinder:/var/log/shaddock/volume:rw
           - /sys:/sys:ro
           - /dev:/dev
-          - /var/run::/var/run
+          - /var/run:/var/run
           - /opt/openstack:/opt/openstack:rw
         privileged: True
         depends-on:
