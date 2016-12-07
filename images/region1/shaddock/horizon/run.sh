@@ -6,11 +6,7 @@ cp \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py.example \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
-cd $HORIZON_DIR
-source bin/activate
-./manage.py make_web_conf --wsgi
-./manage.py make_web_conf --apache > /etc/httpd/conf/horizon.conf
-deactivate
+
 
 chown -R http.http /opt/openstack/services/horizon/
 
@@ -49,6 +45,9 @@ sed -i '/OPENSTACK_API_VERSIONS/a     "volume": 2,' \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
 sed -i '/OPENSTACK_API_VERSIONS/a     "identity": 3,' \
+  $HORIZON_DIR/openstack_dashboard/local/local_settings.py
+
+echo "COMPRESS_OFFLINE = True" >> \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
 echo "Starting horizon using supervisord..."
