@@ -18,7 +18,7 @@ clusters:
         - 10;python-glanceclient
         - 10;python-keystoneclient
         - 10;python-cinderclient
-        - 10;python-opensckclient
+        - 10;python-openstackclient
         - 10;python-novaclient
         - 19;nova
         - 20;glance

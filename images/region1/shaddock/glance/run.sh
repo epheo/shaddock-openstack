@@ -11,14 +11,7 @@ ln -s /opt/openstack/services/glance/etc/ /etc/glance
 echo "Updating conf file..."
 $GLANCE_PATH/python /opt/configparse.py
 
-export OS_PROJECT_DOMAIN_NAME=default
-export OS_USER_DOMAIN_NAME=default
-export OS_PROJECT_NAME=admin
-export OS_USERNAME=admin
-export OS_PASSWORD=${ADMIN_PASS}
-export OS_AUTH_URL=http://${KEYSTONE_API_IP}:35357/v3
-export OS_IDENTITY_API_VERSION=3
-export OS_IMAGE_API_VERSION=2
+source /opt/openstack/service.osrc
 
 svc_project=`$OS_CLI project list -f csv -q |grep service`
 if [ -z "svc_project" ]

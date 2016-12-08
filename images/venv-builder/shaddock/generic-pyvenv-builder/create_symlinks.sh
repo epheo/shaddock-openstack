@@ -2,8 +2,10 @@
 
 d=/opt/openstack/services
 
-mkdir $d && cd $d
-
+if [ ! -d "$d" ]; then
+  mkdir $d
+fi
+cd $d
 srv_list=`ls /opt/openstack/venv \
            |rev \
            |cut -d '-' -f 2- \
@@ -16,5 +18,8 @@ do
              |grep $srv'-' \
              |sort -r \
              |head -n1`
+  if [ -d "$srv" ]; then
+    rm $srv
+  fi
   ln -sf ../venv/$venv_dir $srv
 done

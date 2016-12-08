@@ -13,6 +13,16 @@ clusters:
     images: images/region1/
     services:
 
+      - name: seed
+        image: 'shaddock/seed:arch_based'
+        priority: 0
+        volumes:
+          - /opt/openstack:/opt/openstack:rw
+        env:
+          KEYSTONE_API_IP: '{{ keystone_api_ip }}'
+          ADMIN_PASS: '{{ def_password }}'
+        command: 'generate-osrc.sh'
+
       - name: rabbitmq
         image: 'shaddock/rabbitmq:{{ img_tag }}'
         host: node001
@@ -21,7 +31,7 @@ clusters:
           - 5672:5672
           - 15672:15672
         volumes:
-          - /data/log:/var/log/shaddock/mysql:rw
+          - /var/log/shaddock/mysql:/data/log:rw
         env:
           RABBIT_PASS: '{{ def_password }}'
 
@@ -32,7 +42,7 @@ clusters:
         ports:
           - 3306:3306
         volumes:
-          - /var/log/mysql:/var/log/shaddock/mysql:rw
+          - /var/log/shaddock/mysql:/var/log/mysql:rw
         env:
           MYSQL_USER: '{{ mysql_admin_user }}'
           MYSQL_PASSWORD: '{{ mysql_password }}'
@@ -45,7 +55,7 @@ clusters:
           35357: 35357
           5000: 5000
         volumes:
-          - /var/log/keystone:/var/log/shaddock/keystone:rw
+          - /var/log/shaddock/keystone:/var/log/keystone:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
           - {name: mysql, port: 3306}
@@ -65,7 +75,7 @@ clusters:
           - 9292:9292
           - 9191:9191
         volumes:
-          - /var/log/glance:/var/log/shaddock/glance:rw
+          - /var/log/shaddock/glance:/var/log/glance:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
           - {name: mysql, port: 3306}
@@ -89,7 +99,7 @@ clusters:
           - 8774:8774
         privileged: True
         volumes:
-          - /var/log/nova:/var/log/shaddock/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
           - {name: mysql, port: 3306}
@@ -118,7 +128,7 @@ clusters:
           - 80:8010
           - 11211:11211
         volumes:
-          - /var/log/horizon:/var/log/shaddock/horizon:rw
+          - /var/log/shaddock/horizon:/var/log/horizon:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
           - {name: mysql, port: 3306}
@@ -134,7 +144,7 @@ clusters:
         ports:
           - 8776:8776
         volumes:
-          - /var/log/cinder:/var/log/shaddock/cinder:rw
+          - /var/log/shaddock/cinder:/var/log/cinder:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
           - {name: mysql, port: 3306}
@@ -157,7 +167,7 @@ clusters:
         host: node001
         priority: 65
         volumes:
-          - /var/log/cinder:/var/log/shaddock/volume:rw
+          - /var/log/shaddock/volume:/var/log/cinder:rw
           - /sys:/sys:ro
           - /dev:/dev
           - /var/run:/var/run
@@ -185,7 +195,7 @@ clusters:
         ports:
           - 8775:8775
         volumes:
-          - /var/log/nova:/var/log/shaddock/compute:rw
+          - /var/log/shaddock/compute:/var/log/nova:rw
           - /lib/modules:/lib/modules:ro
           - /opt/openstack:/opt/openstack:rw
         privileged: True
@@ -210,7 +220,7 @@ clusters:
           - 8000:8000
           - 8004:8004
         volumes:
-          - /var/log/heat:/var/log/shaddock/heat:rw
+          - /var/log/shaddock/heat:/var/log/heat:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
           - {name: mysql, port: 3306}
@@ -228,9 +238,9 @@ clusters:
           HEAT_PASS: '{{ def_password }}'
           ADMIN_PASS: '{{ def_password }}'
 
-  - name: base
-    images: images/region1/
-    services:
-      - name: seed
-        image: 'shaddock/seed:arch_based'
-        priority: 0
+      - name: post-configure
+        image: 'shaddock/cloud-manage:{{ img_tag }}'
+        host: node001
+        priority: 900
+        volumes:
+          - /opt/openstack:/opt/openstack:rw

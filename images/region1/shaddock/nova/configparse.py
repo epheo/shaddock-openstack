@@ -25,8 +25,9 @@ rabbit_pass = os.environ.get('RABBIT_PASS')
 glance_host_ip = os.environ.get('GLANCE_API_IP')
 neutron_host_ip = os.environ.get('NEUTRON_API_IP')
 nova_host_ip = os.environ.get('NOVA_API_IP')
-nova_db_pass = os.environ.get('NOVA_DBPASS')
+nova_dbpass = os.environ.get('NOVA_DBPASS')
 nova_pass = os.environ.get('NOVA_PASS')
+
 
 def apply_config(configfile, dict):
     config = ConfigParser.RawConfigParser()
@@ -65,11 +66,11 @@ nova_conf = {
 
     'api_database':
     {'connection':
-     'mysql://nova:%s@%s/nova_api' % (nova_db_pass, mysql_host_ip)},
+     'mysql://nova:%s@%s/nova_api' % (nova_dbpass, mysql_host_ip)},
 
     'database':
     {'connection':
-     'mysql://nova:%s@%s/nova' % (nova_db_pass, mysql_host_ip)},
+     'mysql://nova:%s@%s/nova' % (nova_dbpass, mysql_host_ip)},
 
     'keystone_authtoken':
     {'auth_uri': 'http://%s:5000' % keystone_host_ip,
@@ -87,7 +88,7 @@ nova_conf = {
 
     'vnc':
     {'vncserver_listen': nova_host_ip,
-     'vncserver_proxyclient_address': nova_host_ip,},
+     'vncserver_proxyclient_address': nova_host_ip},
 
     'glance':
     {'api_servers': 'http://%s:9292' % glance_host_ip},

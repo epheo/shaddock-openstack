@@ -1,7 +1,7 @@
 FROM shaddock/seed:arch_based
 MAINTAINER epheo <github@epheo.eu>
 
-RUN pacman -S --noconfirm rabbitmq 
+RUN pacman -Sy --noconfirm rabbitmq 
 
 # Define environment variables.
 ENV RABBITMQ_LOG_BASE /data/log

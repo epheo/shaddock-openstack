@@ -6,6 +6,7 @@ RUN pacman -Syu --noconfirm supervisor \
                             mysql-python \
                             python2-memcached \
                             libidn
+ADD generate-osrc.sh /usr/bin/
 ONBUILD ADD run.sh /usr/bin/
 ONBUILD ADD configparse.py /opt/
 ONBUILD ADD supervisord.conf /etc/
