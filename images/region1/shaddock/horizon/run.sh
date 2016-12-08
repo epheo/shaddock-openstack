@@ -50,11 +50,11 @@ sed -i '/OPENSTACK_API_VERSIONS/a     "identity": 3,' \
 echo "COMPRESS_OFFLINE = True" >> \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
-$HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --wsgi
+$HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --wsgi --force
 $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --apache > \
   /etc/httpd/conf/horizon.conf
 $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py collectstatic --noinput
-$HORIZON_DIR/bin/python $HORIZON_DIR/manage.py compress --noinput
+$HORIZON_DIR/bin/python $HORIZON_DIR/manage.py compress
 
 echo "Starting horizon using supervisord..."
 exec /usr/bin/supervisord -n

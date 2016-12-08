@@ -19,3 +19,11 @@ source bin/activate
 echo "In Glance venv"
 pip install vine
 deactivate
+
+cd /opt/openstack/services/horizon/
+source bin/activate
+echo "In Horizon venv"
+pip install -c http://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt?h=stable/newton .
+deactivate
+
+

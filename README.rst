@@ -11,13 +11,6 @@ All notions and objects of this repository are abstract and redefinable.
 Deploying from the upstream sources
 -------------------------------------
 
-**The seed node** is used as a uniq base image for this platform. It's based on
-a, scratch, daily built, ArchLinux OS.
-    
-.. code:: bash
-
-    shdk -c base build seed
-
 **The venv-builder** will build all the openstack projects from the upstream 
 git branch you want.
 It build them in parallel in separated containers if you "start all".
