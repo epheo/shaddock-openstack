@@ -41,12 +41,10 @@ sed -i '/OPENSTACK_API_VERSIONS/a     "identity": 3,' \
 echo "COMPRESS_OFFLINE = True" >> \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
-$HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --wsgi --force
-$HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --apache > \
-  /etc/httpd/conf/horizon.conf
-$HORIZON_DIR/bin/python $HORIZON_DIR/manage.py collectstatic --noinput
-$HORIZON_DIR/bin/python $HORIZON_DIR/manage.py compress
-
+# $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --wsgi --force
+# $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --apache > \
+#   /etc/httpd/conf/horizon.conf
+# 
 # sed -i '/LoadModule\ foo_module/a LoadModule\ wsgi_module\ modules/mod_wsgi.so' \
 #   /etc/httpd/conf/httpd.conf
 # cat /etc/httpd/conf/horizon.conf >> /etc/httpd/conf/httpd.conf

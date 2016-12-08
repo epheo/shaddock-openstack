@@ -24,6 +24,6 @@ cd /opt/openstack/services/horizon/
 source bin/activate
 echo "In Horizon venv"
 pip install -c http://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt?h=stable/newton .
+python manage.py collectstatic --noinput
+python manage.py compress
 deactivate
-
-
