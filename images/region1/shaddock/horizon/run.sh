@@ -6,15 +6,6 @@ cp \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py.example \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
-
-
-chown -R http.http /opt/openstack/services/horizon/
-
-## The followong two lines are currently unused
-sed -i '/LoadModule\ foo_module/a LoadModule\ wsgi_module\ modules/mod_wsgi.so' \
-  /etc/httpd/conf/httpd.conf
-cat /etc/httpd/conf/horizon.conf >> /etc/httpd/conf/httpd.conf
-
 echo "Updating local_settings.py file..."
 
 sed -i "s/^OPENSTACK_HOST.*/OPENSTACK_HOST = \"${KEYSTONE_API_IP}\"/g" \
@@ -55,6 +46,12 @@ $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --apache > \
   /etc/httpd/conf/horizon.conf
 $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py collectstatic --noinput
 $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py compress
+
+# sed -i '/LoadModule\ foo_module/a LoadModule\ wsgi_module\ modules/mod_wsgi.so' \
+#   /etc/httpd/conf/httpd.conf
+# cat /etc/httpd/conf/horizon.conf >> /etc/httpd/conf/httpd.conf
+
+chown -R http.http /opt/openstack/services/horizon/
 
 echo "Starting horizon using supervisord..."
 exec /usr/bin/supervisord -n
