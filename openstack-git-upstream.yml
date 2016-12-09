@@ -244,5 +244,5 @@ clusters:
         volumes:
           - /opt/openstack:/opt/openstack:rw
         depends-on:
-          - {name: nova, port: 8774, get: '/v2'}
-          - {name: glance, port: 9292, get: '/v2'}
+            - {name: nova, port: 8774, retry: 100}
+            - {name: glance, port: 9292, retry: 100}
