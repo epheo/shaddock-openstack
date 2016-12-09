@@ -1,4 +1,4 @@
-OpenStack architecture and processing model for Shaddock.
+OpenStack definition model for Shaddock
 =========================================================
 
 A yml definition model example you can use with Shaddock to build, deploy and
@@ -24,7 +24,7 @@ You will find the venv directories and Python sources in the
     (shdk) start
 
 And wait until all the containers stop to find your venv built in 
-/opt/openstack.
+/opt/openstack/venv/
 
 As this can be very ressource consuming, it's recommended to add ``priority``
 and ``depends-on`` statements to your builders description.
@@ -63,6 +63,9 @@ platform.
 
 Before deploying you may want to edit the global variables in the 
 vars/default.yml file.
+
+**Authenticating:**
+cat /opt/openstack/service.osrc
 
 
 Deploying Mitaka using .deb binaries
