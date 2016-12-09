@@ -28,6 +28,7 @@ nova_host_ip = os.environ.get('NOVA_API_IP')
 nova_db_pass = os.environ.get('NOVA_DBPASS')
 nova_pass = os.environ.get('NOVA_PASS')
 
+
 def apply_config(configfile, dict):
     config = ConfigParser.RawConfigParser()
     config.read(configfile)
@@ -51,69 +52,6 @@ def apply_config(configfile, dict):
     return True
 
 
-nova_conf = {
-    'DEFAULT':
-    {'rpc_backend': 'rabbit',
-     'auth_strategy': 'keystone',
-     'my_ip': nova_host_ip,
-     'use_neutron': 'False',
-     'firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
-     'network_api_class': 'nova.network.api.API',
-     'security_group_api': 'nova',
-     'network_manager': 'nova.network.manager.FlatDHCPManager',
-     'network_size': '254',
-     'allow_same_net_traffic': 'False',
-     'multi_host': 'True',
-     'send_arp_for_ha': 'True',
-     'share_dhcp_address': 'True',
-     'force_dhcp_release': 'True',
-     'flat_network_bridge': 'br100',
-     'flat_interface': 'eth0',
-     'public_interface': 'eth0',
-     'verbose': 'True'},
-
-    'oslo_messaging_rabbit':
-    {'rabbit_host': rabbit_host_ip,
-     'rabbit_password': rabbit_pass},
-
-    'keystone_authtoken':
-    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
-     'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'memcached_servers': '%s:11211' % keystone_host_ip,
-     'auth_type': 'password',
-     'project_domain_name': 'default',
-     'user_domain_name': 'default',
-     'project_name': 'service',
-     'username': 'nova',
-     'password': nova_pass},
-
-    'oslo_concurrency':
-    {'lock_path': '/var/lib/nova/tmp'},
-
-    'vnc':
-    {'enabled': 'True',
-     'vncserver_listen': '0.0.0.0',
-     'vncserver_proxyclient_address': nova_host_ip,
-     'novncproxy_base_url': 'http://%s:6080/vnc_auto.html' % nova_host_ip,},
-
-    'glance':
-    {'api_servers': 'http://%s:9292' % glance_host_ip},
-
-    '#neutron':
-    {'#url': 'http://%s:9696' % neutron_host_ip,
-     '#auth_url': 'http://%s:35357' % keystone_host_ip,
-     '#auth_type': 'password',
-     '#project_domain_name': 'default',
-     '#user_domain_name': 'default',
-     '#region_name': 'RegionOne',
-     '#project_name': 'service',
-     '#username': 'neutron',
-     '#password': neutron_pass,
-     '#service_metadata_proxy': 'True',
-     '#metadata_proxy_shared_secret': neutron_pass},
-
-    }
-
 nova_compute_conf = {
     'DEFAULT':
     {'compute_driver': 'libvirt.LibvirtDriver'},
@@ -123,7 +61,6 @@ nova_compute_conf = {
 
     }
 
-apply_config('/etc/nova/nova.conf', nova_conf)
 apply_config('/etc/nova/nova-compute.conf', nova_compute_conf)
 
 neutron_conf = {
@@ -150,7 +87,7 @@ neutron_conf = {
 
     }
 
-#apply_config('/etc/neutron/neutron.conf', neutron_conf)
+# apply_config('/etc/neutron/neutron.conf', neutron_conf)
 
 
 neutron_linuxbridge_agent_conf = {
@@ -165,4 +102,5 @@ neutron_linuxbridge_agent_conf = {
      'firewall_driver': 'neutron.agent.linux.iptables_firewall.IptablesFirewallDriver'},
     }
 
-#apply_config('/etc/neutron/plugins/ml2/linuxbridge_agent.ini', neutron_linuxbridge_agent_conf)
+# apply_config('/etc/neutron/plugins/ml2/linuxbridge_agent.ini',
+#              neutron_linuxbridge_agent_conf)

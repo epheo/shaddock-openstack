@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NOVA_PATH=/opt/openstack/services/nova/
+NOVA_PATH=/opt/openstack/services/nova
 OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
 
 ln -s $NOVA_PATH/etc/nova /etc/nova

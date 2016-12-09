@@ -5,10 +5,12 @@ RUN pacman -Sy --noconfirm libvirt-python \
                             sysfsutils \
                             libvirt \
                             qemu \
-                            gcc \
-                            python2-pip
+                            python2
 
-RUN pip2 install oslo_concurrency
+
+RUN ln -s \
+ /opt/openstack/services/horizon/lib/python2.7/site-packages/oslo_concurrency/ \
+ /usr/lib/python2.7/site-packages/
 
 VOLUME  ["/var/log/nova"]
 
