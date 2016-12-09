@@ -244,3 +244,6 @@ clusters:
         priority: 900
         volumes:
           - /opt/openstack:/opt/openstack:rw
+        depends-on:
+          - {name: nova, port: 8774, get: '/v2'}
+          - {name: glance, port: 9292, get: '/v2'}
