@@ -18,24 +18,14 @@
 import ConfigParser
 import os
 
-mysql_host_ip = os.environ.get('MYSQL_HOST_IP')
-keystone_host_ip = os.environ.get('KEYSTONE_API_IP')
-rabbit_host_ip = os.environ.get('RABBIT_HOST_IP')
-rabbit_pass = os.environ.get('RABBIT_PASS')
-glance_host_ip = os.environ.get('GLANCE_API_IP')
-neutron_host_ip = os.environ.get('NEUTRON_API_IP')
-nova_host_ip = os.environ.get('NOVA_API_IP')
-nova_dbpass = os.environ.get('NOVA_DBPASS')
-nova_pass = os.environ.get('NOVA_PASS')
-
 
 def apply_config(configfile, dict):
     config = ConfigParser.RawConfigParser()
     config.read(configfile)
 
     for section in dict.keys():
-        if not set([section]).issubset(config.sections()) \
-                and section != 'DEFAULT':
+        if not set([section]).issubset(
+                config.sections()) and section != 'DEFAULT':
             config.add_section(section)
         inner_dict = dict.get(section)
         for key in inner_dict.keys():
@@ -56,46 +46,58 @@ nova_conf = {
     'DEFAULT':
     {'enabled_apis': 'osapi_compute,metadata',
      'auth_strategy': 'keystone',
-     'my_ip': nova_host_ip,
+     'my_ip': os.environ.get('NOVA_API_IP'),
      'use_neutron': 'False',
      'network_api_class': 'nova.network.api.API',
      'security_group_api': 'nova',
      '#firewall_driver': 'nova.virt.firewall.NoopFirewallDriver',
-     'transport_url': 'rabbit://guest:%s@%s/' % (rabbit_pass, rabbit_host_ip),
-     'verbose': 'True'},
+     'transport_url': 'rabbit://guest:{}@{}/'.format(
+         os.environ.get('RABBIT_PASS'),
+         os.environ.get('RABBIT_HOST_IP')
+         )
+     },
 
     'api_database':
-    {'connection':
-     'mysql://nova:%s@%s/nova_api' % (nova_dbpass, mysql_host_ip)},
+    {'connection': 'mysql://nova:{}@{}/nova_api'.format(
+        os.environ.get('NOVA_DBPASS'),
+        os.environ.get('MYSQL_HOST_IP'))
+     },
 
     'database':
-    {'connection':
-     'mysql://nova:%s@%s/nova' % (nova_dbpass, mysql_host_ip)},
+    {'connection': 'mysql://nova:{}@{}/nova'.format(
+        os.environ.get('NOVA_DBPASS'),
+        os.environ.get('MYSQL_HOST_IP'))
+     },
 
     'keystone_authtoken':
-    {'auth_uri': 'http://%s:5000' % keystone_host_ip,
-     'auth_url': 'http://%s:35357' % keystone_host_ip,
-     'memcached_servers': '%s:11211' % keystone_host_ip,
+    {'auth_uri': 'http://{}:5000'.format(os.environ.get('KEYSTONE_API_IP')),
+     'auth_url': 'http://{}:35357'.format(os.environ.get('KEYSTONE_API_IP')),
+     'memcached_servers': '{}:11211'.format(os.environ.get('KEYSTONE_API_IP')),
      'auth_type': 'password',
      'project_domain_name': 'default',
      'user_domain_name': 'default',
      'project_name': 'service',
      'username': 'nova',
-     'password': nova_pass},
+     'password': os.environ.get('NOVA_PASS')
+     },
 
     'oslo_concurrency':
-    {'lock_path': '/var/lib/nova/tmp'},
+    {'lock_path': '/var/lib/nova/tmp'
+
+     },
 
     'vnc':
-    {'vncserver_listen': nova_host_ip,
-     'vncserver_proxyclient_address': nova_host_ip},
+    {'vncserver_listen': os.environ.get('NOVA_API_IP'),
+     'vncserver_proxyclient_address': os.environ.get('NOVA_API_IP')
+
+     },
 
     'glance':
-    {'api_servers': 'http://%s:9292' % glance_host_ip},
+    {'api_servers': 'http://{}:9292'.format(os.environ.get('GLANCE_API_IP'))},
 
-    '#neutron':
-    {'#url': 'http://%s:9696' % neutron_host_ip,
-     '#auth_url': 'http://%s:35357' % keystone_host_ip,
+    'neutron':
+    {'#url': 'http://{}:9696'.format(os.environ.get('NEUTRON_API_IP')),
+     '#auth_url': 'http://{}:35357'.format(os.environ.get('KEYSTONE_API_IP')),
      '#auth_type': 'password',
      '#project_domain_name': 'default',
      '#user_domain_name': 'default',
@@ -104,11 +106,12 @@ nova_conf = {
      '#username': 'neutron',
      '#password': 'panama',
      '#service_metadata_proxy': 'True',
-     '#metadata_proxy_shared_secret': 'panama'},
+     '#metadata_proxy_shared_secret': 'panama'
+     },
 
     'cinder':
     {'os_region_name': 'RegionOne'},
 
-    }
+}
 
 apply_config('/etc/nova/nova.conf', nova_conf)

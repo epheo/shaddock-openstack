@@ -32,8 +32,8 @@ def apply_config(configfile, dict):
     config.read(configfile)
 
     for section in dict.keys():
-        if not set([section]).issubset(config.sections()) \
-                and section != 'DEFAULT':
+        if not set([section]).issubset(
+                config.sections()) and section != 'DEFAULT':
             config.add_section(section)
         inner_dict = dict.get(section)
         for key in inner_dict.keys():
@@ -48,6 +48,7 @@ def apply_config(configfile, dict):
         config.write(configfile)
     print('Done')
     return True
+
 
 cinder_conf = {
     'DEFAULT':
