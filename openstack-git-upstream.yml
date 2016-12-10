@@ -6,7 +6,6 @@
 
 clusters:
 
-
   - name: openstack-upstream
     vars: !include vars/default.yml
     hosts: !include hosts/all.yml
@@ -176,7 +175,7 @@ clusters:
           - {name: mysql, port: 3306}
           - {name: keystone, port: 5000, get: '/v3'}
           - {name: keystone, port: 35357, get: '/v3'}
-          - {name: cinder}
+          - {name: cinder, port: 8776}
         env:
           MYSQL_HOST_IP: '{{ mysql_vip }}'
           KEYSTONE_API_IP: '{{ public_vip }}'
@@ -200,7 +199,7 @@ clusters:
         privileged: True
         network_mode: host
         depends-on:
-          - {name: nova}
+          - {name: nova, port: 8774, retry: 100}
         env:
           KEYSTONE_API_IP: '{{ public_vip }}'
           RABBIT_HOST_IP: '{{ public_vip }}'
@@ -244,5 +243,5 @@ clusters:
         volumes:
           - /opt/openstack:/opt/openstack:rw
         depends-on:
-            - {name: nova, port: 8774, retry: 100}
-            - {name: glance, port: 9292, retry: 100}
+          - {name: nova, port: 8774, retry: 100}
+          - {name: glance, port: 9292, retry: 100}

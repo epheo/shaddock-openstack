@@ -49,6 +49,7 @@ def apply_config(configfile, dict):
     print('Done')
     return True
 
+
 cinder_conf = {
     'DEFAULT':
     {'rpc_backend': 'rabbit',
@@ -80,4 +81,3 @@ cinder_conf = {
     }
 
 apply_config('/etc/cinder/cinder.conf', cinder_conf)
-
