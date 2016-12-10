@@ -31,9 +31,9 @@ cinder_conf = {
     'DEFAULT':
     {'auth_strategy': 'keystone',
      'enabled_backends': 'lvm',
-     'transport_url:' 'rabbit://guest:%s@%s' % (rabbit_pass,rabbit_host_ip),
      'glance_api_servers': 'http://%s:9292' % glance_host_ip,
-     'my_ip': cinder_host_ip},
+     'my_ip': cinder_host_ip,
+     'transport_url': 'rabbit://guest:%s@%s' % (rabbit_pass, rabbit_host_ip)},
 
     'database':
     {'connection':
