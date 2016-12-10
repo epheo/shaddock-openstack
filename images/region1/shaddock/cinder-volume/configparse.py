@@ -29,15 +29,11 @@ cinder_db_pass = os.environ.get('CINDER_DBPASS')
 
 cinder_conf = {
     'DEFAULT':
-    {'rpc_backend': 'rabbit',
-     'auth_strategy': 'keystone',
+    {'auth_strategy': 'keystone',
      'enabled_backends': 'lvm',
+     'transport_url:' 'rabbit://guest:%s@%s' % (rabbit_pass,rabbit_host_ip),
      'glance_api_servers': 'http://%s:9292' % glance_host_ip,
      'my_ip': cinder_host_ip},
-
-    'oslo_messaging_rabbit':
-    {'rabbit_host': rabbit_host_ip,
-     'rabbit_password': rabbit_pass},
 
     'database':
     {'connection':
