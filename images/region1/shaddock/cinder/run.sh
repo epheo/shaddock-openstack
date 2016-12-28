@@ -78,7 +78,12 @@ else
 fi
 
 echo "Create database tables"
+source $CINDER_PATH/activate
+pip install pymysql
+pip install MySQL-python
+pip install python-memcached
 $CINDER_PATH/cinder-manage db sync
+deactivate
 
 echo "Starting cinder using supervisord..."
 exec /usr/bin/supervisord -n
