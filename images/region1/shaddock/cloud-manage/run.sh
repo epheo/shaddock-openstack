@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/usr/bin/python2
+import os
+import ast
 
-create-cirros-image.sh
-create-demo-project.sh
-create-demo-user.sh
-create-nova-flavor.sh
+CONFIGURE_ARRAY = ast.literal_eval(os.environ.get('CONFIGURE_LIST'))
 
+for config in CONFIGURE_ARRAY:
+  os.system('create-%s.sh' % config)
