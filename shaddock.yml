@@ -6,4 +6,7 @@
 
 projects:
   - !include openstack-venv-builder.yml
-  - !include openstack-git-upstream.yml
+  - !include thirdparty-services.yml
+  - !include openstack-services-configure.yml
+  - !include openstack-services-core.yml
+  # - !include openstack-services-other.yml

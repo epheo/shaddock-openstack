@@ -1,0 +1,53 @@
+---
+
+clusters:
+
+  - name: thirdparty-services
+    vars: !include vars/default.yml
+    hosts: !include hosts/all.yml
+    images: images/region1/
+
+    services: |
+
+      - name: rabbitmq
+        image: 'shaddock/rabbitmq:{{ img_tag }}'
+        priority: 10
+        ports: { '5672/tcp':5672, '15672/tcp':15672 }
+        volumes:
+          - /var/log/shdk/rabbitmq:/data/log:rw
+        environment:
+          RABBIT_USER: '{{ rabbit_user }}'
+          RABBIT_PASS: '{{ rabbit_pass }}'
+        command: 'run.sh'
+
+      - name: mysql
+        image: 'shaddock/mysql:{{ img_tag }}'
+        priority: 20
+        ports: { '3306/tcp':3306 }
+        volumes:
+          - /opt/openstack/mysql:/var/lib/mysql:rw
+          - /var/log/shdk/mysql:/var/log/mysql:rw
+        environment:
+          MYSQL_USER: '{{ mysql_user }}'
+          MYSQL_PASS: '{{ mysql_pass }}'
+      - name: horizon
+        image: 'shaddock/horizon:{{ img_tag }}'
+        priority: 50
+        ports: { '80/tcp':8010, '11211/tcp':11211 }
+        volumes:
+          - /var/log/shaddock/horizon:/var/log/horizon:rw
+          - /opt/openstack:/opt/openstack:rw
+        depends-on:
+          - {name: mysql, port: 3306}
+          - {name: keystone-public, port: 5000, get: '/v3'}
+          - {name: keystone-admin, port: 35357, get: '/v3'}
+        environment:
+          KEYSTONE_VIP: '{{ keystone_vip }}'
+        # command: ['tox', '-e', 'runserver']
+        # command: ['/usr/sbin/apachectl', '-D', "FOREGROUND", ]
+
+      - name: memcached
+        image: 'shaddock/horizon:{{ img_tag }}'
+        priority: 50
+        ports: { '11211/tcp':11211 }
+        command: 'memcached -u daemon'

@@ -40,21 +40,25 @@ sed -i '/OPENSTACK_API_VERSIONS/a     "volume": 2,' \
 sed -i '/OPENSTACK_API_VERSIONS/a     "identity": 3,' \
   $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
-echo "COMPRESS_ENABLED = False" >> \
-  $HORIZON_DIR/openstack_dashboard/local/local_settings.py
+#sed -i "s/^#COMPRESS_ENABLED.*/COMPRESS_ENABLED = False/g" \
+#  $HORIZON_DIR/openstack_dashboard/local/local_settings.py
 
 $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --wsgi --force
+
+# Apache autoconf
 # $HORIZON_DIR/bin/python $HORIZON_DIR/manage.py make_web_conf --apache > \
 #   /etc/httpd/conf/horizon.conf
-# 
 # sed -i '/LoadModule\ foo_module/a LoadModule\ wsgi_module\ modules/mod_wsgi.so' \
 #   /etc/httpd/conf/httpd.conf
 # cat /etc/httpd/conf/horizon.conf >> /etc/httpd/conf/httpd.conf
 
 chown -R http.http /opt/openstack/services/horizon/
 
-#tox -e runserver
 echo "Starting httpd..."
 /usr/sbin/apachectl -D "FOREGROUND" \
                     -f /etc/httpd/conf/wsgi-horizon.conf \
                     -k start
+
+# CONSTRAINTS=/opt/openstack/services/keystone/upper-constraints.txt
+# pip install -c $CONSTRAINTS -r test-requirements.txt
+# tox -e runserver

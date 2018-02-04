@@ -1,0 +1,165 @@
+---
+
+clusters: 
+
+  - name: openstack-services-core
+    vars: !include vars/default.yml
+    hosts: !include hosts/all.yml
+    images: images/region1/
+
+    services: |
+
+      - name: seed
+        image: 'shaddock/seed:arch_based'
+        priority: 0
+        volumes:
+          - /opt/openstack:/opt/openstack:rw
+        environment:
+          KEYSTONE_VIP: '{{ keystone_vip }}'
+          ADMIN_PASS: '{{ admin_pass }}'
+        command: 'generate-osrc.sh'
+
+      - name: keystone-admin
+        image: 'shaddock/keystone:{{ img_tag }}'
+        priority: 30
+        ports: { '35357/tcp':35357 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/keystone:{{ venv_exec_path }}/keystone:ro'
+          - /opt/openstack/etc/keystone:/etc/keystone:ro
+          - /var/log/shaddock/keystone:/var/log/keystone:rw
+        depends-on:
+          - {name: keystone-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/keystone/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/keystone/'
+        command: 'keystone-wsgi-admin --host 0.0.0.0 --port 35357'
+
+      - name: keystone-public
+        image: 'shaddock/keystone:{{ img_tag }}'
+        priority: 30
+        ports: { '5000/tcp':5000 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/keystone:{{ venv_exec_path }}/keystone:ro'
+          - /opt/openstack/etc/keystone:/etc/keystone:rw
+          - /var/log/shaddock/keystone:/var/log/keystone:rw
+        depends-on:
+          - {name: keystone-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/keystone/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/keystone/'
+        command: 'keystone-wsgi-public --host 0.0.0.0 --port 5000'
+        
+      - name: glance-registry
+        image: 'shaddock/glance:{{ img_tag }}'
+        priority: 40
+        ports: { '9191/tcp':9191 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:ro'
+          - /opt/openstack/etc/glance:/etc/glance:ro
+          - /var/log/shaddock/glance:/var/log/glance:rw
+        depends-on:
+          - {name: glance-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
+          #command: 'glance-registry --log-file=/var/log/glance/glance-registry.log'
+        command: 'glance-registry'
+
+      - name: glance-api
+        image: 'shaddock/glance:{{ img_tag }}'
+        priority: 40
+        ports: { '9292/tcp':9292 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:ro'
+          - /opt/openstack/etc/glance:/etc/glance:ro
+          - /var/log/shaddock/glance:/var/log/glance:rw
+        depends-on:
+          - {name: glance-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
+        command: 'glance-api'
+
+      - name: nova-api
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        ports: { '8774/tcp':8774 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+          #command: 'nova-api --log-file=/var/log/nova/nova-api.log'
+        command: 'nova-api'
+
+      - name: nova-placement-api
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        ports: { '8778/tcp':8778 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+          #command: 'nova-placement-api --log-file=/var/log/nova/nova-placement-api.log'
+        command: 'nova-placement-api'
+
+      - name: nova-scheduler
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+        command: 'nova-scheduler'
+
+      - name: nova-conductor
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        privileged: True
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+        command: 'nova-conductor'
+
+      - name: nova-novncproxy
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+        command: 'nova-novncproxy'

@@ -1,6 +1,3 @@
-# Up-stream OpenStack VirtualEnv builder
-# =====================================
-
 ---
 
 clusters: 
@@ -25,21 +22,3 @@ clusters:
             BUILD_PATH: '{{ venv_build_path }}'
             VENV_PATH: '{{ venv_exec_path }}'
         {% endfor %}
-
-        - name: symlink-creator
-          image: '{{ builder_img }}'
-          priority: 30
-          volumes:
-            - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
-            - '{{ venv_exec_path }}:{{ venv_exec_path }}:rw'
-          depends-on:
-            {% for service in services_list %}
-            - name: "{{service.split(';')[1]}}-builder"
-              status: stopped
-              retry: 100
-              sleep: 40
-            {% endfor %}
-          environment:
-            BUILD_PATH: '{{ venv_build_path }}'
-            VENV_PATH: '{{ venv_exec_path }}'
-          command: "create_symlinks.sh"
