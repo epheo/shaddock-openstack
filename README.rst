@@ -1,5 +1,5 @@
 OpenStack definition model for Shaddock
-=========================================================
+========================================
 
 A yml definition model example you can use with Shaddock to build, deploy and
 manage the lifecycle of an OpenStack platform from the upstream git sources.
@@ -38,8 +38,7 @@ clone in a global jinja2 variable like the following for Pike stable:
 
     - name: venv-builder
       hosts: !include hosts/all.yml
-      vars:
-        git_branch: 'stable/pike'
+      vars: !include vars/default.yml
       images: images/venv-builder/
       services:       
           - name: nova-builder
@@ -65,17 +64,4 @@ Before deploying you may want to edit the global variables in the
 vars/default.yml file.
 
 **Authenticating:**
-cat /opt/openstack/service.osrc
-
-
-Deploying Mitaka using .deb binaries
--------------------------------------
-
-This cluster is relaying on a Ubuntu 14.04 base image to install OpenStack 
-Mitaka from the .deb binary packages.
-
-.. code:: bash
-
-    shdk -c openstack-ubuntu-mitaka
-    (shdk) build
-    (shdk) start
+cat /opt/openstack/osrc/service.osrc
