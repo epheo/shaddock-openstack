@@ -39,7 +39,7 @@ clone in a global jinja2 variable like the following for Pike stable:
     - name: venv-builder
       hosts: !include hosts/all.yml
       vars:
-        git_branch: 'stable/pike'
+        git_branch: 'master'
       images: images/venv-builder/
       services:       
           - name: nova-builder
