@@ -32,14 +32,14 @@ and ``depends-on`` statements to your builders description.
 http://shdk.epheo.eu/#using-the-scheduler
 
 To specify the OpenStack version to build, change the git branch to
-clone in a global jinja2 variable like the following for Newton stable:
+clone in a global jinja2 variable like the following for Pike stable:
 
 .. code:: yaml
 
     - name: venv-builder
       hosts: !include hosts/all.yml
       vars:
-        git_branch: 'stable/newton'
+        git_branch: 'stable/pike'
       images: images/venv-builder/
       services:       
           - name: nova-builder
@@ -47,7 +47,7 @@ clone in a global jinja2 variable like the following for Newton stable:
             priority: 10
             volumes:
               - /opt/openstack:/opt/openstack
-            env:
+            environment:
               GIT_URL: https://github.com/openstack/nova.git
               GIT_BRANCH: '{{ git_branch }}'
 

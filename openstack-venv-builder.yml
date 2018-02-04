@@ -1,5 +1,4 @@
-
-# UpStrean OpenStack VirtualEnv builder
+# Up-stream OpenStack VirtualEnv builder
 # =====================================
 
 ---
@@ -8,26 +7,7 @@ clusters:
 
   - name: venv-builder
     hosts: !include hosts/all.yml
-
-    vars:
-      builder_img: 'shaddock/generic-pyvenv-builder:latest'
-      git_repo: 'https://github.com/openstack/'
-      git_branch: 'stable/newton'
-      services_list:
-        - 10;python-neutronclient
-        - 10;python-glanceclient
-        - 10;python-keystoneclient
-        - 10;python-cinderclient
-        - 10;python-openstackclient
-        - 10;python-novaclient
-        - 19;nova
-        - 20;glance
-        - 20;keystone
-        - 20;cinder
-        - 20;neutron
-        - 20;horizon
-        - 20;heat
-
+    vars: !include vars/default.yml
     images: images/venv-builder/
 
     services: | 
@@ -36,17 +16,22 @@ clusters:
           image: {{ builder_img }}
           priority: {{ service.split(';')[0] }}
           volumes:
-            - /opt/openstack:/opt/openstack:rw
-          env:
+            - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
+            - '{{ venv_exec_path }}:{{ venv_exec_path }}:rw'
+          environment:
             GIT_URL: "{{ git_repo }}{{service.split(';')[1]}}.git"
-            GIT_BRANCH: {{ git_branch }}
+            GIT_BRANCH: '{{ git_branch }}'
+            PROJECT_NAME: "{{service.split(';')[1]}}"
+            BUILD_PATH: '{{ venv_build_path }}'
+            VENV_PATH: '{{ venv_exec_path }}'
         {% endfor %}
 
         - name: symlink-creator
           image: '{{ builder_img }}'
           priority: 30
           volumes:
-            /opt/openstack: {'bind': '/opt/openstack','mode': 'rw'}
+            - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
+            - '{{ venv_exec_path }}:{{ venv_exec_path }}:rw'
           depends-on:
             {% for service in services_list %}
             - name: "{{service.split(';')[1]}}-builder"
@@ -54,13 +39,7 @@ clusters:
               retry: 100
               sleep: 40
             {% endfor %}
+          environment:
+            BUILD_PATH: '{{ venv_build_path }}'
+            VENV_PATH: '{{ venv_exec_path }}'
           command: "create_symlinks.sh"
-
-        - name: venv-fixer
-          image: '{{ builder_img }}'
-          priority: 35
-          volumes:
-            - /opt/openstack:/opt/openstack:rw
-          depends-on:
-            - {name: symlink-creator, status: stopped} 
-          command: "openstack-venv-fix.sh"

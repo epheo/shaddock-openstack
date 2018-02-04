@@ -1,16 +1,49 @@
-
 ---
-def_password: 'iAehwS04lHJg5LBs'
-admin_password: '5gP6famJjcI48X2O'
-mysql_password: '6Iv0e2VGOj9_El6M'
 
-mysql_admin_user: 'admin'
+builder_img: 'shaddock/generic-pyvenv-builder:latest'
 
-public_vip: '172.17.0.1'
-internal_vip: '172.17.0.1'
+git_repo: 'https://github.com/openstack/'
+git_branch: 'stable/pike'
+img_tag: 'os'
+
+services_list:
+  - 10;python-glanceclient
+  - 10;python-keystoneclient
+  - 10;python-openstackclient
+  - 10;python-novaclient
+  - 19;nova
+  - 20;glance
+  - 20;keystone
+  - 20;horizon
+  # - 10;python-cinderclient
+  # - 10;python-neutronclient
+  # - 20;cinder
+  # - 20;neutron
+  # - 20;heat
+
+openstack_path: '/opt/openstack'
+venv_build_path: '/opt/openstack/venv'
+venv_exec_path: '/opt/openstack/services'
+
+openstackclient_path: '/opt/openstack/services/python-openstackclient/bin/'
+
+admin_pass: 'A30ZD5GNB7f9Z8sb5xKFPja00'
+mysql_pass: 'p8AKPo91l7NuuCaCqI4Is2ouY'
+rabbit_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
+glance_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
+neutron_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
+nova_db_pass: 'KYQuNl4HWeOeP9IZySAAJ8S5V'
+glance_db_pass: 'EPXvRyWWQ32jceD6y9ncpoCO3'
+neutron_db_pass: 'i9GcnkhvDAU0lTR23bCORnQJJ'
+keystone_db_pass: 'r8j1sLc4WNxObl8axgOiKosXw'
+
+mysql_user: 'admin'
+rabbit_user: 'openstack'
+
 mysql_vip: '172.17.0.1'
+memcached_vip: '172.17.0.1'
+keystone_vip: '172.17.0.1'
+neutron_vip: '172.17.0.1'
+glance_vip: '172.17.0.1'
+nova_vip: '172.17.0.1'
 
-keystone_api_ip: '172.17.0.1'
-glance_api_ip: '172.17.0.1'
-
-img_tag: 'git-newton'

@@ -1,7 +1,3 @@
-
-# OpenStack definition model for Shaddock.
-# ========================================
-
 ---
 
 clusters:
@@ -17,231 +13,327 @@ clusters:
         priority: 0
         volumes:
           - /opt/openstack:/opt/openstack:rw
-        env:
-          KEYSTONE_API_IP: '{{ keystone_api_ip }}'
-          ADMIN_PASS: '{{ def_password }}'
+        environment:
+          KEYSTONE_VIP: '{{ keystone_vip }}'
+          ADMIN_PASS: '{{ admin_pass }}'
         command: 'generate-osrc.sh'
 
       - name: rabbitmq
         image: 'shaddock/rabbitmq:{{ img_tag }}'
-        host: node001
         priority: 10
-        ports:
-          - 5672:5672
-          - 15672:15672
+        ports: { '5672/tcp':5672, '15672/tcp':15672 }
         volumes:
-          - /var/log/shaddock/mysql:/data/log:rw
-        env:
-          RABBIT_PASS: '{{ def_password }}'
+          - /var/log/shdk/rabbitmq:/data/log:rw
+        environment:
+          RABBIT_USER: '{{ rabbit_user }}'
+          RABBIT_PASS: '{{ rabbit_pass }}'
+        command: 'run.sh'
 
       - name: mysql
         image: 'shaddock/mysql:{{ img_tag }}'
-        host: node001
         priority: 20
-        ports:
-          - 3306:3306
+        ports: { '3306/tcp':3306 }
         volumes:
-          - /var/log/shaddock/mysql:/var/log/mysql:rw
-        env:
-          MYSQL_USER: '{{ mysql_admin_user }}'
-          MYSQL_PASSWORD: '{{ mysql_password }}'
+          - /opt/openstack/mysql:/var/lib/mysql:rw
+          - /var/log/shdk/mysql:/var/log/mysql:rw
+        environment:
+          MYSQL_USER: '{{ mysql_user }}'
+          MYSQL_PASS: '{{ mysql_pass }}'
 
-      - name: keystone
+      - name: keystone-configure
         image: 'shaddock/keystone:{{ img_tag }}'
-        host: node001
         priority: 30
-        ports:
-          - 35357:35357
-          - 5000:5000
         volumes:
+          - '{{ venv_exec_path }}/keystone:{{ venv_exec_path }}/keystone:rw'
+          - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
+          - /opt/openstack/etc/keystone:/etc/keystone:rw
+          - /var/log/shdk/keystone:/var/log/keystone:rw
+        depends-on:
+          - {name: mysql, port: 3306}
+        environment:
+          MYSQL_VIP: '{{ mysql_vip }}'
+          MYSQL_USER: '{{ mysql_user }}'
+          MYSQL_PASS: '{{ mysql_pass }}'
+          KEYSTONE_VIP: '{{ keystone_vip }}'
+          KEYSTONE_DB_PASS: '{{ keystone_db_pass }}'
+          ADMIN_PASS: '{{ admin_pass }}'
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/keystone/bin'
+        command: 'run.sh'
+
+      - name: keystone-admin
+        image: 'shaddock/keystone:{{ img_tag }}'
+        priority: 30
+        ports: { '35357/tcp':35357 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/keystone:{{ venv_exec_path }}/keystone:ro'
+          - /opt/openstack/etc/keystone:/etc/keystone:ro
           - /var/log/shaddock/keystone:/var/log/keystone:rw
-          - /opt/openstack:/opt/openstack:rw
         depends-on:
-          - {name: mysql, port: 3306}
-        env:
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
-          MYSQL_USER: '{{ mysql_admin_user }}'
-          MYSQL_PASSWORD: '{{ mysql_password }}'
-          KEYSTONE_API_IP: '{{ keystone_api_ip }}'
-          KEYSTONE_DBPASS: '{{ def_password }}'
-          ADMIN_TOKEN: '{{ def_password }}'
+          - {name: keystone-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/keystone/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/keystone/'
+        command: 'keystone-wsgi-admin --host 0.0.0.0 --port 35357'
 
-      - name: glance
-        image: 'shaddock/glance:{{ img_tag }}'
-        host: node001
-        priority: 40
-        ports:
-          - 9292:9292
-          - 9191:9191
+      - name: keystone-public
+        image: 'shaddock/keystone:{{ img_tag }}'
+        priority: 30
+        ports: { '5000/tcp':5000 }
         volumes:
-          - /var/log/shaddock/glance:/var/log/glance:rw
-          - /opt/openstack:/opt/openstack:rw
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/keystone:{{ venv_exec_path }}/keystone:ro'
+          - /opt/openstack/etc/keystone:/etc/keystone:rw
+          - /var/log/shaddock/keystone:/var/log/keystone:rw
+        depends-on:
+          - {name: keystone-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/keystone/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/keystone/'
+        command: 'keystone-wsgi-public --host 0.0.0.0 --port 5000'
+
+      - name: glance-configure
+        image: 'shaddock/glance:{{ img_tag }}'
+        priority: 40
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:rw'
+          - '{{ venv_exec_path }}/python-openstackclient:{{ venv_exec_path }}/python-openstackclient:ro'
+          - /opt/openstack/etc/glance:/etc/glance:rw
+          - /opt/openstack/osrc:/opt/openstack/osrc:ro
         depends-on:
           - {name: mysql, port: 3306}
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-        env:
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
-          MYSQL_USER: '{{ mysql_admin_user }}'
-          MYSQL_PASSWORD: '{{ mysql_password }}'
-          KEYSTONE_API_IP: '{{ keystone_api_ip }}'
-          GLANCE_API_IP: '{{ glance_api_ip }}'
-          GLANCE_DBPASS: '{{ def_password }}'
-          GLANCE_PASS: '{{ def_password }}'
-          ADMIN_PASS: '{{ def_password }}'
+          - {name: keystone-public, port: 5000, get: '/v3'}
+          - {name: keystone-admin, port: 35357, get: '/v3'}
+        environment:
+          MYSQL_VIP: '{{ mysql_vip }}'
+          MYSQL_USER: '{{ mysql_user }}'
+          MYSQL_PASS: '{{ mysql_pass }}'
+          KEYSTONE_VIP: '{{ keystone_vip }}'
+          GLANCE_VIP: '{{ glance_vip }}'
+          GLANCE_DB_PASS: '{{ glance_db_pass }}'
+          GLANCE_PASS: '{{ glance_pass }}'
+          MEMCACHED_VIP: '{{ memcached_vip }}'
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin:{{ openstackclient_path }}'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
 
-      - name: nova
+      - name: glance-registry
+        image: 'shaddock/glance:{{ img_tag }}'
+        priority: 40
+        ports: { '9191/tcp':9191 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:ro'
+          - /opt/openstack/etc/glance:/etc/glance:ro
+          - /var/log/shaddock/glance:/var/log/glance:rw
+        depends-on:
+          - {name: glance-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
+          #command: 'glance-registry --log-file=/var/log/glance/glance-registry.log'
+        command: 'glance-registry'
+
+      - name: glance-api
+        image: 'shaddock/glance:{{ img_tag }}'
+        priority: 40
+        ports: { '9292/tcp':9292 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:ro'
+          - /opt/openstack/etc/glance:/etc/glance:ro
+          - /var/log/shaddock/glance:/var/log/glance:rw
+        depends-on:
+          - {name: glance-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
+        command: 'glance-api'
+
+      - name: nova-configure
         image: 'shaddock/nova:{{ img_tag }}'
-        host: node001
         priority: 45
-        ports:
-          - 8774:8774
         privileged: True
         volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:rw'
+          - '{{ venv_exec_path }}/python-openstackclient:{{ venv_exec_path }}/python-openstackclient:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /opt/openstack/osrc:/opt/openstack/osrc:rw
           - /var/log/shaddock/nova:/var/log/nova:rw
-          - /opt/openstack:/opt/openstack:rw
         depends-on:
           - {name: mysql, port: 3306}
           - {name: rabbitmq, port: 5672}
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-        env:
-          RABBIT_PASS: '{{ def_password }}'
-          RABBIT_HOST_IP: '{{ public_vip }}'
-          NOVA_DBPASS: '{{ def_password }}'
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
-          MYSQL_USER: '{{ mysql_admin_user }}'
-          MYSQL_PASSWORD: '{{ mysql_password }}'
-          KEYSTONE_API_IP: '{{ public_vip }}'
-          NOVA_PASS: '{{ def_password }}'
-          NOVA_API_IP: '{{ public_vip }}'
-          GLANCE_API_IP: '{{ public_vip }}'
-          NEUTRON_API_IP: '{{ public_vip }}'
+          - {name: keystone-public, port: 5000, get: '/v3'}
+          - {name: keystone-admin, port: 35357, get: '/v3'}
+        environment:
+          RABBIT_USER: '{{ rabbit_user }}'
+          RABBIT_PASS: '{{ rabbit_pass }}'
+          RABBIT_VIP: '{{ nova_vip }}'
+          NOVA_DB_PASS: '{{ nova_db_pass }}'
+          MYSQL_VIP: '{{ mysql_vip }}'
+          MYSQL_USER: '{{ mysql_user }}'
+          MYSQL_PASS: '{{ mysql_pass }}'
+          KEYSTONE_VIP: '{{ keystone_vip }}'
+          MEMCACHED_VIP: '{{ memcached_vip }}'
+          NOVA_PASS: '{{ nova_pass }}'
+          NOVA_VIP: '{{ nova_vip }}'
+          GLANCE_VIP: '{{ glance_vip }}'
+          NEUTRON_VIP: '{{ neutron_vip }}'
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin:{{ openstackclient_path }}'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+
+      - name: nova-api
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        ports: { '8774/tcp':8774 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+          #command: 'nova-api --log-file=/var/log/nova/nova-api.log'
+        command: 'nova-api'
+
+      - name: nova-placement-api
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        ports: { '8778/tcp':8778 }
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+          #command: 'nova-placement-api --log-file=/var/log/nova/nova-placement-api.log'
+        command: 'nova-placement-api'
+
+      - name: nova-scheduler
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+        command: 'nova-scheduler'
+
+      - name: nova-conductor
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        privileged: True
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+        command: 'nova-conductor'
+
+      - name: nova-novncproxy
+        image: 'shaddock/nova:{{ img_tag }}'
+        priority: 45
+        volumes:
+          - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+          - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+          - /opt/openstack/etc/nova:/etc/nova:rw
+          - /var/log/shaddock/nova:/var/log/nova:rw
+        depends-on:
+          - {name: nova-configure, status: stopped}
+        environment:
+          PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+          VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+        command: 'nova-novncproxy'
 
       - name: horizon
         image: 'shaddock/horizon:{{ img_tag }}'
-        host: node001
         priority: 50
-        ports:
-          - 80:8010
-          - 11211:11211
+        ports: { '80/tcp':8010, '11211/tcp':11211 }
         volumes:
           - /var/log/shaddock/horizon:/var/log/horizon:rw
           - /opt/openstack:/opt/openstack:rw
         depends-on:
           - {name: mysql, port: 3306}
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-        env:
-          KEYSTONE_API_IP: '{{ public_vip }}'
+          - {name: keystone-public, port: 5000, get: '/v3'}
+          - {name: keystone-admin, port: 35357, get: '/v3'}
+        environment:
+          KEYSTONE_VIP: '{{ keystone_vip }}'
 
-      - name: cinder
-        image: 'shaddock/cinder:{{ img_tag }}'
-        host: node001
-        priority: 60
-        ports:
-          - 8776:8776
-        volumes:
-          - /var/log/shaddock/cinder:/var/log/cinder:rw
-          - /opt/openstack:/opt/openstack:rw
-        depends-on:
-          - {name: mysql, port: 3306}
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-        env:
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
-          MYSQL_USER: '{{ mysql_admin_user }}'
-          MYSQL_PASSWORD: '{{ mysql_password }}'
-          KEYSTONE_API_IP: '{{ public_vip }}'
-          RABBIT_HOST_IP: '{{ public_vip }}'
-          RABBIT_PASS: '{{ def_password }}'
-          CINDER_API_IP: '{{ public_vip }}'
-          CINDER_DBPASS: '{{ def_password }}'
-          CINDER_PASS: '{{ def_password }}'
-          ADMIN_PASS: '{{ def_password }}'
+      - name: memcached
+        image: 'shaddock/horizon:{{ img_tag }}'
+        priority: 50
+        ports: { '11211/tcp':11211 }
+        command: 'memcached -u daemon'
 
-      - name: cinder-volume
-        image: 'shaddock/cinder-volume:{{ img_tag }}'
-        host: node001
-        priority: 65
-        volumes:
-          - /var/log/shaddock/volume:/var/log/cinder:rw
-          - /sys:/sys:ro
-          - /dev:/dev
-          - /var/run:/var/run
-          - /opt/openstack:/opt/openstack:rw
-        privileged: True
-        depends-on:
-          - {name: mysql, port: 3306}
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-          - {name: cinder, port: 8776}
-        env:
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
-          KEYSTONE_API_IP: '{{ public_vip }}'
-          RABBIT_HOST_IP: '{{ public_vip }}'
-          RABBIT_PASS: '{{ def_password }}'
-          GLANCE_API_IP: '{{ public_vip }}'
-          CINDER_API_IP: '{{ public_vip }}'
-          CINDER_DBPASS: '{{ def_password }}'
-          CINDER_PASS: '{{ def_password }}'
+      # - name: nova-qemu
+      #   image: 'shaddock/nova-qemu:{{ img_tag }}'
+      #   priority: 90
+      #   ports:
+      #     - 8775:8775
+      #   volumes:
+      #     - /var/log/shaddock/compute:/var/log/nova:rw
+      #     - /lib/modules:/lib/modules:ro
+      #     - /opt/openstack:/opt/openstack:rw
+      #   privileged: True
+      #   network_mode: host
+      #   depends-on:
+      #     - {name: nova, port: 8774, retry: 100}
+      #   environment:
+      #     KEYSTONE_VIP: '{{ keystone_vip }}'
+      #     RABBIT_VIP: '{{ rabbit_vip }}'
+      #     RABBIT_PASS: '{{ rabbit_pass }}'
+      #     GLANCE_VIP: '{{ glance_vip }}'
+      #     NEUTRON_VIP: '{{ neutron_vip }}'
+      #     NEUTRON_PASS: '{{ neutron_pass }}'
+      #     NOVA_VIP: '{{ nova_vip }}'
+      #     NOVA_PASS: '{{ nova_pass }}'
 
-      - name: nova-qemu
-        image: 'shaddock/nova-qemu:{{ img_tag }}'
-        host: node001
-        priority: 90
-        ports:
-          - 8775:8775
-        volumes:
-          - /var/log/shaddock/compute:/var/log/nova:rw
-          - /lib/modules:/lib/modules:ro
-          - /opt/openstack:/opt/openstack:rw
-        privileged: True
-        network_mode: host
-        depends-on:
-          - {name: nova, port: 8774, retry: 100}
-        env:
-          KEYSTONE_API_IP: '{{ public_vip }}'
-          RABBIT_HOST_IP: '{{ public_vip }}'
-          RABBIT_PASS: '{{ def_password }}'
-          GLANCE_API_IP: '{{ public_vip }}'
-          NEUTRON_API_IP: '{{ public_vip }}'
-          NEUTRON_PASS: '{{ def_password }}'
-          NOVA_API_IP: '{{ public_vip }}'
-          NOVA_PASS: '{{ def_password }}'
+      # - name: heat
+      #   image: 'shaddock/heat:{{ img_tag }}'
+      #   priority: 100
+      #   ports: { '8000/tcp':8000, '8004/tcp':8004 }
+      #   volumes:
+      #     - /var/log/shaddock/heat:/var/log/heat:rw
+      #     - /opt/openstack:/opt/openstack:rw
+      #   depends-on:
+      #     - {name: mysql, port: 3306}
+      #     - {name: keystone, port: 5000, get: '/v3'}
+      #     - {name: keystone, port: 35357, get: '/v3'}
+      #   environment:
+      #     MYSQL_HOST_IP: '{{ mysql_vip }}'
+      #     MYSQL_USER: '{{ mysql_admin_user }}'
+      #     MYSQL_PASSWORD: '{{ mysql_password }}'
+      #     KEYSTONE_API_IP: '{{ public_vip }}'
+      #     RABBIT_HOST_IP: '{{ public_vip }}'
+      #     RABBIT_PASS: '{{ def_password }}'
+      #     HEAT_API_IP: '{{ public_vip }}'
+      #     HEAT_DBPASS: '{{ def_password }}'
+      #     HEAT_PASS: '{{ def_password }}'
+      #     ADMIN_PASS: '{{ def_password }}'
 
-      - name: heat
-        image: 'shaddock/heat:{{ img_tag }}'
-        host: node001
-        priority: 100
-        ports:
-          - 8000:8000
-          - 8004:8004
-        volumes:
-          - /var/log/shaddock/heat:/var/log/heat:rw
-          - /opt/openstack:/opt/openstack:rw
-        depends-on:
-          - {name: mysql, port: 3306}
-          - {name: keystone, port: 5000, get: '/v3'}
-          - {name: keystone, port: 35357, get: '/v3'}
-        env:
-          MYSQL_HOST_IP: '{{ mysql_vip }}'
-          MYSQL_USER: '{{ mysql_admin_user }}'
-          MYSQL_PASSWORD: '{{ mysql_password }}'
-          KEYSTONE_API_IP: '{{ public_vip }}'
-          RABBIT_HOST_IP: '{{ public_vip }}'
-          RABBIT_PASS: '{{ def_password }}'
-          HEAT_API_IP: '{{ public_vip }}'
-          HEAT_DBPASS: '{{ def_password }}'
-          HEAT_PASS: '{{ def_password }}'
-          ADMIN_PASS: '{{ def_password }}'
-
-      - name: post-configure
-        image: 'shaddock/cloud-manage:{{ img_tag }}'
-        host: node001
-        priority: 900
-        volumes:
-          - /opt/openstack:/opt/openstack:rw
-        depends-on:
-          - {name: nova, port: 8774, retry: 100}
-          - {name: glance, port: 9292, retry: 100}
+      # - name: post-configure
+      #   image: 'shaddock/cloud-manage:{{ img_tag }}'
+      #   priority: 900
+      #   volumes:
+      #     - /opt/openstack:/opt/openstack:rw
+      #   depends-on:
+      #     - {name: nova, port: 8774, retry: 100}
+      #     - {name: glance, port: 9292, retry: 100}

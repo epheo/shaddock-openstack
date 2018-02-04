@@ -14,8 +14,8 @@ RUN mkdir -p /opt/openstack/venv/
 
 RUN ln -s /usr/lib/libffi-*/include/ /usr/include/libffi
 
-ADD builder.sh /usr/bin/
 ADD create_symlinks.sh /usr/bin/
-ADD openstack-venv-fix.sh /usr/bin/
+ADD builder.sh /usr/bin/
+ADD post-conf.sh /usr/bin/
 
-CMD ["builder.sh","/opt/openstack/venv"]
+CMD ["builder.sh"]

@@ -1,44 +1,65 @@
 #!/usr/bin/env bash
-# clone 
-# activate
-# install
 
 if [ -z "$GIT_URL" ]
 then    
-    echo "You need to run the builder with -e GIT_URL=your_git_url"
+    echo "You need to specify a GIT_URL"
     exit 1
 fi
-
 if [ -z "$GIT_BRANCH" ]
 then    
-    echo "You need to run the builder with -e GIT_BRANCH=your_git_branch"
+    echo "You need to specify a GIT_BRANCH"
     exit 1
 fi
-
-if [ -z "$1" ]
+if [ -z "$PROJECT_NAME" ]
 then    
-    echo "You need give a path as first argument to this script"
+    echo "You need to specify a PROJECT_NAME"
+    exit 1
+fi
+if [ -z "$BUILD_PATH" ]
+then    
+    echo "You need set the BUILD_PATH env variable."
+    echo 'A venv will be created in $BUILD_PATH/name-DATE/'
+    exit 1
+fi
+if [ -z "$VENV_PATH" ]
+then    
+    echo "You need set the VENV_PATH env variable."
+    echo "This is the exec PATH of your current build"
+    echo 'The symlink-creator will symlink a build into $VENV_PATH/name/'
     exit 1
 fi
 
 DATE=`date -Iseconds |sed -r 's/[^a-zA-Z0-9]//g; s/0000/0/g'`
 echo TimeStamp is: $DATE
 
-PROJECT_NAME=`echo $GIT_URL           \
-              | sed -e 's/\/$//'      \
-              | awk -F/ '{print $NF}' \
-              | sed -e 's/.git$//'    \
-             `
 echo Project Name is: $PROJECT_NAME
+EXEC_PATH=$VENV_PATH/$PROJECT_NAME
+BUILD_DIR=$BUILD_PATH/$PROJECT_NAME-$DATE
 
-GIT_DIR=$1/$PROJECT_NAME-$DATE
-echo Git directory is: $GIT_DIR
+mkdir -p $VENV_PATH
+mkdir -p $BUILD_DIR
+echo Build directory is: $BUILD_DIR
+echo Venv symlink is: $EXEC_PATH
 
-git clone -b $GIT_BRANCH $GIT_URL $GIT_DIR
-cd $GIT_DIR
+git clone -b $GIT_BRANCH $GIT_URL $BUILD_DIR --depth 1 --single-branch
+
+rm $EXEC_PATH; ln -s $BUILD_DIR $EXEC_PATH; cd $EXEC_PATH
+
 if [ ! -d "venv" ]; then virtualenv2 .; fi
+curl \
+  https://raw.githubusercontent.com/openstack/requirements/$GIT_BRANCH/upper-constraints.txt \
+  > upper-constraints.txt
+
 . bin/activate
-pip install .
+
+if pip install -c upper-constraints.txt . --upgrade ; then
+  echo "Installed respecting Upper Constraints"
+else
+  echo "Installation failed, trying without constraints"
+  pip install .
+fi
+
+
 virtualenv2 --relocatable .
 
 IS_GENCONFIG=`grep -r genconfig tox.ini`

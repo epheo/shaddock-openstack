@@ -7,4 +7,3 @@
 projects:
   - !include openstack-venv-builder.yml
   - !include openstack-git-upstream.yml
-  - !include openstack-ubuntu-mitaka.yml

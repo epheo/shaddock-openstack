@@ -1,90 +1,113 @@
 #!/bin/bash
 
-echo "Removing glance DB..."
 rm /var/lib/glance/glance.sqlite
 
-GLANCE_PATH=/opt/openstack/services/glance/bin/
-OS_CLI=/opt/openstack/services/python-openstackclient/bin/openstack
+CONSTRAINTS=/opt/openstack/services/glance/upper-constraints.txt
+pip install -c $CONSTRAINTS pymysql
+pip install -c $CONSTRAINTS python-memcached
 
-ln -s /opt/openstack/services/glance/etc/ /etc/glance
+rm -rf /etc/glance/*
+cp -r /opt/openstack/services/glance/etc/* /etc/glance/
 
-echo "Updating conf file..."
-$GLANCE_PATH/python /opt/configparse.py
+source /opt/openstack/osrc/service.osrc
 
-source /opt/openstack/service.osrc
-
-svc_project=`$OS_CLI project list -f csv -q |grep service`
-if [ -z "svc_project" ]
+if [ -z `openstack prject list -f csv -q |grep service` ]
 then
-    $OS_CLI project create service
+      openstack project create service
 fi
 
-endpoint=`$OS_CLI endpoint list -f csv -q |grep glance`
+endpoint=`openstack endpoint list -f csv -q |grep glance`
 if [ -z "$endpoint" ]
 then
     echo ">>>>>>> Endpoint not yet created"
     echo "Creating database"
-    mysql \
-        -h${MYSQL_HOST_IP} \
-        -u${MYSQL_USER} \
-        -p${MYSQL_PASSWORD} \
+mysql  -h${MYSQL_VIP} -u${MYSQL_USER} -p${MYSQL_PASS} \
         -e "CREATE DATABASE glance;"
 
-    mysql \
-        -h${MYSQL_HOST_IP} \
-        -u${MYSQL_USER} \
-        -p${MYSQL_PASSWORD} \
+mysql  -h${MYSQL_VIP} -u${MYSQL_USER} -p${MYSQL_PASS} \
         -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' \
-            IDENTIFIED BY '${GLANCE_DBPASS}';"
+            IDENTIFIED BY '${GLANCE_DB_PASS}';"
 
-    mysql \
-        -h${MYSQL_HOST_IP} \
-        -u${MYSQL_USER} \
-        -p${MYSQL_PASSWORD} \
+mysql  -h${MYSQL_VIP} -u${MYSQL_USER} -p${MYSQL_PASS} \
         -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' \
-            IDENTIFIED BY '${GLANCE_DBPASS}'"
+            IDENTIFIED BY '${GLANCE_DB_PASS}'"
 
 
     echo "Creating Glance user..."
-    $OS_CLI user create --domain default --password ${GLANCE_PASS} glance
+    openstack user create --domain default --password ${GLANCE_PASS} glance
 
-    $OS_CLI role add --project service --user glance admin
+    openstack role add --project service --user glance admin
 
     echo "Registering Glance API and EndPoints..."
-    $OS_CLI service create --name glance \
+    openstack service create --name glance \
         --description "OpenStack Image" image
-
-    $OS_CLI endpoint create --region RegionOne \
-        image public http://${GLANCE_API_IP}:9292
-
-    $OS_CLI endpoint create --region RegionOne \
-        image internal http://${GLANCE_API_IP}:9292
-
-    $OS_CLI endpoint create --region RegionOne \
-        image admin http://${GLANCE_API_IP}:9292
+    openstack endpoint create --region RegionOne \
+        image public http://${GLANCE_VIP}:9292
+    openstack endpoint create --region RegionOne \
+        image internal http://${GLANCE_VIP}:9292
+    openstack endpoint create --region RegionOne \
+        image admin http://${GLANCE_VIP}:9292
 
 else
 
     if [[ $endpoint == *"ERROR"* ]]
     then
-        echo ">>>>>>> Cannot connect to Keystone"
+        echo "> Cannot connect to Keystone"
         exit
     else
-        echo ">>>>>>> Endpoint already created"
+        echo "> Endpoint already created"
     fi
 fi
 
+crudini --set /etc/glance/glance-api.conf database connection \
+  "mysql+pymysql://glance:$GLANCE_DB_PASS@$MYSQL_VIP/glance"
+
+crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_uri \
+  "http://$KEYSTONE_VIP:5000"
+crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_url \
+  "http://$KEYSTONE_VIP:35357"
+crudini --set /etc/glance/glance-api.conf keystone_authtoken memcached_servers \
+  $MEMCACHED_VIP:11211
+crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_type password
+crudini --set /etc/glance/glance-api.conf keystone_authtoken project_domain_name \
+  default
+crudini --set /etc/glance/glance-api.conf keystone_authtoken user_domain_name \
+  default
+crudini --set /etc/glance/glance-api.conf keystone_authtoken project_name service
+crudini --set /etc/glance/glance-api.conf keystone_authtoken username glance
+crudini --set /etc/glance/glance-api.conf keystone_authtoken password $GLANCE_PASS
+
+crudini --set /etc/glance/glance-api.conf paste_deploy flavor keystone
+
+crudini --set /etc/glance/glance-api.conf glance_store stores file,http
+crudini --set /etc/glance/glance-api.conf glance_store default_store file
+crudini --set /etc/glance/glance-api.conf glance_store filesystem_store_datadir \
+  '/var/lib/glance/images/'
+
+# Glance registry
+crudini --set /etc/glance/glance-registry.conf database connection \
+  "mysql+pymysql://glance:$GLANCE_DB_PASS@$MYSQL_VIP/glance"
+
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  auth_uri "http://$KEYSTONE_VIP:5000"
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  auth_url "http://$KEYSTONE_VIP:35357"
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  memcached_servers $MEMCACHED_VIP:11211
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  auth_type password
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  project_domain_name default
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  user_domain_name default
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  project_name service
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  username glance
+crudini --set /etc/glance/glance-registry.conf keystone_authtoken \
+  password $GLANCE_PASS
+
+crudini --set /etc/glance/glance-registry.conf paste_deploy flavor keystone
+
 echo "Create database tables"
-source $GLANCE_PATH/activate
-pip install pymysql
-pip install python-memcached
-$GLANCE_PATH/glance-manage db_sync
-deactivate
-
-echo "Starting glance using supervisord..."
-exec /usr/bin/supervisord -n
-
-#mkdir /tmp/images
-#wget -P /tmp/images http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
-#openstack image create --disk-format qcow2 --container-format bare --public --file /tmp/images/cirros-0.3.4-x86_64-disk.img cirros-0.3.4-x86_64
-#openstack image list
+glance-manage db_sync

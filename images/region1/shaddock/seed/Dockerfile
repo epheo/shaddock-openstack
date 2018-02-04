@@ -5,10 +5,13 @@ RUN pacman -Syu --noconfirm supervisor \
                             mariadb-clients \
                             mysql-python \
                             python2-memcached \
-                            libidn
+                            libidn \
+                            python2-pip
+
+RUN pip2 install crudini
+RUN sed -i '/draig\ Brady/c\\#\ Copyright\ Padraig\ Brady\ \<PadraigBrady\.com\>' \
+    /usr/bin/crudini
 ADD generate-osrc.sh /usr/bin/
 ONBUILD ADD run.sh /usr/bin/
-ONBUILD ADD configparse.py /opt/
-ONBUILD ADD supervisord.conf /etc/
 
 CMD ["run.sh"]

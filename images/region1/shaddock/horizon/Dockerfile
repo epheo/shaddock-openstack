@@ -9,6 +9,8 @@ RUN pacman -Sy --noconfirm apache \
 RUN mkdir -p /run/httpd/
 ADD wsgi-horizon.conf /etc/httpd/conf/wsgi-horizon.conf
 
+RUN useradd http
+
 VOLUME ["/var/log/horizon"]
 
 EXPOSE 80
