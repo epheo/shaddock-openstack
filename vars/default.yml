@@ -4,7 +4,7 @@ builder_img: 'shaddock/generic-pyvenv-builder:latest'
 
 git_repo: 'https://github.com/openstack/'
 git_branch: 'stable/pike'
-img_tag: 'os'
+img_tag: 'pike'
 
 services_list:
   - 10;python-glanceclient

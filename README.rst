@@ -65,17 +65,4 @@ Before deploying you may want to edit the global variables in the
 vars/default.yml file.
 
 **Authenticating:**
-cat /opt/openstack/service.osrc
-
-
-Deploying Mitaka using .deb binaries
--------------------------------------
-
-This cluster is relaying on a Ubuntu 14.04 base image to install OpenStack 
-Mitaka from the .deb binary packages.
-
-.. code:: bash
-
-    shdk -c openstack-ubuntu-mitaka
-    (shdk) build
-    (shdk) start
+cat /opt/openstack/osrc/service.osrc
