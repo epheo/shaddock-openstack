@@ -25,29 +25,24 @@ clusters:
         priority: 20
         ports: { '3306/tcp':3306 }
         volumes:
-          - /opt/openstack/mysql:/var/lib/mysql:rw
+          - '{{ openstack_path }}/mysql:/var/lib/mysql:rw'
           - /var/log/shdk/mysql:/var/log/mysql:rw
         environment:
           MYSQL_USER: '{{ mysql_user }}'
           MYSQL_PASS: '{{ mysql_pass }}'
-      - name: horizon
-        image: 'shaddock/horizon:{{ img_tag }}'
-        priority: 50
-        ports: { '80/tcp':8010 }
-        volumes:
-          - /var/log/shaddock/horizon:/var/log/horizon:rw
-          - /opt/openstack:/opt/openstack:rw
-        depends-on:
-          - {name: mysql, port: 3306}
-          - {name: keystone-public, port: 5000, get: '/v3'}
-          - {name: keystone-admin, port: 35357, get: '/v3'}
-        environment:
-          KEYSTONE_VIP: '{{ keystone_vip }}'
-        # command: ['tox', '-e', 'runserver']
-        # command: ['/usr/sbin/apachectl', '-D', "FOREGROUND", ]
 
       - name: memcached
         image: 'shaddock/horizon:{{ img_tag }}'
-        priority: 50
+        priority: 20
         ports: { '11211/tcp':11211 }
-        command: 'memcached -u daemon'
+        command: ['memcached', '-u', 'daemon']
+
+      - name: sona-onos
+        image: 'shaddock/onos:{{ img_tag }}'
+        priority: 20
+        ports: { 
+          '6653/tcp':6653,
+          '6640/tcp':6640,
+          '8181/tcp':8181,
+          '8101/tcp':8101,
+          '9876/tcp':9876 }

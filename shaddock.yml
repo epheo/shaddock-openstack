@@ -9,4 +9,4 @@ projects:
   - !include thirdparty-services.yml
   - !include openstack-services-configure.yml
   - !include openstack-services-core.yml
-  # - !include openstack-services-other.yml
+  - !include openstack-services-other.yml
