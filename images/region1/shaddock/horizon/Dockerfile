@@ -10,6 +10,7 @@ RUN mkdir -p /run/httpd/
 ADD wsgi-horizon.conf /etc/httpd/conf/wsgi-horizon.conf
 
 RUN useradd http
+RUN useradd daemon
 
 VOLUME ["/var/log/horizon"]
 

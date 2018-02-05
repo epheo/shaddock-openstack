@@ -9,16 +9,6 @@ clusters:
 
     services: |
 
-      - name: seed
-        image: 'shaddock/seed:arch_based'
-        priority: 0
-        volumes:
-          - /opt/openstack:/opt/openstack:rw
-        environment:
-          KEYSTONE_VIP: '{{ keystone_vip }}'
-          ADMIN_PASS: '{{ admin_pass }}'
-        command: 'generate-osrc.sh'
-
       - name: keystone-admin
         image: 'shaddock/keystone:{{ img_tag }}'
         priority: 30
@@ -26,7 +16,7 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/keystone:{{ venv_exec_path }}/keystone:ro'
-          - /opt/openstack/etc/keystone:/etc/keystone:ro
+          - '{{ openstack_path }}/etc/keystone:/etc/keystone:ro'
           - /var/log/shaddock/keystone:/var/log/keystone:rw
         depends-on:
           - {name: keystone-configure, status: stopped}
@@ -42,7 +32,7 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/keystone:{{ venv_exec_path }}/keystone:ro'
-          - /opt/openstack/etc/keystone:/etc/keystone:rw
+          - '{{ openstack_path }}/etc/keystone:/etc/keystone:rw'
           - /var/log/shaddock/keystone:/var/log/keystone:rw
         depends-on:
           - {name: keystone-configure, status: stopped}
@@ -58,14 +48,13 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:ro'
-          - /opt/openstack/etc/glance:/etc/glance:ro
+          - '{{ openstack_path }}/etc/glance:/etc/glance:ro'
           - /var/log/shaddock/glance:/var/log/glance:rw
         depends-on:
           - {name: glance-configure, status: stopped}
         environment:
           PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin'
           VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
-          #command: 'glance-registry --log-file=/var/log/glance/glance-registry.log'
         command: 'glance-registry'
 
       - name: glance-api
@@ -75,7 +64,7 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:ro'
-          - /opt/openstack/etc/glance:/etc/glance:ro
+          - '{{ openstack_path }}/etc/glance:/etc/glance:ro'
           - /var/log/shaddock/glance:/var/log/glance:rw
         depends-on:
           - {name: glance-configure, status: stopped}
@@ -91,14 +80,13 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
-          - /opt/openstack/etc/nova:/etc/nova:rw
+          - '{{ openstack_path }}/etc/nova:/etc/nova:rw'
           - /var/log/shaddock/nova:/var/log/nova:rw
         depends-on:
           - {name: nova-configure, status: stopped}
         environment:
           PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
           VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
-          #command: 'nova-api --log-file=/var/log/nova/nova-api.log'
         command: 'nova-api'
 
       - name: nova-placement-api
@@ -108,14 +96,13 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
-          - /opt/openstack/etc/nova:/etc/nova:rw
+          - '{{ openstack_path }}/etc/nova:/etc/nova:ro'
           - /var/log/shaddock/nova:/var/log/nova:rw
         depends-on:
           - {name: nova-configure, status: stopped}
         environment:
           PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
           VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
-          #command: 'nova-placement-api --log-file=/var/log/nova/nova-placement-api.log'
         command: 'nova-placement-api'
 
       - name: nova-scheduler
@@ -124,7 +111,7 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
-          - /opt/openstack/etc/nova:/etc/nova:rw
+          - '{{ openstack_path }}/etc/nova:/etc/nova:ro'
           - /var/log/shaddock/nova:/var/log/nova:rw
         depends-on:
           - {name: nova-configure, status: stopped}
@@ -140,7 +127,7 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
-          - /opt/openstack/etc/nova:/etc/nova:rw
+          - '{{ openstack_path }}/etc/nova:/etc/nova:ro'
           - /var/log/shaddock/nova:/var/log/nova:rw
         depends-on:
           - {name: nova-configure, status: stopped}
@@ -155,7 +142,7 @@ clusters:
         volumes:
           - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
           - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
-          - /opt/openstack/etc/nova:/etc/nova:rw
+          - '{{ openstack_path }}/etc/nova:/etc/nova:ro'
           - /var/log/shaddock/nova:/var/log/nova:rw
         depends-on:
           - {name: nova-configure, status: stopped}

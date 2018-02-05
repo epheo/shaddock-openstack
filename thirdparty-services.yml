@@ -33,7 +33,7 @@ clusters:
       - name: horizon
         image: 'shaddock/horizon:{{ img_tag }}'
         priority: 50
-        ports: { '80/tcp':8010, '11211/tcp':11211 }
+        ports: { '80/tcp':8010 }
         volumes:
           - /var/log/shaddock/horizon:/var/log/horizon:rw
           - /opt/openstack:/opt/openstack:rw

@@ -14,7 +14,8 @@ RUN mkdir -p /opt/openstack/venv/
 
 RUN ln -s /usr/lib/libffi-*/include/ /usr/include/libffi
 
-ADD create_symlinks.sh /usr/bin/
+ADD pull_from_remote.sh /usr/bin/
+ADD update_symlinks.sh /usr/bin/
 ADD builder.sh /usr/bin/
 ADD post-conf.sh /usr/bin/
 
