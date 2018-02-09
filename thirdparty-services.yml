@@ -5,7 +5,7 @@ clusters:
   - name: thirdparty-services
     vars: !include vars/default.yml
     hosts: !include hosts/all.yml
-    images: images/region1/
+    images: images/thirdparty
 
     services: |
 
@@ -18,7 +18,6 @@ clusters:
         environment:
           RABBIT_USER: '{{ rabbit_user }}'
           RABBIT_PASS: '{{ rabbit_pass }}'
-        command: 'run.sh'
 
       - name: mysql
         image: 'shaddock/mysql:{{ img_tag }}'
@@ -32,7 +31,7 @@ clusters:
           MYSQL_PASS: '{{ mysql_pass }}'
 
       - name: memcached
-        image: 'shaddock/horizon:{{ img_tag }}'
+        image: 'shaddock/memcached:{{ img_tag }}'
         priority: 20
         ports: { '11211/tcp':11211 }
         command: ['memcached', '-u', 'daemon']

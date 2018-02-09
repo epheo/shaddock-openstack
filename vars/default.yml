@@ -10,40 +10,52 @@ services_list:
   - 10;python-glanceclient
   - 10;python-keystoneclient
   - 10;python-openstackclient
+  - 10;python-neutronclient
+  - 10;python-cinderclient
   - 10;python-novaclient
   - 19;nova
   - 20;glance
+  - 20;neutron
   - 20;keystone
   - 20;horizon
-  # - 10;python-cinderclient
-  # - 10;python-neutronclient
-  # - 20;cinder
-  # - 20;neutron
-  # - 20;heat
+  - 20;cinder
+  - 20;heat
 
 openstack_path: '/opt/openstack'
 venv_build_path: '/opt/openstack/venv'
 venv_exec_path: '/opt/openstack/services'
 
 openstackclient_path: '/opt/openstack/services/python-openstackclient/bin/'
-
 admin_pass: 'A30ZD5GNB7f9Z8sb5xKFPja00'
-mysql_pass: 'p8AKPo91l7NuuCaCqI4Is2ouY'
-rabbit_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
-glance_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
-neutron_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
-nova_db_pass: 'KYQuNl4HWeOeP9IZySAAJ8S5V'
-glance_db_pass: 'EPXvRyWWQ32jceD6y9ncpoCO3'
-neutron_db_pass: 'i9GcnkhvDAU0lTR23bCORnQJJ'
-keystone_db_pass: 'r8j1sLc4WNxObl8axgOiKosXw'
 
-mysql_user: 'admin'
+rabbit_vip: '172.17.0.1'
 rabbit_user: 'openstack'
+rabbit_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
 
 mysql_vip: '172.17.0.1'
-memcached_vip: '172.17.0.1'
-keystone_vip: '172.17.0.1'
-neutron_vip: '172.17.0.1'
-glance_vip: '172.17.0.1'
-nova_vip: '172.17.0.1'
+mysql_user: 'admin'
+mysql_pass: 'p8AKPo91l7NuuCaCqI4Is2ouY'
 
+memcached_vip: '172.17.0.1'
+
+keystone_vip: '172.17.0.1'
+keystone_pass: 'KYQuNl4HWeOeP9IZySAAJ8S5V'
+keystone_db_pass: 'r8j1sLc4WNxObl8axgOiKosXw'
+
+glance_vip: '172.17.0.1'
+glance_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
+glance_db_pass: 'EPXvRyWWQ32jceD6y9ncpoCO3'
+
+nova_vip: '172.17.0.1'
+nova_pass: 'i9GcnkhvDAU0lTR23bCORnQJJ'
+nova_db_pass: 'KYQuNl4HWeOeP9IZySAAJ8S5V'
+
+neutron_vip: '172.17.0.1'
+neutron_pass: 'be9s5GkUE53Ply0zzDqEhglOl'
+neutron_db_pass: 'i9GcnkhvDAU0lTR23bCORnQJJ'
+
+metadata_secret: 'be9s5GkUE53Ply0zzDqEhglOl'
+
+onos_vip: '172.17.0.1'
+onos_user: 'onos'
+onos_pass: 'rocks'

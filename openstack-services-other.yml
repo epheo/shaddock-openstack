@@ -5,25 +5,24 @@ clusters:
   - name: openstack-services-other
     vars: !include vars/default.yml
     hosts: !include hosts/all.yml
-    images: images/region1/
+    images: images/openstack/
 
     services: |
 
-      - name: horizon
+      - name: horizon-dashboard
         image: 'shaddock/horizon:{{ img_tag }}'
-        priority: 50
+        priority: 85
         ports: { '80/tcp':8010 }
         volumes:
+          - '{{ openstack_path }}:{{ openstack_path }}:ro'
           - /var/log/shaddock/horizon:/var/log/horizon:rw
-          - /opt/openstack:/opt/openstack:rw
         depends-on:
-          - {name: mysql, port: 3306}
           - {name: keystone-public, port: 5000, get: '/v3'}
           - {name: keystone-admin, port: 35357, get: '/v3'}
         environment:
           KEYSTONE_VIP: '{{ keystone_vip }}'
-        # command: ['tox', '-e', 'runserver']
-        # command: ['/usr/sbin/apachectl', '-D', "FOREGROUND", ]
+        command: ['apachectl', '-D', 'FOREGROUND', '-f', 
+                  '/etc/httpd/conf/wsgi-horizon.conf', '-k', 'start']
 
 
       # - name: post-configure

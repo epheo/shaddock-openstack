@@ -7,5 +7,12 @@
 - [x] nova
 - [x] nova-qemu
 - [ ] cinder
+  cinder-scheduler
+  cinder-api
 - [ ] cinder-volume
+  tgtd ?
+  cinder-volume
 - [ ] heat
+  heat-api
+  heat-api-cfn
+  heat-engine
