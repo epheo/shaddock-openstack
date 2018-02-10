@@ -1,0 +1,58 @@
+---
+
+name: openstack-neutron
+image-path: images/openstack
+
+grant:
+  environment:
+    PATH: '/usr/bin:/bin:{{ venv_exec_path }}/neutron/bin:{{ openstackclient_path }}'
+    VIRTUAL_ENV: '{{ venv_exec_path }}/neutron/'
+  depends-on:
+    - {name: mysql, port: 3306}
+    - {name: rabbitmq, port: 5672}
+    - {name: keystone-public, port: 5000, get: '/v3'}
+    - {name: keystone-admin, port: 35357, get: '/v3'}
+
+containers:
+
+  - name: neutron-configure
+    image: 'shaddock/neutron:{{ img_tag }}'
+    priority: 50
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
+      - '{{ venv_exec_path }}/neutron:{{ venv_exec_path }}/neutron:rw'
+      - '{{ venv_exec_path }}/python-openstackclient:{{ venv_exec_path }}/python-openstackclient:ro'
+      - '{{ venv_exec_path }}/neutron/etc:/etc/neutron:rw'
+      - '{{ venv_exec_path }}/nova/etc/nova:/etc/nova:rw'
+      - '{{ openstack_path }}/osrc:{{ openstack_path }}/osrc:ro'
+    environment:
+      MYSQL_VIP: '{{ mysql_vip }}'
+      MYSQL_USER: '{{ mysql_user }}'
+      MYSQL_PASS: '{{ mysql_pass }}'
+      RABBIT_VIP: '{{ rabbit_vip }}'
+      RABBIT_USER: '{{ rabbit_user }}'
+      RABBIT_PASS: '{{ rabbit_pass }}'
+      MEMCACHED_VIP: '{{ memcached_vip }}'
+      KEYSTONE_VIP: '{{ keystone_vip }}'
+      NEUTRON_VIP: '{{ neutron_vip }}'
+      GLANCE_VIP: '{{ glance_vip }}'
+      NOVA_VIP: '{{ nova_vip }}'
+      METADATA_SECRET: '{{ metadata_secret }}'
+      NEUTRON_DB_PASS: '{{ neutron_db_pass }}'
+      NEUTRON_PASS: '{{ neutron_pass }}'
+
+  - name: neutron
+    image: 'shaddock/neutron:{{ img_tag }}'
+    priority: 51
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/neutron:{{ venv_exec_path }}/neutron:ro'
+      - '{{ openstack_path }}/etc/neutron:/etc/neutron:ro'
+      - /var/log/shaddock/neutron:/var/log/neutron:rw
+    depends-on:
+      - {name: neutron-configure, status: stopped}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/neutron/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/neutron/'
+    command: 'neutron-server'
+

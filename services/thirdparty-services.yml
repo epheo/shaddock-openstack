@@ -1,0 +1,43 @@
+---
+
+name: thirdparty
+image_path: images/thirdparty
+
+containers: 
+
+  - name: rabbitmq
+    image: 'shaddock/rabbitmq:{{ img_tag }}'
+    priority: 10
+    ports: { '5672/tcp':5672, '15672/tcp':15672 }
+    volumes:
+      - /var/log/shdk/rabbitmq:/data/log:rw
+    environment:
+      RABBIT_USER: '{{ rabbit_user }}'
+      RABBIT_PASS: '{{ rabbit_pass }}'
+
+  - name: mysql
+    image: 'shaddock/mysql:{{ img_tag }}'
+    priority: 20
+    ports: { '3306/tcp':3306 }
+    volumes:
+      - '{{ openstack_path }}/mysql:/var/lib/mysql:rw'
+      - /var/log/shdk/mysql:/var/log/mysql:rw
+    environment:
+      MYSQL_USER: '{{ mysql_user }}'
+      MYSQL_PASS: '{{ mysql_pass }}'
+
+  - name: memcached
+    image: 'shaddock/memcached:{{ img_tag }}'
+    priority: 20
+    ports: { '11211/tcp':11211 }
+    command: ['memcached', '-u', 'daemon']
+
+  - name: sona-onos
+    image: 'shaddock/onos:{{ img_tag }}'
+    priority: 20
+    ports: { 
+      '6653/tcp':6653,
+      '6640/tcp':6640,
+      '8181/tcp':8181,
+      '8101/tcp':8101,
+      '9876/tcp':9876 }

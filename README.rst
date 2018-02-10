@@ -8,7 +8,7 @@ http://shaddock.epheo.eu
 
 All notions and objects of this repository are abstract and redefinable.
 
-Deploying from the upstream sources
+Deploying the platform from the upstream sources
 -------------------------------------
 
 **The venv-builder** will build all the openstack projects from the upstream 
@@ -26,8 +26,8 @@ You will find the venv directories and Python sources in the
 And wait until all the containers stop to find your venv built in 
 /opt/openstack/venv/
 
-As this can be very ressource consuming, it's recommended to add ``priority``
-and ``depends-on`` statements to your builders description.
+You can adapt serialisation and parallel building using  ``priority`` and \
+``depends-on`` statements to your builders description.
 
 http://shdk.epheo.eu/#using-the-scheduler
 
@@ -57,25 +57,13 @@ platform.
 
 .. code:: bash
 
-    shdk -c openstack-upstream 
+    shdk
     (shdk) build
     (shdk) start
+    (shdk) ps
 
 Before deploying you may want to edit the global variables in the 
 vars/default.yml file.
 
 **Authenticating:**
-cat /opt/openstack/service.osrc
-
-
-Deploying Mitaka using .deb binaries
--------------------------------------
-
-This cluster is relaying on a Ubuntu 14.04 base image to install OpenStack 
-Mitaka from the .deb binary packages.
-
-.. code:: bash
-
-    shdk -c openstack-ubuntu-mitaka
-    (shdk) build
-    (shdk) start
+cat /opt/openstack/osrc/service.osrc

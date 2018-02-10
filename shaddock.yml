@@ -1,12 +1,18 @@
-
-# UpStrean OpenStack VirtualEnv builder
-# =====================================
-
 ---
 
-projects:
-  - !include openstack-venv-builder.yml
-  - !include thirdparty-services.yml
-  - !include openstack-services-configure.yml
-  - !include openstack-services-core.yml
-  - !include openstack-services-other.yml
+host_groups:
+  - !include hosts/all.yml
+
+networks:
+  - !include networks/openstack-api.yml
+  - !include networks/openstack-manage.yml
+
+services:
+  - !include services/venv-builder.yml
+  - !include services/thirdparty.yml
+  - !include services/openstack-keystone.yml
+  - !include services/openstack-glance.yml
+  - !include services/openstack-nova.yml
+  - !include services/openstack-neutron.yml
+  - !include services/openstack-dashboard.yml
+  - !include services/openstack-other.yml

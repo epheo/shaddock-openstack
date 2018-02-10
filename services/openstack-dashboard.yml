@@ -1,0 +1,18 @@
+---
+
+name: openstack-dashboard
+image-path: images/openstack
+containers:
+
+  - name: horizon-configure
+    image: 'shaddock/horizon:{{ img_tag }}'
+    priority: 89
+    volumes:
+      - '{{ openstack_path }}:{{ openstack_path }}:rw'
+    depends-on:
+      - {name: keystone-public, port: 5000, get: '/v3'}
+      - {name: keystone-admin, port: 35357, get: '/v3'}
+    environment:
+      KEYSTONE_VIP: '{{ keystone_vip }}'
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/horizon/bin:{{ openstackclient_path }}'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/horizon/'

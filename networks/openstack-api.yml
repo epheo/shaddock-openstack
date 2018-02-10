@@ -1,0 +1,32 @@
+---
+
+name: openstack-api 
+
+connect:
+  
+  - container: keystone-admin
+    aliases: ['keystone-admin_api']
+
+  - container: keystone-public
+    aliases: ['keystone-public_api']
+
+  - container: glance-registry
+    aliases: ['glance-registry_api']
+
+  - container: glance-api
+    aliases: ['glance-api_api']
+
+  - container: nova-api
+    aliases: ['nova-api_api']
+
+  - container: nova-placement-api
+    aliases: ['nova-placement-api_api']
+
+  - container: nova-compute
+    aliases: ['nova-compute_api']
+
+  - container: neutron-server
+    aliases: ['neutron-server_api']
+
+  - container: horizon-dashboard
+    aliases: ['horizon-dashboard_api']

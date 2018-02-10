@@ -1,0 +1,72 @@
+---
+
+name: openstack-manage
+
+connect:
+  
+  - container: rabbitmq
+    aliases: ['rabbitmq_management']
+
+  - container: mysql
+    aliases: ['mysql_management']
+
+  - container: memcached
+    aliases: ['memcached_management']
+
+  - container: sona-onos
+    aliases: ['sona-onos_management']
+
+  - container: mysql
+    aliases: ['mysql_management']
+
+  - container: mysql
+    aliases: ['mysql_management']
+
+  - container: keystone-configure
+    aliases: ['keystone-configure_management']
+
+  - container: glance-configure
+    aliases: ['glance-configure_management']
+
+  - container: nova-configure
+    aliases: ['nova-configure_management']
+
+  - container: keystone-configure
+    aliases: ['keystone-configure_management']
+
+
+  - container: keystone-admin
+    aliases: ['keystone-admin_management']
+
+  - container: keystone-public
+    aliases: ['keystone-public_management']
+
+  - container: glance-registry
+    aliases: ['glance-registry_management']
+
+  - container: glance-api
+    aliases: ['glance-api_management']
+
+  - container: nova-api
+    aliases: ['nova-api_management']
+
+  - container: nova-placement-api
+    aliases: ['nova-placement-api_management']
+
+
+  - container: nova-scheduler
+    aliases: ['nova-scheduler_management']
+
+  - container: nova-conductor
+    aliases: ['nova-conductor_management']
+
+  - container: nova-novncproxy
+    aliases: ['nova-novncproxy_management']
+
+  - container: nova-compute
+    aliases: ['nova-compute_management']
+
+  - container: neutron-server
+    aliases: ['neutron-server_management']
+
+

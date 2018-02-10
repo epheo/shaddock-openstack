@@ -1,1 +1,0 @@
-../images/venv-builder/shaddock/venv-fixer/openstack-venv-fix.sh

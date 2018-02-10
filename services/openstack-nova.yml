@@ -1,0 +1,133 @@
+---
+
+name: openstack-nova
+image-path: images/openstack
+containers:
+
+  - name: nova-configure
+    image: 'shaddock/nova:{{ img_tag }}'
+    priority: 45
+    privileged: True
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
+      - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:rw'
+      - '{{ venv_exec_path }}/python-openstackclient:{{ venv_exec_path }}/python-openstackclient:ro'
+      - '{{ openstack_path }}/nova/etc/nova:/etc/nova:rw'
+      - '{{ openstack_path }}/osrc:{{ openstack_path }}/osrc:ro'
+    depends-on:
+      - {name: mysql, port: 3306}
+      - {name: rabbitmq, port: 5672}
+      - {name: keystone-public, port: 5000, get: '/v3'}
+      - {name: keystone-admin, port: 35357, get: '/v3'}
+    environment:
+      MYSQL_VIP: '{{ mysql_vip }}'
+      MYSQL_USER: '{{ mysql_user }}'
+      MYSQL_PASS: '{{ mysql_pass }}'
+      RABBIT_VIP: '{{ rabbit_vip }}'
+      RABBIT_USER: '{{ rabbit_user }}'
+      RABBIT_PASS: '{{ rabbit_pass }}'
+      MEMCACHED_VIP: '{{ memcached_vip }}'
+      KEYSTONE_VIP: '{{ keystone_vip }}'
+      NEUTRON_VIP: '{{ neutron_vip }}'
+      GLANCE_VIP: '{{ glance_vip }}'
+      NOVA_VIP: '{{ nova_vip }}'
+      NOVA_DB_PASS: '{{ nova_db_pass }}'
+      NOVA_PASS: '{{ nova_pass }}'
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin:{{ openstackclient_path }}'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+
+  - name: nova-api
+    image: 'shaddock/nova:{{ img_tag }}'
+    priority: 46
+    ports: { '8774/tcp':8774 }
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+      - '{{ venv_exec_path }}/nova/etc/nova:/etc/nova:rw'
+      - /var/log/shaddock/nova:/var/log/nova:rw
+    depends-on:
+      - {name: nova-configure, status: stopped}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+    command: 'nova-api'
+
+  - name: nova-placement-api
+    image: 'shaddock/nova:{{ img_tag }}'
+    priority: 46
+    ports: { '8778/tcp':8778 }
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+      - '{{ venv_exec_path }}/nova/etc/nova:/etc/nova:rw'
+      - /var/log/shaddock/nova:/var/log/nova:rw
+    depends-on:
+      - {name: nova-configure, status: stopped}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+    command: 'nova-placement-api'
+
+  - name: nova-scheduler
+    image: 'shaddock/nova:{{ img_tag }}'
+    priority: 46
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+      - '{{ venv_exec_path }}/nova/etc/nova:/etc/nova:rw'
+      - /var/log/shaddock/nova:/var/log/nova:rw
+    depends-on:
+      - {name: nova-configure, status: stopped}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+    command: 'nova-scheduler'
+
+  - name: nova-conductor
+    image: 'shaddock/nova:{{ img_tag }}'
+    priority: 46
+    privileged: True
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+      - '{{ venv_exec_path }}/nova/etc/nova:/etc/nova:rw'
+      - /var/log/shaddock/nova:/var/log/nova:rw
+    depends-on:
+      - {name: nova-configure, status: stopped}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+    command: 'nova-conductor'
+
+  - name: nova-novncproxy
+    image: 'shaddock/nova:{{ img_tag }}'
+    priority: 47
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+      - '{{ venv_exec_path }}/nova/etc/nova:/etc/nova:rw'
+      - /var/log/shaddock/nova:/var/log/nova:rw
+    depends-on:
+      - {name: nova-configure, status: stopped}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+    command: 'nova-novncproxy'
+
+  - name: nova-compute
+    image: 'shaddock/nova-compute:{{ img_tag }}'
+    priority: 100
+    privileged: True
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/nova:{{ venv_exec_path }}/nova:ro'
+      - '{{ openstack_path }}/nova/etc/nova:/etc/nova:ro'
+      - /var/log/shaddock/nova:/var/log/nova:rw
+    depends-on:
+      - {name: rabbitmq, port: 5672}
+      - {name: keystone-public, port: 5000, get: '/v3'}
+      - {name: keystone-admin, port: 35357, get: '/v3'}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/nova/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/nova/'
+    command: 'nova-compute'

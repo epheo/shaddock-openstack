@@ -1,0 +1,62 @@
+---
+
+name: openstack-glance
+image-path: images/openstack
+containers:
+
+  - name: glance-configure
+    image: 'shaddock/glance:{{ img_tag }}'
+    priority: 40
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:rw'
+      - '{{ venv_exec_path }}/python-openstackclient:{{ venv_exec_path }}/python-openstackclient:ro'
+      - '{{ venv_exec_path }}/glance/etc:/etc/glance:rw'
+      - '{{ openstack_path }}/osrc:{{ openstack_path }}/osrc:ro'
+    depends-on:
+      - {name: mysql, port: 3306}
+      - {name: keystone-public, port: 5000, get: '/v3'}
+      - {name: keystone-admin, port: 35357, get: '/v3'}
+    environment:
+      MYSQL_VIP: '{{ mysql_vip }}'
+      MYSQL_USER: '{{ mysql_user }}'
+      MYSQL_PASS: '{{ mysql_pass }}'
+      KEYSTONE_VIP: '{{ keystone_vip }}'
+      GLANCE_VIP: '{{ glance_vip }}'
+      GLANCE_DB_PASS: '{{ glance_db_pass }}'
+      GLANCE_PASS: '{{ glance_pass }}'
+      MEMCACHED_VIP: '{{ memcached_vip }}'
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin:{{ openstackclient_path }}'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
+
+  - name: glance-registry
+    image: 'shaddock/glance:{{ img_tag }}'
+    priority: 41
+    ports: { '9191/tcp':9191 }
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:ro'
+      - '{{ venv_exec_path }}/glance/etc:/etc/glance:ro'
+      - /var/log/shaddock/glance:/var/log/glance:rw
+    depends-on:
+      - {name: glance-configure, status: stopped}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
+    command: 'glance-registry'
+
+  - name: glance-api
+    image: 'shaddock/glance:{{ img_tag }}'
+    priority: 41
+    ports: { '9292/tcp':9292 }
+    volumes:
+      - '{{ venv_build_path }}:{{ venv_build_path }}:ro'
+      - '{{ venv_exec_path }}/glance:{{ venv_exec_path }}/glance:ro'
+      - '{{ venv_exec_path }}/glance/etc:/etc/glance:ro'
+      - /var/log/shaddock/glance:/var/log/glance:rw
+    depends-on:
+      - {name: glance-configure, status: stopped}
+    environment:
+      PATH: '/usr/bin:/bin:{{ venv_exec_path }}/glance/bin'
+      VIRTUAL_ENV: '{{ venv_exec_path }}/glance/'
+    command: 'glance-api'

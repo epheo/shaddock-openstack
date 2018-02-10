@@ -1,0 +1,17 @@
+---
+
+name: openstack-manage
+image-path: images/openstack
+containers:
+
+  - name: seed
+    image: 'shaddock/seed:arch_based'
+    priority: 0
+    volumes:
+      - '{{ openstack_path }}/osrc:{{ openstack_path }}/osrc:rw'
+    environment:
+      KEYSTONE_VIP: '{{ keystone_vip }}'
+      ADMIN_PASS: '{{ admin_pass }}'
+    command: 'generate-osrc.sh'
+
+

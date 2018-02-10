@@ -1,0 +1,39 @@
+---
+
+name: venv-builder
+images: images/venv-builder
+
+containers:
+
+    {% for service in services_list %}
+    - name: "{{service.split(';')[1]}}-builder"
+      image: {{ builder_img }}
+      priority: {{ service.split(';')[0] }}
+      volumes:
+        - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
+        - '{{ venv_exec_path }}:{{ venv_exec_path }}:rw'
+      environment:
+        GIT_URL: "{{ git_repo }}{{service.split(';')[1]}}.git"
+        GIT_BRANCH: '{{ git_branch }}'
+        PROJECT_NAME: "{{service.split(';')[1]}}"
+        BUILD_PATH: '{{ venv_build_path }}'
+        VENV_PATH: '{{ venv_exec_path }}'
+    {% endfor %}
+
+    - name: symlink-updater
+      image: '{{ builder_img }}'
+      priority: 30
+      volumes:
+        - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
+        - '{{ venv_exec_path }}:{{ venv_exec_path }}:rw'
+      depends-on:
+        {% for service in services_list %}
+        - name: "{{service.split(';')[1]}}-builder"
+          status: stopped
+          retry: 100
+          sleep: 40
+        {% endfor %}
+      environment:
+        BUILD_PATH: '{{ venv_build_path }}'
+        VENV_PATH: '{{ venv_exec_path }}'
+      command: ['update_symlinks.sh', '{{ git_branch }}']
