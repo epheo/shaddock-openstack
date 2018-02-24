@@ -1,18 +1,18 @@
 ---
 
 host_groups:
-  - !include hosts/all.yml
+  - hosts/all.yml
 
 networks:
-  - !include networks/openstack-api.yml
-  - !include networks/openstack-manage.yml
+  - networks/openstack-api.yml
+  - networks/openstack-manage.yml
 
-services:
-  - !include services/venv-builder.yml
-  - !include services/thirdparty.yml
-  - !include services/openstack-keystone.yml
-  - !include services/openstack-glance.yml
-  - !include services/openstack-nova.yml
-  - !include services/openstack-neutron.yml
-  - !include services/openstack-dashboard.yml
-  - !include services/openstack-other.yml
+service_groups:
+  - services/venv-builder.yml
+  - services/thirdparty.yml
+  - services/openstack-keystone.yml
+  - services/openstack-glance.yml
+  - services/openstack-nova.yml
+  - services/openstack-neutron.yml
+  - services/openstack-dashboard.yml
+  - services/openstack-other.yml

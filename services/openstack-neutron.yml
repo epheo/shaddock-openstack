@@ -13,11 +13,13 @@ grant:
     - {name: keystone-public, port: 5000, get: '/v3'}
     - {name: keystone-admin, port: 35357, get: '/v3'}
 
-containers:
+services:
 
   - name: neutron-configure
     image: 'shaddock/neutron:{{ img_tag }}'
     priority: 50
+    group: neutron
+    type: service
     volumes:
       - '{{ venv_build_path }}:{{ venv_build_path }}:rw'
       - '{{ venv_exec_path }}/neutron:{{ venv_exec_path }}/neutron:rw'

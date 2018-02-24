@@ -13,5 +13,3 @@ containers:
       KEYSTONE_VIP: '{{ keystone_vip }}'
       ADMIN_PASS: '{{ admin_pass }}'
     command: 'generate-osrc.sh'
-
-
